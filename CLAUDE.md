@@ -1,13 +1,12 @@
 # Instructions for Claude
 
-## Git workflow: every commit lands on `main`
+## Git workflow: work directly on `main`
 
 The team pulls `main` on their laptops, so work must not stay on a side branch.
 
-1. Commit on the session's working branch and push it.
-2. Open a pull request from that branch into `main`.
-3. Merge it right away (regular merge commit). No need to ask first.
-4. Before the next change, bring the working branch up to date with `origin/main`. Team members also push to `main` directly.
+1. Work on `main`, even if the session names a different working branch. No feature branches or pull requests.
+2. Before starting, run `git pull origin main`. Team members also push to `main` directly.
+3. Commit and push straight to `main` (`git push origin main`).
 
 ## Source of truth for all tasks
 
