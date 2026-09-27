@@ -1,0 +1,1093 @@
+<title>Sakshya</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;600;700;800&family=Hind:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F3F4F8; --surface:#FFFFFF; --surface-2:#EBEDF4; --ink:#141A2E; --ink-2:#4B5372; --ink-3:#7A819C; --line:#D8DBE6;
+  --accent:#5B3CC4; --accent-soft:#ECE7FB; --accent-ink:#3F2596;
+  --ok:#1D7A4E; --ok-soft:#E2F2E9; --warn:#9A5B06; --warn-soft:#FBEFD9; --bad:#B3261E; --bad-soft:#FBE5E3;
+  --r-direct:#2E6BD1; --r-translate:#0E8C83; --r-hybrid:#5B3CC4;
+  --display:"Mukta","Noto Sans Devanagari",system-ui,sans-serif;
+  --body:"Hind","Noto Sans Devanagari",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0E1120; --surface:#161A2C; --surface-2:#1F2439; --ink:#E7E9F3; --ink-2:#A6ACC4; --ink-3:#7C83A0; --line:#2C3252;
+    --accent:#A48BFF; --accent-soft:#29214D; --accent-ink:#CBBDFF;
+    --ok:#4FC48C; --ok-soft:#12301F; --warn:#E3A84D; --warn-soft:#33260E; --bad:#F2786D; --bad-soft:#3A1714;
+    --r-direct:#6FA2FF; --r-translate:#3CC7BC; --r-hybrid:#A48BFF;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1120; --surface:#161A2C; --surface-2:#1F2439; --ink:#E7E9F3; --ink-2:#A6ACC4; --ink-3:#7C83A0; --line:#2C3252;
+  --accent:#A48BFF; --accent-soft:#29214D; --accent-ink:#CBBDFF;
+  --ok:#4FC48C; --ok-soft:#12301F; --warn:#E3A84D; --warn-soft:#33260E; --bad:#F2786D; --bad-soft:#3A1714;
+  --r-direct:#6FA2FF; --r-translate:#3CC7BC; --r-hybrid:#A48BFF;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;padding-inline:16px}
+.wrap{max-width:1120px;margin:0 auto}
+h1,h2,h3,h4{font-family:var(--display);line-height:1.15;margin:0;text-wrap:balance}
+h2{font-size:clamp(28px,4vw,38px);font-weight:800;letter-spacing:-.01em}
+h3{font-size:21px;font-weight:700}
+h4{font-size:17px;font-weight:700}
+p{margin:0}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.muted{color:var(--ink-2)}
+.small{font-size:14px}
+.mono{font-family:var(--mono)}
+.dev{font-family:var(--body)}
+
+/* nav */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);margin-inline:-16px;padding-inline:16px}
+.nav .wrap{display:flex;gap:6px;overflow-x:auto;padding-block:10px;scrollbar-width:none}
+.nav a{flex:none;text-decoration:none;color:var(--ink-2);font-size:14px;font-weight:500;padding:4px 10px;border-radius:99px}
+.nav a:hover{background:var(--surface-2);color:var(--ink)}
+.nav .brand{font-family:var(--display);font-weight:800;color:var(--accent);margin-right:6px}
+
+section{padding-block:64px;border-bottom:1px solid var(--line)}
+section:last-of-type{border-bottom:0}
+.sec-head{display:grid;gap:10px;max-width:760px;margin-bottom:32px}
+.sec-head p{color:var(--ink-2);font-size:17px}
+
+/* hero */
+.hero{padding-block:48px 56px;display:grid;grid-template-columns:1.05fr 1fr;gap:40px;align-items:center}
+.hero h1{font-size:clamp(56px,9vw,96px);font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.stamp{display:inline-block;font-family:var(--display);font-weight:800;color:var(--accent);border:3px double var(--accent);border-radius:6px;padding:0 12px;transform:rotate(-6deg);font-size:.42em;line-height:1.5;letter-spacing:0}
+.hero .lede{font-size:19px;color:var(--ink-2);max-width:34em;margin-top:18px}
+.hero .meta{margin-top:18px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12px;padding:3px 9px;border-radius:99px;background:var(--surface-2);color:var(--ink-2);white-space:nowrap}
+.cite{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:11.5px;font-weight:500;color:var(--accent-ink);border:1.5px solid var(--accent);border-radius:3px;padding:0 6px;line-height:1.6;white-space:nowrap;vertical-align:1px;background:var(--accent-soft)}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;padding:2px 9px;border-radius:99px;white-space:nowrap}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.pill.acc{background:var(--accent-soft);color:var(--accent-ink)}
+.pill.neu{background:var(--surface-2);color:var(--ink-2)}
+
+.case{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 32px -18px rgba(20,26,46,.35);overflow:hidden}
+.case .q{padding:16px 18px;border-bottom:1px dashed var(--line);display:grid;gap:4px}
+.case .q .typed{font-size:18px;font-weight:500}
+.case .a{padding:16px 18px;display:grid;gap:10px}
+.case .a .ans{font-size:16.5px}
+.case .foot{display:flex;flex-wrap:wrap;gap:6px;padding:12px 18px;background:var(--surface-2);font-size:13px}
+
+/* verdict */
+.tri{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:36px}
+.tri > div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:grid;gap:8px;align-content:start}
+.tri ul{margin:0;padding-left:18px;display:grid;gap:4px;color:var(--ink-2);font-size:15px}
+.findings{display:grid;gap:0;border-top:1px solid var(--line)}
+.finding{display:grid;grid-template-columns:92px 1fr;gap:16px;padding:16px 0;border-bottom:1px solid var(--line)}
+.finding h4{margin-bottom:4px}
+.finding p{color:var(--ink-2);font-size:15px}
+.finding .fix{margin-top:6px;color:var(--ink);font-size:15px}
+.finding .fix b{color:var(--ok)}
+
+/* architecture */
+.diagram{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px;overflow-x:auto}
+.diagram svg{display:block;min-width:880px;width:100%;height:auto}
+.box{fill:var(--surface);stroke:var(--line);stroke-width:1.2}
+.box.nv{stroke:var(--accent);stroke-width:1.6}
+.box.store{fill:var(--surface-2);stroke:var(--line)}
+.box.abst{fill:var(--bad-soft);stroke:var(--bad)}
+.box.ans{fill:var(--ok-soft);stroke:var(--ok)}
+.t{fill:var(--ink);font-family:var(--display);font-weight:700;font-size:14.5px}
+.s{fill:var(--ink-2);font-family:var(--body);font-size:12px}
+.lane{fill:var(--ink-3);font-family:var(--mono);font-size:11px;letter-spacing:.08em}
+.ln{stroke:var(--ink-3);stroke-width:1.4;fill:none}
+.ln.dash{stroke-dasharray:4 4}
+.mk{fill:var(--ink-3)}
+.tag rect{fill:var(--accent)}
+.tag text{fill:var(--surface);font-family:var(--mono);font-size:10.5px;font-weight:500}
+.lbl{fill:var(--ink-2);font-family:var(--mono);font-size:10.5px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:14px;font-size:14px;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:10px;height:10px;border-radius:2px;display:inline-block}
+
+.layers{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px}
+.layer{border-top:2px solid var(--ink);padding-top:12px;display:grid;gap:8px;align-content:start}
+.layer ul{margin:0;padding-left:18px;color:var(--ink-2);font-size:15px;display:grid;gap:3px}
+
+/* walkthrough */
+.sim{display:grid;grid-template-columns:280px 1fr;gap:24px;align-items:start}
+.tabs{display:grid;gap:8px;position:sticky;top:64px}
+.tab{all:unset;cursor:pointer;display:grid;gap:4px;padding:12px 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface)}
+.tab:hover{border-color:var(--ink-3)}
+.tab[aria-selected="true"]{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}
+.tab .who{font-family:var(--display);font-weight:700;font-size:16px}
+.tab .qq{font-size:13.5px;color:var(--ink-2);line-height:1.4}
+.tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.simtop{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:14px}
+.btn{all:unset;cursor:pointer;font-weight:600;font-size:14px;padding:7px 14px;border-radius:6px;background:var(--accent);color:var(--surface)}
+.btn:hover{filter:brightness(1.08)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.steps{display:grid;gap:12px;counter-reset:st}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:grid;gap:10px;transition:opacity .3s,border-color .3s}
+.step-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.step-h .n{font-family:var(--mono);font-size:12px;color:var(--accent-ink);background:var(--accent-soft);border-radius:4px;padding:1px 7px}
+.step-h h4{flex:1}
+.steps.playing .step{opacity:.35}
+.steps.playing .step.lit{opacity:1;border-color:var(--accent)}
+.kv{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;font-size:14.5px}
+.kv dt{color:var(--ink-3);font-family:var(--mono);font-size:12px;padding-top:3px}
+.kv dd{margin:0}
+.bars{display:grid;gap:6px}
+.bar{display:grid;grid-template-columns:92px 1fr 44px;gap:10px;align-items:center;font-size:14px}
+.bar .track{height:10px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+.bar .fill{height:100%;border-radius:99px}
+.bar .v{font-family:var(--mono);font-size:12.5px;text-align:right;font-variant-numeric:tabular-nums}
+.bar.win .lab{font-weight:600}
+.cands{display:grid;gap:8px}
+.cand{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:10px 12px;border-radius:8px;background:var(--surface-2);font-size:14px}
+.cand .src{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.cand .txt{grid-column:1 / -1;color:var(--ink-2);font-size:14.5px}
+.cand .sc{font-family:var(--mono);font-size:12px;color:var(--ink-2);text-align:right;font-variant-numeric:tabular-nums}
+.cand.drop{opacity:.55}
+.gate{display:flex;flex-wrap:wrap;align-items:center;gap:12px;font-size:14.5px}
+.meter{position:relative;flex:1;min-width:180px;height:12px;background:var(--surface-2);border-radius:99px}
+.meter .f{position:absolute;inset:0 auto 0 0;border-radius:99px}
+.meter .tau{position:absolute;top:-5px;bottom:-5px;width:2px;background:var(--ink)}
+.claims{display:grid;gap:8px}
+.claim{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start;font-size:15px;padding:8px 10px;border-left:3px solid var(--ok);background:var(--surface-2);border-radius:0 6px 6px 0}
+.claim.w{border-left-color:var(--warn)}
+.final{border:1.5px solid var(--ok);background:var(--ok-soft);border-radius:8px;padding:14px 16px;display:grid;gap:8px;font-size:16.5px}
+.final.no{border-color:var(--bad);background:var(--bad-soft)}
+.final .alt{font-size:14.5px;color:var(--ink-2)}
+.contrast{font-size:14.5px;padding:10px 12px;border:1px dashed var(--ink-3);border-radius:8px;color:var(--ink-2)}
+.contrast b{color:var(--ink)}
+.illu{font-size:13px;color:var(--ink-3)}
+
+/* use cases */
+.uc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.uc{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:grid;gap:10px;align-content:start}
+.uc .where{font-family:var(--mono);font-size:12px;color:var(--ink-3);letter-spacing:.04em;text-transform:uppercase}
+.uc .ask{font-size:15.5px;padding:8px 10px;background:var(--surface-2);border-radius:6px}
+.uc dl{display:grid;gap:6px;margin:0;font-size:14.5px}
+.uc dt{font-weight:600;color:var(--ink)}
+.uc dd{margin:0;color:var(--ink-2)}
+.ntags{display:flex;gap:6px;flex-wrap:wrap}
+.ntag{font-family:var(--mono);font-size:11.5px;padding:1px 7px;border-radius:4px;background:var(--accent);color:var(--surface)}
+
+/* novelty */
+.nov-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:36px}
+.nov{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;display:grid;gap:10px;align-content:start}
+.nov .id{font-family:var(--mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.nov p{color:var(--ink-2);font-size:15px}
+.nov .gapref{font-size:14px;color:var(--ink);border-top:1px solid var(--line);padding-top:8px}
+.honest{background:var(--accent-soft);border-radius:10px;padding:20px 22px;display:grid;gap:8px;max-width:860px;margin-bottom:36px}
+.honest p{color:var(--ink);font-size:15.5px}
+
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{padding:10px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+thead th{font-family:var(--mono);font-size:11.5px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);background:var(--surface-2)}
+tbody tr:last-child td{border-bottom:0}
+.matrix{min-width:900px}
+.matrix td,.matrix th{text-align:center}
+.matrix td:first-child,.matrix th:first-child{text-align:left}
+.matrix td{font-size:17px}
+.matrix .yes{color:var(--ok)} .matrix .part{color:var(--warn)} .matrix .no{color:var(--ink-3)}
+.matrix tr.you td{background:var(--surface-2)}
+.matrix tr.us td{background:var(--accent-soft);font-weight:600}
+.matrix .pname{font-size:14px;font-weight:500}
+.matrix .pname small{display:block;color:var(--ink-3);font-weight:400}
+.cmp{min-width:860px}
+.cmp td:first-child{font-weight:600;width:150px}
+.cmp td:last-child{width:110px}
+.cmp td:nth-child(2){color:var(--ink-2)}
+
+/* evaluation & plan */
+.two{display:grid;grid-template-columns:1.3fr 1fr;gap:24px;align-items:start}
+.hyp{min-width:640px}
+.hyp td:first-child{font-family:var(--mono);font-weight:500;color:var(--accent-ink);width:44px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:grid;gap:10px;align-content:start}
+.card ul{margin:0;padding-left:18px;display:grid;gap:4px;color:var(--ink-2);font-size:15px}
+.bench{display:grid;gap:8px}
+.mix{display:flex;height:14px;border-radius:99px;overflow:hidden}
+.mix span{height:100%}
+.mix-leg{display:grid;grid-template-columns:repeat(2,1fr);gap:4px 12px;font-size:13.5px;color:var(--ink-2)}
+.mix-leg span{display:inline-flex;align-items:center;gap:6px}
+.plan{min-width:760px}
+.plan td:first-child{font-family:var(--mono);font-size:13px;white-space:nowrap;width:90px}
+.plan td:last-child{width:170px}
+.ms{font-size:13px}
+
+.risks{display:grid;grid-template-columns:repeat(2,1fr);gap:0 32px}
+.risk{padding:14px 0;border-bottom:1px solid var(--line);display:grid;gap:4px}
+.risk h4{font-size:16px}
+.risk p{color:var(--ink-2);font-size:15px}
+.fixlist{display:grid;gap:8px;margin:0;padding:0;list-style:none;counter-reset:fx}
+.fixlist li{display:grid;grid-template-columns:28px 1fr;gap:8px;font-size:15.5px}
+.fixlist li::before{counter-increment:fx;content:counter(fx);font-family:var(--mono);font-size:12px;color:var(--accent-ink);background:var(--accent-soft);border-radius:4px;text-align:center;height:22px;line-height:22px}
+.pitch{font-family:var(--display);font-size:clamp(22px,3vw,30px);font-weight:700;line-height:1.3;max-width:900px;text-wrap:balance}
+.pitch em{font-style:normal;color:var(--accent)}
+footer{padding-block:28px 48px;color:var(--ink-3);font-size:13.5px}
+
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr}
+  .tri,.layers,.uc-grid{grid-template-columns:1fr 1fr}
+  .sim{grid-template-columns:1fr}
+  .tabs{position:static;grid-auto-flow:column;grid-auto-columns:minmax(220px,1fr);overflow-x:auto;padding-bottom:4px}
+  .two{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .tri,.layers,.uc-grid,.nov-grid,.risks{grid-template-columns:1fr}
+  .finding{grid-template-columns:1fr;gap:6px}
+  .bar{grid-template-columns:78px 1fr 40px}
+  section{padding-block:48px}
+}
+@media (prefers-reduced-motion:reduce){.step{transition:none}}
+</style>
+
+<nav class="nav" aria-label="Sections">
+  <div class="wrap">
+    <a class="brand" href="#top">Sakshya</a>
+    <a href="#verdict">Plan review</a>
+    <a href="#solution">Solution</a>
+    <a href="#walkthrough">Walkthrough</a>
+    <a href="#usecases">Use cases</a>
+    <a href="#novelty">Novelty</a>
+    <a href="#compare">Comparison</a>
+    <a href="#evaluate">Evaluation</a>
+    <a href="#plan">12-week plan</a>
+    <a href="#risks">Risks &amp; fixes</a>
+  </div>
+</nav>
+
+<div class="wrap" id="top">
+
+<header class="hero">
+  <div>
+    <div class="eyebrow">Counter-proposal · Multilingual Document Intelligence (RAG) · BE AI&amp;DS, MMCOE Pune</div>
+    <h1 style="margin-top:14px">Sakshya <span class="stamp" lang="mr">साक्ष्य</span></h1>
+    <p class="lede">Sakshya means “evidence”. It answers questions over an office’s own English, Hindi and Marathi files, including old scans. It replies in the language and script the person typed in, and every sentence points to the page it came from. When the files don’t support an answer, it says so and shows the closest pages it found.</p>
+    <div class="meta">
+      <span class="chip">English · हिंदी · मराठी</span>
+      <span class="chip">romanized &amp; code-mixed input</span>
+      <span class="chip">native PDF · DOCX · scans</span>
+      <span class="chip">runs on a Colab T4 or CPU</span>
+    </div>
+  </div>
+  <div class="case" aria-label="Example question and answer">
+    <div class="q">
+      <span class="eyebrow">Gram Panchayat clerk types</span>
+      <span class="typed">gharkul yojana sathi utpannachi maryada kiti ahe?</span>
+      <span class="small muted">Romanized Marathi: “What is the income limit for the Gharkul housing scheme?”</span>
+    </div>
+    <div class="a">
+      <span class="eyebrow">Sakshya replies in the same script</span>
+      <p class="ans">Gharkul yojanesathi kutumbache varshik utpanna ₹3,00,000 peksha jasta nasave <span class="cite">GR_2023 · p.3</span>. Arjasobat utpannacha dakhla jodne avashyak ahe <span class="cite">GR_2023 · p.4</span>.</p>
+      <p class="small muted dev" lang="mr">देवनागरी: घरकुल योजनेसाठी कुटुंबाचे वार्षिक उत्पन्न ₹3,00,000 पेक्षा जास्त नसावे…</p>
+    </div>
+    <div class="foot">
+      <span class="pill acc">route: hybrid</span>
+      <span class="pill ok">2 of 2 claims verified</span>
+      <span class="pill warn">p.4 is a scan, OCR 0.77</span>
+    </div>
+  </div>
+</header>
+<p class="illu" style="margin-top:-32px;margin-bottom:8px">All documents, figures and scores in the examples on this page are illustrative sample data for explaining the design.</p>
+
+<!-- ===================== VERDICT ===================== -->
+<section id="verdict">
+  <div class="sec-head">
+    <div class="eyebrow">01 · Review of your proposal</div>
+    <h2>Your synopsis points the right way. The plan and the deck drift away from it.</h2>
+    <p>I read the abstract, both synopsis versions, both research-gap reviews, the detailed plan v2 and the Review 1 deck. The six paper PDFs in the folder are empty (0 bytes), so the paper-level analysis below relies on your gap review’s summaries of them.</p>
+  </div>
+
+  <div class="tri">
+    <div>
+      <span class="pill ok">Keep</span>
+      <h4>What is already strong</h4>
+      <ul>
+        <li>RQ1–RQ4 are well framed and measurable</li>
+        <li>Page-level metadata on every chunk</li>
+        <li>PostgreSQL + pgvector + HNSW is right-sized</li>
+        <li>Cross-encoder reranking after dense recall</li>
+        <li>The synopsis metric list (citation P/R, abstention precision, OCR robustness)</li>
+      </ul>
+    </div>
+    <div>
+      <span class="pill bad">At risk</span>
+      <h4>What a reviewer will attack</h4>
+      <ul>
+        <li>Three documents describe three different systems</li>
+        <li>Novelty rests on a feature multilingual-E5 already has</li>
+        <li>“Eliminates hallucination” is claimed, never measured</li>
+        <li>SaaS work absorbs half the team’s 12 weeks</li>
+      </ul>
+    </div>
+    <div>
+      <span class="pill acc">Change</span>
+      <h4>What Sakshya changes</h4>
+      <ul>
+        <li>The “adaptive router may…” line becomes the core contribution</li>
+        <li>Handles how people in Maharashtra actually type: romanized and mixed</li>
+        <li>Abstention becomes a calibrated gate plus per-sentence checks</li>
+        <li>A small human-checked benchmark replaces synthetic-only evaluation</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="findings">
+    <div class="finding">
+      <div><span class="pill bad">Critical</span></div>
+      <div>
+        <h4>The plan, deck and synopsis disagree on what you are building</h4>
+        <p>Plan v2 is a multi-tenant SaaS that calls Claude Haiku with dense-only top-5 retrieval over 12 weeks. The Review 1 deck promises QLoRA LLaMA-3.2-3B, 100+ languages and 6 months. The synopsis is a controlled comparison of three retrieval strategies with abstention. An examiner who reads two of them will ask which one is real.</p>
+        <p class="fix"><b>Fix:</b> adopt the synopsis framing as the single source of truth and rewrite the plan and deck to match it.</p>
+      </div>
+    </div>
+    <div class="finding">
+      <div><span class="pill bad">Critical</span></div>
+      <div>
+        <h4>The claimed novelty is a property of the model you download</h4>
+        <p>Plan v2 names “the multilingual embedding layer (multilingual-E5) that allows cross-lingual retrieval” as the novel contribution. Cross-lingual retrieval is what multilingual-E5 was trained to do. The one idea that would be yours, an adaptive router, appears only as “may select”.</p>
+        <p class="fix"><b>Fix:</b> make the learned router (N1) and the romanized-query path (N2) the headline contributions.</p>
+      </div>
+    </div>
+    <div class="finding">
+      <div><span class="pill bad">Critical</span></div>
+      <div>
+        <h4>Hallucination control is a prompt instruction</h4>
+        <p>Plan v2 says the system prompt “explicitly forbids answering outside the provided text, eliminating fabrication”. Small models ignore such instructions regularly, especially in Hindi and Marathi. The plan has no mechanism to catch it and no metric that would show it.</p>
+        <p class="fix"><b>Fix:</b> an evidence gate before generation, an NLI check on every sentence after it, and an unsupported-claim rate in the results table (N4).</p>
+      </div>
+    </div>
+    <div class="finding">
+      <div><span class="pill warn">High</span></div>
+      <div>
+        <h4>Citations can be wrong by construction</h4>
+        <p>RecursiveCharacterTextSplitter with 512/64 windows runs over extracted text and will produce chunks that span two pages, so the “page” on a citation is sometimes the wrong page. Plan v2’s ingestion also lists only pdfplumber, python-docx and TXT; OCR for scans appears in the synopsis but not in the build steps.</p>
+        <p class="fix"><b>Fix:</b> chunk inside page boundaries, keep bounding boxes, and add Tesseract with per-word confidence to the ingestion pipeline.</p>
+      </div>
+    </div>
+    <div class="finding">
+      <div><span class="pill warn">High</span></div>
+      <div>
+        <h4>langdetect will fail on your real users’ input</h4>
+        <p>Short queries, Hindi vs Marathi (both Devanagari), and romanized text like “kiti divas miltat” are exactly where langdetect is unreliable. Every downstream choice (routing, answer language) depends on this label.</p>
+        <p class="fix"><b>Fix:</b> AI4Bharat IndicLID for native and romanized script, IndicXlit for transliteration, and a Hindi/Marathi check on the corpus side.</p>
+      </div>
+    </div>
+    <div class="finding">
+      <div><span class="pill warn">High</span></div>
+      <div>
+        <h4>Three heavy training jobs, one of them from scratch</h4>
+        <p>Fine-tuning E5-large, training a cross-encoder from bert-base-multilingual-cased on 3–8k pairs, and QLoRA on a 3B generator all on a T4 is a lot for one member. A reranker trained from a base BERT on a few thousand pairs usually underperforms an existing multilingual reranker. LLaMA-3.2’s official language list includes Hindi but not Marathi.</p>
+        <p class="fix"><b>Fix:</b> fine-tune a pretrained multilingual reranker, train the router (cheap and novel), and pick the generator by a small Marathi/Hindi pilot. QLoRA becomes a stretch goal.</p>
+      </div>
+    </div>
+    <div class="finding">
+      <div><span class="pill warn">High</span></div>
+      <div>
+        <h4>Evaluation data can leak</h4>
+        <p>Plan v2 generates 2–5k queries with GPT/Gemini for fine-tuning and evaluates on “a held-out set” built the same way. IndicCorp and Wikipedia dumps are raw text with no question–evidence labels, and nothing tests unanswerable questions.</p>
+        <p class="fix"><b>Fix:</b> a ~400-question human-checked set with page-level gold evidence and a 15% unanswerable slice.</p>
+      </div>
+    </div>
+    <div class="finding">
+      <div><span class="pill neu">Medium</span></div>
+      <div>
+        <h4>Unsupported numbers in the deck and plan</h4>
+        <p>Slide 2 cites “73% of enterprise data” and “3.5 hrs avg. daily time spent searching” with no source. Plan v2 predicts “~12% P@5 improvement” before any experiment. Examiners notice both.</p>
+        <p class="fix"><b>Fix:</b> cite a source or remove the statistics, and turn predicted gains into hypotheses.</p>
+      </div>
+    </div>
+    <div class="finding">
+      <div><span class="pill neu">Medium</span></div>
+      <div>
+        <h4>Indic lexical search needs its own tokenization</h4>
+        <p>The plan’s hybrid route relies on PostgreSQL full-text search, which ships no Marathi configuration. Scanned government orders also often print numbers in Devanagari digits (१४२), which will never match “142” typed in a query.</p>
+        <p class="fix"><b>Fix:</b> IndicNLP normalization, character n-grams for OCR noise, and digit normalization in both directions.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SOLUTION ===================== -->
+<section id="solution">
+  <div class="sec-head">
+    <div class="eyebrow">02 · The proposed solution</div>
+    <h2>One pipeline, five places where the design is new</h2>
+    <p>The ingest side runs once per document. The ask side runs per question and snakes from the router to the answer. Boxes outlined in violet carry a novelty tag, explained in section 05.</p>
+  </div>
+
+  <div class="diagram" role="img" aria-label="Sakshya architecture: ingest pipeline builds dense, lexical and English shadow indexes; each question is understood, routed, retrieved, reranked, gated, generated and verified before answering or abstaining.">
+    <svg viewBox="0 0 990 600" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk" d="M0,0 L10,5 L0,10 z"/></marker>
+      </defs>
+
+      <text class="lane" x="20" y="38">INGEST · ONCE PER DOCUMENT</text>
+      <!-- row 1 -->
+      <rect class="box" x="20" y="54" width="172" height="74" rx="8"/>
+      <text class="t" x="34" y="80">Upload</text>
+      <text class="s" x="34" y="99">PDF · DOCX · scanned</text>
+      <text class="s" x="34" y="115">image, any language</text>
+
+      <rect class="box nv" x="214" y="54" width="172" height="74" rx="8"/>
+      <text class="t" x="228" y="80">Parse + OCR</text>
+      <text class="s" x="228" y="99">Tesseract hin + mar</text>
+      <text class="s" x="228" y="115">keeps word confidence</text>
+      <g class="tag"><rect x="352" y="45" width="28" height="18" rx="4"/><text x="358" y="58">N3</text></g>
+
+      <rect class="box" x="408" y="54" width="172" height="74" rx="8"/>
+      <text class="t" x="422" y="80">Script + language ID</text>
+      <text class="s" x="422" y="99">per block, IndicLID</text>
+      <text class="s" x="422" y="115">Hindi vs Marathi check</text>
+
+      <rect class="box nv" x="602" y="54" width="172" height="74" rx="8"/>
+      <text class="t" x="616" y="80">Page-anchored chunks</text>
+      <text class="s" x="616" y="99">never cross a page</text>
+      <text class="s" x="616" y="115">page · bbox · OCR conf</text>
+      <g class="tag"><rect x="740" y="45" width="28" height="18" rx="4"/><text x="746" y="58">N3</text></g>
+
+      <rect class="box" x="796" y="54" width="172" height="74" rx="8"/>
+      <text class="t" x="810" y="80">Embed + index</text>
+      <text class="s" x="810" y="99">E5 vectors, BM25 terms,</text>
+      <text class="s" x="810" y="115">English shadow copy</text>
+
+      <path class="ln" d="M192 91 H212" marker-end="url(#ah)"/>
+      <path class="ln" d="M386 91 H406" marker-end="url(#ah)"/>
+      <path class="ln" d="M580 91 H600" marker-end="url(#ah)"/>
+      <path class="ln" d="M774 91 H794" marker-end="url(#ah)"/>
+      <path class="ln" d="M882 128 V154" marker-end="url(#ah)"/>
+
+      <!-- stores -->
+      <text class="lane" x="548" y="176" text-anchor="end">INDEXES</text>
+      <rect class="box store" x="560" y="158" width="408" height="26" rx="5"/>
+      <rect x="560" y="158" width="5" height="26" rx="2" fill="var(--r-direct)"/>
+      <text class="s" x="574" y="176" style="fill:var(--ink)">Dense · multilingual-E5 in pgvector (HNSW)</text>
+      <text class="lbl" x="958" y="176" text-anchor="end">direct · hybrid</text>
+      <rect class="box store" x="560" y="189" width="408" height="26" rx="5"/>
+      <rect x="560" y="189" width="5" height="26" rx="2" fill="var(--r-hybrid)"/>
+      <text class="s" x="574" y="207" style="fill:var(--ink)">Lexical · BM25, IndicNLP tokens + char n-grams</text>
+      <text class="lbl" x="958" y="207" text-anchor="end">hybrid</text>
+      <rect class="box store" x="560" y="220" width="408" height="26" rx="5"/>
+      <rect x="560" y="220" width="5" height="26" rx="2" fill="var(--r-translate)"/>
+      <text class="s" x="574" y="238" style="fill:var(--ink)">English shadow · IndicTrans2 chunk translations</text>
+      <text class="lbl" x="958" y="238" text-anchor="end">translate</text>
+
+      <text class="lane" x="20" y="272">ASK · EVERY QUESTION</text>
+      <!-- row 3 -->
+      <rect class="box" x="20" y="288" width="172" height="74" rx="8"/>
+      <text class="t" x="34" y="314">Question</text>
+      <text class="s" x="34" y="333">any language or script,</text>
+      <text class="s" x="34" y="349">e.g. romanized Marathi</text>
+
+      <rect class="box nv" x="214" y="288" width="172" height="74" rx="8"/>
+      <text class="t" x="228" y="314">Understand query</text>
+      <text class="s" x="228" y="333">transliterate · translate</text>
+      <text class="s" x="228" y="349">intent · digits १४२→142</text>
+      <g class="tag"><rect x="352" y="279" width="28" height="18" rx="4"/><text x="358" y="292">N2</text></g>
+
+      <rect class="box nv" x="408" y="288" width="172" height="74" rx="8"/>
+      <text class="t" x="422" y="314">Learned router</text>
+      <text class="s" x="422" y="333">direct, translate or</text>
+      <text class="s" x="422" y="349">hybrid + fusion weights</text>
+      <g class="tag"><rect x="546" y="279" width="28" height="18" rx="4"/><text x="552" y="292">N1</text></g>
+
+      <path class="ln" d="M192 325 H212" marker-end="url(#ah)"/>
+      <path class="ln" d="M386 325 H406" marker-end="url(#ah)"/>
+      <path class="ln" d="M580 325 H640 V250" marker-end="url(#ah)"/>
+      <text class="lbl" x="650" y="296">route + weights</text>
+      <path class="ln" d="M930 246 V420" marker-end="url(#ah)"/>
+      <text class="lbl" x="920" y="340" text-anchor="end">top-40 candidates</text>
+
+      <!-- row 4 (right to left) -->
+      <rect class="box" x="796" y="424" width="172" height="74" rx="8"/>
+      <text class="t" x="810" y="450">Rerank</text>
+      <text class="s" x="810" y="469">fine-tuned multilingual</text>
+      <text class="s" x="810" y="485">cross-encoder → top 6</text>
+
+      <rect class="box nv" x="602" y="424" width="172" height="74" rx="8"/>
+      <text class="t" x="616" y="450">Evidence gate</text>
+      <text class="s" x="616" y="469">calibrated sufficiency</text>
+      <text class="s" x="616" y="485">score ≥ τ ?</text>
+      <g class="tag"><rect x="740" y="415" width="28" height="18" rx="4"/><text x="746" y="428">N4</text></g>
+
+      <rect class="box" x="408" y="424" width="172" height="74" rx="8"/>
+      <text class="t" x="422" y="450">Generate</text>
+      <text class="s" x="422" y="469">small local LLM, 4-bit</text>
+      <text class="s" x="422" y="485">one citation per sentence</text>
+
+      <rect class="box nv" x="214" y="424" width="172" height="74" rx="8"/>
+      <text class="t" x="228" y="450">Verify</text>
+      <text class="s" x="228" y="469">multilingual NLI per claim</text>
+      <text class="s" x="228" y="485">language + script check</text>
+      <g class="tag"><rect x="318" y="415" width="62" height="18" rx="4"/><text x="324" y="428">N4 · N5</text></g>
+
+      <rect class="box ans" x="20" y="424" width="172" height="74" rx="8"/>
+      <text class="t" x="34" y="450">Cited answer</text>
+      <text class="s" x="34" y="469">user’s language + script,</text>
+      <text class="s" x="34" y="485">opens highlighted page</text>
+
+      <path class="ln" d="M796 461 H776" marker-end="url(#ah)"/>
+      <path class="ln" d="M602 461 H582" marker-end="url(#ah)"/>
+      <text class="lbl" x="592" y="452" text-anchor="middle">pass</text>
+      <path class="ln" d="M408 461 H388" marker-end="url(#ah)"/>
+      <path class="ln" d="M214 461 H194" marker-end="url(#ah)"/>
+
+      <rect class="box abst" x="20" y="526" width="172" height="58" rx="8"/>
+      <text class="t" x="34" y="551">Abstain</text>
+      <text class="s" x="34" y="570">says what is missing</text>
+      <path class="ln" d="M688 498 V555 H194" marker-end="url(#ah)"/>
+      <text class="lbl" x="698" y="532">below τ, skip the LLM</text>
+      <path class="ln dash" d="M300 498 V553"/>
+      <text class="lbl" x="310" y="532">claims fail</text>
+    </svg>
+  </div>
+  <div class="legend">
+    <span><i class="sw" style="background:var(--r-direct)"></i>Direct multilingual route</span>
+    <span><i class="sw" style="background:var(--r-translate)"></i>Translate-to-English route</span>
+    <span><i class="sw" style="background:var(--r-hybrid)"></i>Hybrid dense + BM25 route</span>
+    <span><i class="sw" style="background:var(--accent);border-radius:4px"></i>Novelty component</span>
+  </div>
+
+  <div class="layers">
+    <div class="layer">
+      <h4>Models you train (your ML core)</h4>
+      <ul>
+        <li><b>Router</b>: gradient-boosted trees on ~15 query and corpus features, trained on oracle labels from the RQ1 experiment</li>
+        <li><b>Reranker</b>: fine-tune a pretrained multilingual cross-encoder (e.g. mMiniLM trained on mMARCO) with your hard negatives</li>
+        <li><b>Evidence gate</b>: logistic calibration over reranker and retrieval signals</li>
+        <li><b>Verifier</b> (optional): fine-tune mDeBERTa XNLI on Hindi/Marathi claim–evidence pairs</li>
+      </ul>
+    </div>
+    <div class="layer">
+      <h4>Models you use as they are</h4>
+      <ul>
+        <li>multilingual-E5 (base vs large as a budget variable)</li>
+        <li>IndicLID, IndicXlit, IndicTrans2 (AI4Bharat)</li>
+        <li>Tesseract with hin and mar traineddata</li>
+        <li>A 2–4B instruct model in 4-bit via llama.cpp or Ollama, picked by pilot</li>
+        <li>Optional ablation: BGE-M3, which gives dense and sparse scores from one model</li>
+      </ul>
+    </div>
+    <div class="layer">
+      <h4>Delivery, kept small</h4>
+      <ul>
+        <li>FastAPI + PostgreSQL/pgvector, as you planned</li>
+        <li>Next.js single workspace: upload, ask, PDF viewer with highlighted evidence</li>
+        <li>“Why this route” panel showing router features and scores</li>
+        <li>Multi-tenancy, JWT, S3, Redis, billing move to future work</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== WALKTHROUGH ===================== -->
+<section id="walkthrough">
+  <div class="sec-head">
+    <div class="eyebrow">03 · Walkthrough</div>
+    <h2>Follow one question through the pipeline</h2>
+    <p>Pick a person on the left. Each card shows what that stage sees and decides. The dashed box at the bottom shows what the current plan v2 would likely do with the same question.</p>
+  </div>
+
+  <div class="sim">
+    <div class="tabs" role="tablist" aria-label="Scenarios" id="tabs"></div>
+    <div>
+      <div class="simtop">
+        <span class="illu" id="simnote">Illustrative data</span>
+        <button class="btn" id="play" type="button">Play through the stages</button>
+      </div>
+      <div class="steps" id="steps" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== USE CASES ===================== -->
+<section id="usecases">
+  <div class="sec-head">
+    <div class="eyebrow">04 · Where it solves a real problem</div>
+    <h2>Six places in Maharashtra where this saves hours and prevents wrong answers</h2>
+    <p>Each of these offices holds a mix of English, Hindi and Marathi files, many of them scanned, and each has people who need a precise answer they can defend. The tags show which novelty does the heavy lifting.</p>
+  </div>
+  <div class="uc-grid">
+    <article class="uc">
+      <div class="where">Gram Panchayat · Tehsil office</div>
+      <h3>Scheme eligibility at the counter</h3>
+      <div class="ask" lang="mr">“gharkul sathi arj karayla kay kagadpatra lagtat?”</div>
+      <dl>
+        <dt>Files</dt><dd>Scanned Marathi GRs, central English scheme guidelines, local circulars.</dd>
+        <dt>Today</dt><dd>The clerk flips through folders or phones the block office. Citizens get different answers on different days.</dd>
+        <dt>With Sakshya</dt><dd>An answer in the script the clerk typed, with the GR page on screen to show the citizen.</dd>
+      </dl>
+      <div class="ntags"><span class="ntag">N2</span><span class="ntag">N3</span><span class="ntag">N5</span></div>
+    </article>
+    <article class="uc">
+      <div class="where">University · exam cell</div>
+      <h3>Rules students actually ask about</h3>
+      <div class="ask">“third year me ATKT ke liye kitne backlog allowed hai?”</div>
+      <dl>
+        <dt>Files</dt><dd>English ordinances and circulars, Marathi notices, revised rules by year.</dd>
+        <dt>Today</dt><dd>WhatsApp forwards and seniors’ memory. The official circular is a 40-page PDF.</dd>
+        <dt>With Sakshya</dt><dd>A Hinglish answer citing the exact rule page, and a warning when two circulars conflict.</dd>
+      </dl>
+      <div class="ntags"><span class="ntag">N1</span><span class="ntag">N2</span><span class="ntag">N5</span></div>
+    </article>
+    <article class="uc">
+      <div class="where">Law firm · district court</div>
+      <h3>Cross-lingual case research</h3>
+      <div class="ask">“What compensation did the Collector fix for Survey No. 142?”</div>
+      <dl>
+        <dt>Files</dt><dd>Old Marathi land-acquisition orders (scanned), English Acts and judgments.</dd>
+        <dt>Today</dt><dd>A junior reads through scanned bundles. Numbers in Devanagari digits defeat Ctrl+F.</dd>
+        <dt>With Sakshya</dt><dd>English answer with the Marathi source clause, digit-normalized matching, and an OCR warning on faint pages.</dd>
+      </dl>
+      <div class="ntags"><span class="ntag">N1</span><span class="ntag">N3</span><span class="ntag">N4</span></div>
+    </article>
+    <article class="uc">
+      <div class="where">Primary health centre</div>
+      <h3>Protocol lookup that knows its limits</h3>
+      <div class="ask" lang="hi">“टाइफाइड कंजुगेट वैक्सीन किस उम्र में दी जाती है?”</div>
+      <dl>
+        <dt>Files</dt><dd>English national guidelines, Hindi and Marathi ASHA training modules.</dd>
+        <dt>Today</dt><dd>A general chatbot answers from memory, and nobody can tell whether the answer matches the current protocol.</dd>
+        <dt>With Sakshya</dt><dd>If the loaded protocols don’t cover it, it declines and names what to add. It supports search and does not give medical advice.</dd>
+      </dl>
+      <div class="ntags"><span class="ntag">N4</span><span class="ntag">N5</span></div>
+    </article>
+    <article class="uc">
+      <div class="where">Co-operative bank · compliance</div>
+      <h3>Circular lookups with an audit trail</h3>
+      <div class="ask">“KYC update ki last date kya hai low-risk customers ke liye?”</div>
+      <dl>
+        <dt>Files</dt><dd>RBI master directions and circulars in English and Hindi, internal board notes.</dd>
+        <dt>Today</dt><dd>Officers search by keyword and miss amendments that use different wording.</dd>
+        <dt>With Sakshya</dt><dd>Dates and clause numbers routed to hybrid search, every answer saved with its cited pages for inspectors.</dd>
+      </dl>
+      <div class="ntags"><span class="ntag">N1</span><span class="ntag">N4</span></div>
+    </article>
+    <article class="uc">
+      <div class="where">Krishi Vigyan Kendra</div>
+      <h3>Advisories for farmers in their words</h3>
+      <div class="ask" lang="mr">“soybean var kid padli tar konti favarni karavi?”</div>
+      <dl>
+        <dt>Files</dt><dd>Marathi crop advisories, university package-of-practice PDFs, scheme notices.</dd>
+        <dt>Today</dt><dd>Advisories are published as PDFs few farmers open. Helpline staff repeat the same lookups daily.</dd>
+        <dt>With Sakshya</dt><dd>Helpline staff answer in romanized Marathi with the advisory page attached. A WhatsApp channel is future work.</dd>
+      </dl>
+      <div class="ntags"><span class="ntag">N2</span><span class="ntag">N5</span></div>
+    </article>
+  </div>
+</section>
+
+<!-- ===================== NOVELTY ===================== -->
+<section id="novelty">
+  <div class="sec-head">
+    <div class="eyebrow">05 · Novelty</div>
+    <h2>What is new, and which gap each piece closes</h2>
+    <p>Each item maps to a gap your review found in the seven papers, and to a hypothesis you can test in section 07.</p>
+  </div>
+
+  <div class="nov-grid">
+    <article class="nov">
+      <span class="id">N1 · Learned retrieval router</span>
+      <h3>The comparison study becomes a policy the system uses</h3>
+      <p>Run all three routes on every training question, record which one found the gold page best, and train a small model to predict that from cheap features: script, romanization, code-mix ratio, numbers and IDs in the query, query length, corpus language mix, share of scanned pages. At query time it picks a route, or sets fusion weights, in under a millisecond.</p>
+      <p class="gapref">Closes the gap in <b>Translation-based embeddings (2024)</b> and <b>Resource-efficient Indic RAG</b>: neither says <i>which</i> queries need translation. Tested by H1 and H2.</p>
+    </article>
+    <article class="nov">
+      <span class="id">N2 · Romanized and code-mixed queries</span>
+      <h3>Accepts the way people really type</h3>
+      <p>Many users type Marathi or Hindi in Latin letters and mix in English terms (“ATKT”, “backlog”). Sakshya builds three views of each query (as typed, transliterated to Devanagari, translated to English) and normalizes Devanagari digits. The router sees all three.</p>
+      <p class="gapref">None of the seven reviewed papers evaluates romanized or code-mixed queries. Tested by H3.</p>
+    </article>
+    <article class="nov">
+      <span class="id">N3 · OCR-aware retrieval and citation</span>
+      <h3>Knows when its evidence came from a bad scan</h3>
+      <p>Tesseract word confidences are averaged per chunk and stored. They feed the router, shift fusion weight toward character n-grams on noisy pages, and put a “check the page” badge on citations from faint scans.</p>
+      <p class="gapref">Closes the gap in <b>Multilingual IDP system (2025)</b> and <b>M3-RAG</b>: no page-cited QA evaluated against scan quality. Tested by H4.</p>
+    </article>
+    <article class="nov">
+      <span class="id">N4 · Claim-level verification with calibrated abstention</span>
+      <h3>Every sentence is checked against the page it cites</h3>
+      <p>A gate decides before generation whether the evidence is enough, which skips the LLM entirely when it isn’t. After generation, a multilingual NLI model checks each sentence against its cited chunk. Unsupported sentences are dropped, and if too few survive the answer becomes an abstention. The threshold is set from a risk–coverage curve.</p>
+      <p class="gapref">Closes the out-of-context failure reported in <b>LegalRAG (2025)</b>. Tested by H5.</p>
+    </article>
+    <article class="nov">
+      <span class="id">N5 · Script-faithful answering</span>
+      <h3>Answers in the language and the script of the question</h3>
+      <p>Romanized Marathi in, romanized Marathi out, with a Devanagari toggle. The output is checked for language and script. On mismatch it is transliterated or translated with IndicTrans2 rather than returned in English.</p>
+      <p class="gapref">Addresses the query-language and Latin-script bias in <b>Language Preference of Multilingual RAG (ACL Findings 2025)</b>, and gives RQ4 a mechanism. Tested by H6.</p>
+    </article>
+    <article class="nov">
+      <span class="id">C6 · Sakshya-Bench</span>
+      <h3>A small public benchmark for Indian office documents</h3>
+      <p>About 400 human-checked questions over ~60 English, Hindi and Marathi documents (native and scanned), with page-level gold evidence, a romanized slice and an unanswerable slice. Releasing it is a contribution on its own, and it removes the synthetic-data leakage risk.</p>
+      <p class="gapref">No reviewed paper releases an Indic private-document QA set with unanswerable questions.</p>
+    </article>
+  </div>
+
+  <div class="honest">
+    <h4>The question every examiner will ask</h4>
+    <p>“Hybrid search, NLI checking and transliteration already exist. What is new?” The answer: the router is trained on the outcome of your own controlled comparison, so the study produces a working policy instead of a table. And the system is evaluated under conditions the reviewed papers skip together: romanized queries, scanned Marathi, page-level citations, unanswerable questions and a T4 budget.</p>
+  </div>
+
+  <h3 style="margin-bottom:12px">Novelty matrix</h3>
+  <div class="tbl-wrap">
+    <table class="matrix">
+      <thead>
+        <tr>
+          <th>Work</th><th>Indian languages</th><th>Romanized / code-mixed</th><th>Compares 3 routes</th><th>Per-query routing</th><th>OCR-aware</th><th>Page citations</th><th>Claim check + abstain</th><th>Answer script fidelity</th><th>Low-budget HW</th>
+        </tr>
+      </thead>
+      <tbody id="matrix"></tbody>
+    </table>
+  </div>
+  <p class="illu" style="margin-top:8px">● addressed · ◐ partly · — not reported. Based on your team’s research-gap review, since the paper PDFs in the folder are empty. Check each cell against the papers before putting this in the report.</p>
+</section>
+
+<!-- ===================== COMPARISON ===================== -->
+<section id="compare">
+  <div class="sec-head">
+    <div class="eyebrow">06 · Side by side</div>
+    <h2>Your proposal and Sakshya, dimension by dimension</h2>
+    <p>“Current proposal” combines plan v2, the Review 1 deck and the synopsis, and notes where they disagree.</p>
+  </div>
+  <div class="tbl-wrap">
+    <table class="cmp">
+      <thead><tr><th>Dimension</th><th>Current proposal</th><th>Sakshya</th><th>Verdict</th></tr></thead>
+      <tbody id="cmp"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== EVALUATION ===================== -->
+<section id="evaluate">
+  <div class="sec-head">
+    <div class="eyebrow">07 · Evaluation</div>
+    <h2>Six hypotheses, each with a baseline you already planned</h2>
+    <p>RQ1–RQ4 stay as they are. H3, H4 and H6 test the new pieces. Every comparison uses the same benchmark and reports results per language, per script and per document type.</p>
+  </div>
+  <div class="two">
+    <div class="tbl-wrap">
+      <table class="hyp">
+        <thead><tr><th>ID</th><th>Hypothesis</th><th>Measured by</th><th>Compared against</th></tr></thead>
+        <tbody>
+          <tr><td>H1</td><td>No single fixed route wins across language × document type × query type (RQ1)</td><td>nDCG@10, Recall@20 per slice; oracle upper bound</td><td>Direct, translate, hybrid fixed routes</td></tr>
+          <tr><td>H2</td><td>The learned router matches or beats the best fixed route at lower average cost (N1)</td><td>nDCG@10, ms per query, share of queries sent to translation</td><td>Best fixed route, always-hybrid, hand-written rules</td></tr>
+          <tr><td>H3</td><td>Transliterated views raise recall on romanized and code-mixed queries (N2)</td><td>Recall@20 on the romanized slice</td><td>Raw query, langdetect pipeline</td></tr>
+          <tr><td>H4</td><td>OCR-aware weighting keeps recall steady as scan quality drops (N3)</td><td>Recall@20 by OCR-confidence bucket; synthetic noise at 5–30% character error</td><td>Same system without OCR features</td></tr>
+          <tr><td>H5</td><td>Gate + claim checks cut unsupported sentences at modest added latency (RQ2, RQ3, N4)</td><td>Unsupported-claim rate, citation P/R, abstention P/R, AURC, added ms</td><td>Prompt-only guard (plan v2), no reranker</td></tr>
+          <tr><td>H6</td><td>Script-faithful answering raises language and script match (RQ4, N5)</td><td>Fidelity rate by query script, human fluency rating</td><td>Generator without the fidelity check</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h4>Sakshya-Bench, planned composition</h4>
+      <div class="bench">
+        <div class="mix" aria-hidden="true">
+          <span style="width:40%;background:var(--r-direct)"></span>
+          <span style="width:30%;background:var(--r-translate)"></span>
+          <span style="width:15%;background:var(--r-hybrid)"></span>
+          <span style="width:15%;background:var(--bad)"></span>
+        </div>
+        <div class="mix-leg">
+          <span><i class="sw" style="background:var(--r-direct)"></i>40% same-language</span>
+          <span><i class="sw" style="background:var(--r-translate)"></i>30% cross-language</span>
+          <span><i class="sw" style="background:var(--r-hybrid)"></i>15% romanized / mixed</span>
+          <span><i class="sw" style="background:var(--bad)"></i>15% unanswerable</span>
+        </div>
+      </div>
+      <ul>
+        <li>~60 public documents: Maharashtra GRs, university circulars, gazettes, NPTEL notes; about 40% scanned</li>
+        <li>~400 questions, each with gold document, page and span</li>
+        <li>An LLM may draft questions; a person confirms every answer and evidence page</li>
+        <li>15% double-annotated to report inter-annotator agreement</li>
+        <li>Sanity checks on public sets: IndicQA (includes Marathi) and MIRACL Hindi</li>
+      </ul>
+      <h4>Budget reporting</h4>
+      <ul>
+        <li>Latency p50/p95 and peak RAM/VRAM on a Colab T4 and a 16 GB CPU laptop</li>
+        <li>A Pareto chart of quality against cost for every configuration</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PLAN ===================== -->
+<section id="plan">
+  <div class="sec-head">
+    <div class="eyebrow">08 · 12-week plan for two people</div>
+    <h2>The research core is finished by week 8, in time for Review 2</h2>
+    <p>Same two-track split as your plan. Member 1 owns retrieval and models; Member 2 owns data, generation and the interface. Both annotate.</p>
+  </div>
+  <div class="tbl-wrap">
+    <table class="plan">
+      <thead><tr><th>Weeks</th><th>Member 1 · retrieval &amp; models</th><th>Member 2 · data, generation &amp; UI</th><th>Milestone</th></tr></thead>
+      <tbody>
+        <tr><td>1–2</td><td>Page-anchored ingestion with OCR confidence; dense, lexical and shadow indexes</td><td>Collect ~60 documents; annotation guideline and a simple labelling tool; minimal upload + ask UI</td><td class="ms"><span class="pill neu">Scope frozen</span></td></tr>
+        <tr><td>3–4</td><td>Three fixed routes; evaluation harness (nDCG, Recall, citation P/R); query understanding with IndicLID, IndicXlit, IndicTrans2</td><td>Annotate ~400 questions (M1 double-annotates 15%); PDF viewer with bounding-box highlight</td><td class="ms"><span class="pill neu">Bench v1</span></td></tr>
+        <tr><td>5–6</td><td>Run the controlled comparison (RQ1), derive oracle labels, train the router with document-level cross-validation</td><td>Fine-tune the multilingual reranker on annotated pairs; “why this route” panel</td><td class="ms"><span class="pill acc">N1 + N2 done</span></td></tr>
+        <tr><td>7–8</td><td>Evidence gate, NLI verifier, calibration on the risk–coverage curve; OCR-aware fusion weights</td><td>Generator pilot on 2–3 small models in Hindi and Marathi; script-faithful output path</td><td class="ms"><span class="pill acc">Research core · Review 2</span></td></tr>
+        <tr><td>9–10</td><td colspan="2">Both: full ablations for H1–H6; latency and memory on T4 and CPU; synthetic OCR-noise stress test; error analysis</td><td class="ms"><span class="pill neu">Results tables</span></td></tr>
+        <tr><td>11–12</td><td colspan="2">Both: report and a short paper draft; demo with the four walkthrough scenarios; release code and Sakshya-Bench</td><td class="ms"><span class="pill ok">Review 3 · demo</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small muted" style="margin-top:12px">Stretch goals if weeks 9–10 finish early: QLoRA fine-tune of the generator for citation format, E5 contrastive fine-tuning, BGE-M3 ablation.</p>
+</section>
+
+<!-- ===================== RISKS ===================== -->
+<section id="risks">
+  <div class="sec-head">
+    <div class="eyebrow">09 · Risks, and what to fix in your documents now</div>
+    <h2>Where this can go wrong, and the fallback for each</h2>
+  </div>
+  <div class="risks">
+    <div class="risk"><h4>Annotation takes longer than planned</h4><p>Start in week 1. Cap at 400 questions. Let an LLM draft questions, but have a person confirm every evidence page.</p></div>
+    <div class="risk"><h4>The router overfits 400 questions</h4><p>Keep it shallow with about 15 features, cross-validate by document, and report the gap to the oracle openly. A modest gain over the best fixed route is still a result.</p></div>
+    <div class="risk"><h4>Small models write poor Marathi</h4><p>Generate in Hindi or English and translate with IndicTrans2, then report fidelity and fluency separately.</p></div>
+    <div class="risk"><h4>The NLI verifier is weaker in Marathi</h4><p>XNLI covers Hindi but not Marathi. Fine-tune on 1–2k translated and hand-checked claim pairs, and report per-language verifier accuracy.</p></div>
+    <div class="risk"><h4>Tesseract struggles on old scans</h4><p>Treat it as a finding: the recall-vs-OCR-quality curve is part of H4. Keep the OCR engine fixed so the comparison stays fair.</p></div>
+    <div class="risk"><h4>T4 memory runs out</h4><p>Use E5-base vs E5-large as a budget variable, ONNX int8 for embeddings, and a 4-bit GGUF generator. Load models once per process.</p></div>
+  </div>
+
+  <div class="two" style="margin-top:40px">
+    <div class="card">
+      <h4>Fix in the current documents before the next review</h4>
+      <ol class="fixlist">
+        <li>Re-download the six paper PDFs; every one in the project folder is 0 bytes.</li>
+        <li>Pick one generator story across the plan, deck and synopsis.</li>
+        <li>Drop “100+ languages” and “eliminates hallucination”; claim only what you evaluate.</li>
+        <li>Cite or remove “73% of enterprise data” and “3.5 hrs avg. daily” on slide 2.</li>
+        <li>Replace “improves P@5 by ~12%” with a hypothesis.</li>
+        <li>The deck’s literature survey lists only 2020–2023 foundation papers. Add the seven multilingual RAG papers from your gap review.</li>
+        <li>Add OCR and page-bounded chunking to the plan v2 ingestion steps.</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h4>Cut or defer from plan v2</h4>
+      <ul>
+        <li>Multi-tenant orgs, JWT auth, per-user rate limits</li>
+        <li>AWS S3, Redis caching, Sentry, Vercel + Railway split</li>
+        <li>Usage analytics dashboard</li>
+        <li>Training a cross-encoder from base BERT</li>
+        <li>QLoRA as a core deliverable (keep as stretch)</li>
+      </ul>
+      <p class="small muted">These are good product features. They belong in the “future work” slide, because they don’t answer any of your research questions.</p>
+    </div>
+  </div>
+
+  <div style="margin-top:48px;display:grid;gap:10px">
+    <div class="eyebrow">The one-line pitch for Review 2</div>
+    <p class="pitch">We don’t stop at comparing three retrieval strategies. <em>We learn which one each question needs</em>, answer in the script it was asked in, and check every sentence against the page it cites.</p>
+  </div>
+</section>
+
+<footer>Prepared as an independent review of the Multilingual Document Intelligence (RAG) project documents. All example documents, values and scores are illustrative and must be replaced with measured results.</footer>
+</div>
+
+<script>
+(function(){
+  const R = {direct:{name:"Direct",c:"var(--r-direct)"}, translate:{name:"Translate",c:"var(--r-translate)"}, hybrid:{name:"Hybrid",c:"var(--r-hybrid)"}};
+
+  const S = [
+  {
+    id:"gp", who:"Gram Panchayat clerk", where:"Romanized Marathi · scanned GR",
+    typed:"gharkul yojana sathi utpannachi maryada kiti ahe?",
+    understand:{
+      lid:"mr (romanized) · IndicLID 0.93", base:"langdetect → id (Indonesian) ✗",
+      codemix:"0.00", intent:"numeric fact (“kiti” = how much)", entities:"घरकुल योजना",
+      views:[["As typed","gharkul yojana sathi utpannachi maryada kiti ahe?"],["Devanagari (IndicXlit)","घरकुल योजनेसाठी उत्पन्नाची मर्यादा किती आहे?"],["English (IndicTrans2)","What is the income limit for the Gharkul scheme?"]]
+    },
+    corpus:"Workspace: 62% Marathi, 30% English, 8% Hindi · 41% of pages scanned",
+    route:{p:{direct:0.22,translate:0.09,hybrid:0.69}, pick:"hybrid", why:"Numeric intent and a named scheme favour exact-term matching; the corpus is mostly Marathi, so translating to English adds cost without benefit."},
+    cands:[
+      {doc:"GR_Gharkul_2023_scan.pdf",p:3,lang:"mr",kind:"scan",ocr:0.81,dense:0.83,bm:1,rr:0.94,txt:"…लाभार्थी कुटुंबाचे वार्षिक उत्पन्न ₹3,00,000 पेक्षा जास्त नसावे…"},
+      {doc:"Housing_Framework_EN.pdf",p:12,lang:"en",kind:"native",dense:0.79,bm:4,rr:0.61,txt:"Households with annual income above the prescribed ceiling are excluded from the list of beneficiaries…"},
+      {doc:"GR_Gharkul_2023_scan.pdf",p:4,lang:"mr",kind:"scan",ocr:0.77,dense:0.74,bm:2,rr:0.58,txt:"…अर्जासोबत उत्पन्नाचा दाखला जोडणे आवश्यक आहे…"},
+      {doc:"Panchayat_Circular_2022.docx",p:1,lang:"mr",kind:"native",dense:0.71,bm:6,rr:0.21,txt:"घरकुल लाभार्थी यादी ग्रामसभेत मंजूर करण्यात यावी…",drop:true}
+    ],
+    gate:{score:0.88,tau:0.62},
+    claims:[
+      {t:"Gharkul yojanesathi kutumbache varshik utpanna ₹3,00,000 peksha jasta nasave.",cite:"GR_2023 · p.3",e:0.95},
+      {t:"Arjasobat utpannacha dakhla jodne avashyak ahe.",cite:"GR_2023 · p.4",e:0.90,warn:"scan, OCR 0.77"}
+    ],
+    fidelity:"Output: Marathi ✓ · Latin script ✓ (matches the question)",
+    answer:{ok:true, html:'Gharkul yojanesathi kutumbache varshik utpanna ₹3,00,000 peksha jasta nasave <span class="cite">GR_2023 · p.3</span>. Arjasobat utpannacha dakhla jodne avashyak ahe <span class="cite">GR_2023 · p.4</span>.', alt:'देवनागरी: घरकुल योजनेसाठी कुटुंबाचे वार्षिक उत्पन्न ₹3,00,000 पेक्षा जास्त नसावे. अर्जासोबत उत्पन्नाचा दाखला जोडणे आवश्यक आहे.'},
+    plan:"<b>Plan v2 would likely</b> mislabel the language, embed the romanized text directly, rank the English framework page first, and answer in English without the ₹ limit from the GR or any warning that the source is a scan."
+  },
+  {
+    id:"uni", who:"Engineering student", where:"Hinglish · English circulars",
+    typed:"third year me ATKT ke liye kitne backlog allowed hai?",
+    understand:{
+      lid:"hi (romanized) + en · IndicLID 0.88", base:"langdetect → en ✗ (misses Hindi)",
+      codemix:"0.38", intent:"rule / eligibility", entities:"ATKT · Third Year · backlog",
+      views:[["As typed","third year me ATKT ke liye kitne backlog allowed hai?"],["Devanagari (IndicXlit)","थर्ड ईयर में ATKT के लिए कितने बैकलॉग अलाउड हैं?"],["English (IndicTrans2)","How many backlogs are allowed for ATKT to third year?"]]
+    },
+    corpus:"Workspace: 85% English, 15% Marathi · all native PDFs",
+    route:{p:{direct:0.11,translate:0.58,hybrid:0.31}, pick:"translate", why:"The domain terms are English acronyms and the corpus is English, so the clean English translation matches the circular’s wording best."},
+    cands:[
+      {doc:"Exam_Rules_2024.pdf",p:7,lang:"en",kind:"native",dense:0.86,bm:1,rr:0.91,txt:"…eligible for ATKT to Third Year provided the student has cleared all First Year courses and has not more than 4 backlog courses in Second Year."},
+      {doc:"Exam_Rules_2024.pdf",p:8,lang:"en",kind:"native",dense:0.80,bm:3,rr:0.66,txt:"All backlog courses must be cleared before admission to Final Year."},
+      {doc:"ATKT_Notice_MR.pdf",p:1,lang:"mr",kind:"native",dense:0.72,bm:9,rr:0.34,txt:"एटीकेटी प्रवेशासाठी अर्ज करण्याची अंतिम तारीख…",drop:true}
+    ],
+    gate:{score:0.85,tau:0.62},
+    claims:[
+      {t:"Third Year me ATKT ke liye First Year ke saare courses clear hone chahiye, aur Second Year me 4 se zyada backlog nahi hone chahiye.",cite:"Exam_Rules · p.7",e:0.93},
+      {t:"Final Year me admission se pehle saare backlog clear karna zaroori hai.",cite:"Exam_Rules · p.8",e:0.88}
+    ],
+    fidelity:"Output: Hindi-English mix ✓ · Latin script ✓",
+    answer:{ok:true, html:'Third Year me ATKT ke liye First Year ke saare courses clear hone chahiye, aur Second Year me 4 se zyada backlog nahi hone chahiye <span class="cite">Exam_Rules · p.7</span>. Final Year me admission se pehle saare backlog clear karna zaroori hai <span class="cite">Exam_Rules · p.8</span>.', alt:'Also available in English and Devanagari.'},
+    plan:"<b>Plan v2 would likely</b> retrieve the right page, since the corpus is English. The answer would come back in formal English rather than the student’s Hinglish, which is what RQ4 is meant to measure."
+  },
+  {
+    id:"law", who:"Junior advocate", where:"English question · Marathi scans",
+    typed:"What compensation rate did the Collector fix for land in Survey No. 142?",
+    understand:{
+      lid:"en · IndicLID 0.99", base:"langdetect → en ✓",
+      codemix:"0.00", intent:"numeric fact + identifier", entities:"Collector · Survey No. 142",
+      views:[["As typed","What compensation rate did the Collector fix for land in Survey No. 142?"],["Digits normalized","Survey No. 142 ↔ सर्व्हे क्र. १४२"],["Marathi (IndicTrans2)","सर्व्हे क्र. १४२ मधील जमिनीसाठी जिल्हाधिकाऱ्यांनी कोणता मोबदला दर निश्चित केला?"]]
+    },
+    corpus:"Workspace: 70% Marathi court and revenue orders (mostly scanned), 30% English Acts",
+    route:{p:{direct:0.27,translate:0.14,hybrid:0.59}, pick:"hybrid", why:"An identifier (142) must match exactly, and the target documents are Marathi scans. BM25 runs on the Marathi translation with Devanagari digits; dense handles the cross-lingual meaning."},
+    cands:[
+      {doc:"Bhusampadan_Order_2019_scan.pdf",p:5,lang:"mr",kind:"scan",ocr:0.64,dense:0.78,bm:1,rr:0.89,txt:"…सर्व्हे क्र. १४२ मधील संपादित जमिनीसाठी प्रति हेक्टर ₹१८,४०,००० दराने मोबदला निश्चित करण्यात येत आहे…"},
+      {doc:"Bhusampadan_Order_2019_scan.pdf",p:6,lang:"mr",kind:"scan",ocr:0.58,dense:0.74,bm:3,rr:0.72,txt:"…सदर मोबदल्यावर १००% दिलासा रक्कम देय राहील…"},
+      {doc:"Land_Acquisition_Act_2013_EN.pdf",p:21,lang:"en",kind:"native",dense:0.77,bm:5,rr:0.64,txt:"…a solatium equal to one hundred per cent of the compensation amount…"},
+      {doc:"Bhusampadan_Order_2019_scan.pdf",p:2,lang:"mr",kind:"scan",ocr:0.70,dense:0.80,bm:8,rr:0.12,txt:"…सर्व्हे क्र. १३८ मधील जमिनीचे मूल्यांकन…",drop:true}
+    ],
+    gate:{score:0.79,tau:0.62},
+    claims:[
+      {t:"The Collector fixed compensation at ₹18,40,000 per hectare for land in Survey No. 142.",cite:"Order_2019 · p.5",e:0.91,warn:"scan, OCR 0.64"},
+      {t:"A solatium of 100% on that compensation is also payable.",cite:"Order_2019 · p.6",e:0.84,warn:"scan, OCR 0.58"},
+      {t:"This matches the solatium provision in the 2013 Act.",cite:"LA_Act_2013 · p.21",e:0.77}
+    ],
+    fidelity:"Output: English ✓ · Marathi source clauses shown with English gloss",
+    answer:{ok:true, html:'The Collector fixed compensation at ₹18,40,000 per hectare for land in Survey No. 142 <span class="cite">Order_2019 · p.5</span>. A solatium of 100% on that compensation is also payable <span class="cite">Order_2019 · p.6</span>, which matches the 2013 Act <span class="cite">LA_Act_2013 · p.21</span>.', alt:'Pages 5 and 6 are faint scans. Open them to confirm the figures before relying on them.'},
+    plan:"<b>Plan v2 would likely</b> rank page 2 (Survey No. १३८) highest, because dense embeddings blur numbers and “142” never matches “१४२”. The answer would cite the wrong survey number and look correct."
+  },
+  {
+    id:"phc", who:"PHC health worker", where:"Hindi · topic not in files",
+    typed:"टाइफाइड कंजुगेट वैक्सीन किस उम्र में दी जाती है?",
+    understand:{
+      lid:"hi · IndicLID 0.97", base:"langdetect → hi ✓",
+      codemix:"0.05", intent:"protocol fact", entities:"टाइफाइड कंजुगेट वैक्सीन",
+      views:[["As typed","टाइफाइड कंजुगेट वैक्सीन किस उम्र में दी जाती है?"],["English (IndicTrans2)","At what age is the typhoid conjugate vaccine given?"]]
+    },
+    corpus:"Workspace: English national guidelines, Hindi anaemia module, Marathi ASHA module",
+    route:{p:{direct:0.61,translate:0.09,hybrid:0.30}, pick:"direct", why:"A natural-language question over a mixed-language corpus with no identifiers. Direct multilingual retrieval covers all three languages in one pass."},
+    cands:[
+      {doc:"Immunization_Handbook_EN.pdf",p:14,lang:"en",kind:"native",dense:0.74,bm:2,rr:0.38,txt:"National schedule: BCG, OPV, Pentavalent, Rotavirus, PCV, Measles-Rubella… (typhoid vaccine not listed)"},
+      {doc:"ASHA_Module_MR.pdf",p:22,lang:"mr",kind:"scan",ocr:0.83,dense:0.69,bm:7,rr:0.29,txt:"लसीकरणाचे वेळापत्रक: जन्मानंतर बीसीजी, ओपीव्ही…"},
+      {doc:"Anaemia_Module_HI.pdf",p:9,lang:"hi",kind:"native",dense:0.66,bm:11,rr:0.12,txt:"आयरन फोलिक एसिड की गोली सप्ताह में एक बार…",drop:true}
+    ],
+    gate:{score:0.31,tau:0.62},
+    claims:[],
+    fidelity:"Generation skipped, so no LLM cost for this question",
+    answer:{ok:false, html:'आपके दस्तावेज़ों में टाइफाइड कंजुगेट वैक्सीन की उम्र के बारे में जानकारी नहीं मिली। सबसे नज़दीकी स्रोत: <span class="cite">Immunization_Handbook · p.14</span> (अन्य टीकों की सूची)।', alt:'Suggestion: add the latest immunization schedule to this workspace, or rephrase the question. Sakshya supports document search and does not give medical advice.'},
+    plan:"<b>Plan v2 would likely</b> pass the top-5 chunks to the LLM anyway. A small model often answers such a question from its own memory despite the prompt, and the citation would point to the handbook page that doesn’t contain the answer."
+  }];
+
+  const tabs = document.getElementById('tabs');
+  const steps = document.getElementById('steps');
+  let cur = 0, timer = null;
+
+  function f2(x){return x.toFixed(2)}
+  function esc(s){return s}
+
+  function render(i){
+    const s = S[i];
+    const u = s.understand;
+    const probs = Object.entries(s.route.p);
+    const bars = probs.map(([k,v])=>`<div class="bar${k===s.route.pick?' win':''}"><span class="lab">${R[k].name}${k===s.route.pick?' ✓':''}</span><span class="track"><span class="fill" style="width:${v*100}%;background:${R[k].c}"></span></span><span class="v">${f2(v)}</span></div>`).join('');
+    const cands = s.cands.map((c,j)=>`<div class="cand${c.drop?' drop':''}">
+        <div class="src"><span class="cite">${c.doc} · p.${c.p}</span><span class="chip">${c.lang}</span>${c.kind==='scan'?`<span class="pill ${c.ocr<0.7?'warn':'neu'}">scan · OCR ${f2(c.ocr)}</span>`:'<span class="chip">native</span>'}</div>
+        <div class="sc">dense ${f2(c.dense)} · BM25 #${c.bm}</div>
+        <div class="txt" lang="${c.lang}">${c.txt}</div></div>`).join('');
+    const rr = s.cands.slice().sort((a,b)=>b.rr-a.rr).map(c=>`<div class="bar"><span class="lab mono" style="font-size:12px">${c.doc.split('_')[0]} p.${c.p}</span><span class="track"><span class="fill" style="width:${c.rr*100}%;background:${c.rr>=0.5?'var(--ok)':'var(--ink-3)'}"></span></span><span class="v">${f2(c.rr)}</span></div>`).join('');
+    const pass = s.gate.score >= s.gate.tau;
+    const gate = `<div class="gate"><span>Sufficiency <b class="mono">${f2(s.gate.score)}</b></span><div class="meter" aria-hidden="true"><span class="f" style="width:${s.gate.score*100}%;background:${pass?'var(--ok)':'var(--bad)'}"></span><span class="tau" style="left:${s.gate.tau*100}%"></span></div><span class="pill ${pass?'ok':'bad'}">${pass?'Pass, τ = '+s.gate.tau:'Below τ = '+s.gate.tau+', abstain'}</span></div>`;
+    const claims = s.claims.length ? `<div class="claims">${s.claims.map(c=>`<div class="claim${c.warn?' w':''}"><span>${c.t} <span class="cite">${c.cite}</span></span><span class="pill ${c.warn?'warn':'ok'}">entails ${f2(c.e)}${c.warn?' · '+c.warn:''}</span></div>`).join('')}</div>` : `<p class="muted">The gate closed, so no text was generated and there is nothing to verify.</p>`;
+
+    steps.innerHTML = `
+      <article class="step"><div class="step-h"><span class="n">1</span><h4>Understand the question</h4><span class="pill acc">N2</span></div>
+        <dl class="kv"><dt>Typed</dt><dd lang="${s.id==='phc'?'hi':'und'}"><b>${s.typed}</b></dd><dt>Language</dt><dd>${u.lid} <span class="muted small">(${u.base})</span></dd><dt>Code-mix</dt><dd>${u.codemix}</dd><dt>Intent</dt><dd>${u.intent}</dd><dt>Entities</dt><dd>${u.entities}</dd>
+        ${u.views.map(v=>`<dt>${v[0]}</dt><dd>${v[1]}</dd>`).join('')}</dl></article>
+      <article class="step"><div class="step-h"><span class="n">2</span><h4>Route the question</h4><span class="pill acc">N1</span></div>
+        <p class="small muted">${s.corpus}</p><div class="bars">${bars}</div><p class="small">${s.route.why}</p></article>
+      <article class="step"><div class="step-h"><span class="n">3</span><h4>Retrieve candidates</h4><span class="pill acc">N3</span></div>
+        <div class="cands">${cands}</div></article>
+      <article class="step"><div class="step-h"><span class="n">4</span><h4>Rerank and check the evidence is enough</h4><span class="pill acc">N4</span></div>
+        <div class="bars">${rr}</div>${gate}</article>
+      <article class="step"><div class="step-h"><span class="n">5</span><h4>Generate and verify each sentence</h4><span class="pill acc">N4 · N5</span></div>
+        ${claims}<p class="small muted">${s.fidelity}</p></article>
+      <article class="step"><div class="step-h"><span class="n">6</span><h4>${s.answer.ok?'Answer with citations':'Abstain and point to the nearest pages'}</h4></div>
+        <div class="final${s.answer.ok?'':' no'}"><div>${s.answer.html}</div><div class="alt">${s.answer.alt}</div></div>
+        <div class="contrast">${s.plan}</div></article>`;
+    [...tabs.children].forEach((t,j)=>{t.setAttribute('aria-selected', j===i?'true':'false'); t.tabIndex = j===i?0:-1;});
+  }
+
+  S.forEach((s,i)=>{
+    const b = document.createElement('button');
+    b.className='tab'; b.type='button'; b.setAttribute('role','tab'); b.id='tab-'+s.id;
+    b.innerHTML = `<span class="eyebrow">${s.where}</span><span class="who">${s.who}</span><span class="qq">${s.typed}</span>`;
+    b.addEventListener('click',()=>{stop(); cur=i; render(i); try{localStorage.setItem('sakshya-tab',i)}catch(e){}});
+    b.addEventListener('keydown',e=>{ if(e.key==='ArrowDown'||e.key==='ArrowRight'){e.preventDefault(); const n=(i+1)%S.length; tabs.children[n].focus(); tabs.children[n].click();} if(e.key==='ArrowUp'||e.key==='ArrowLeft'){e.preventDefault(); const n=(i-1+S.length)%S.length; tabs.children[n].focus(); tabs.children[n].click();}});
+    tabs.appendChild(b);
+  });
+
+  function stop(){ if(timer){clearTimeout(timer); timer=null;} steps.classList.remove('playing'); [...steps.children].forEach(c=>c.classList.remove('lit')); document.getElementById('play').textContent='Play through the stages'; }
+  document.getElementById('play').addEventListener('click',()=>{
+    if(timer){stop(); return;}
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const cards=[...steps.children]; steps.classList.add('playing'); let k=0;
+    document.getElementById('play').textContent='Stop';
+    const tick=()=>{ if(k>0) cards[k-1].classList.remove('lit'); if(k>=cards.length){stop();return;} cards[k].classList.add('lit'); if(!reduce) cards[k].scrollIntoView({block:'nearest',behavior:'smooth'}); k++; timer=setTimeout(tick, reduce?900:1500); };
+    tick();
+  });
+
+  try{ const v=parseInt(localStorage.getItem('sakshya-tab'),10); if(v>=0&&v<S.length) cur=v; }catch(e){}
+  render(cur);
+
+  // novelty matrix
+  const Y='<span class="yes">●</span>', P='<span class="part">◐</span>', N='<span class="no">—</span>';
+  const M = [
+    ["Language Preference of Multilingual RAG","ACL Findings 2025",[N,N,P,N,N,N,N,Y,N]],
+    ["Resource-Efficient Multilingual RAG for Indian Languages","2026",[Y,N,P,N,N,N,N,N,Y]],
+    ["M3-RAG: Multimodal + Multilingual RAG","2025",[N,N,N,P,N,N,N,N,N]],
+    ["Translation-Based Embedding Strategies","2024",[N,N,P,N,N,N,N,N,N]],
+    ["Multilingual Intelligent Document Processing","2025",[P,N,N,N,P,N,N,N,N]],
+    ["LegalRAG (Bangla–English)","2025",[P,N,N,N,N,N,P,N,N]],
+    ["Hybrid Layered Retrieval, Persian RAG","2026",[N,N,P,P,N,N,N,N,P]],
+  ];
+  const you = ["Your current proposal","plan v2 + synopsis",[Y,N,P,P,P,P,P,P,P]];
+  const us = ["Sakshya","this proposal",[Y,Y,Y,Y,Y,Y,Y,Y,Y]];
+  const row=(r,cls)=>`<tr class="${cls||''}"><td class="pname">${r[0]}<small>${r[1]}</small></td>${r[2].map(c=>`<td>${c}</td>`).join('')}</tr>`;
+  document.getElementById('matrix').innerHTML = M.map(r=>row(r)).join('') + row(you,'you') + row(us,'us');
+
+  // comparison
+  const V={keep:'<span class="pill ok">Keep</span>', str:'<span class="pill warn">Strengthen</span>', chg:'<span class="pill acc">Change</span>'};
+  const C = [
+    ["Identity","Three versions: SaaS + Claude Haiku (plan v2); QLoRA LLaMA + 100+ languages (deck); retrieval comparison with abstention (synopsis)","One system: evidence-first document QA for English, Hindi and Marathi, with a learned router as the research core",V.chg],
+    ["Research question","Which of three retrieval strategies is best overall?","Which strategy does this question need, and can a cheap model predict it?",V.str],
+    ["Retrieval","Dense E5 top-5 (plan); three strategies compared (synopsis); hybrid listed as post-v1 in plan","Three routes over dense, lexical and English-shadow indexes, fused with reciprocal rank fusion using router weights",V.str],
+    ["Routing","“An adaptive router may select…”","Gradient-boosted router trained on oracle labels from the comparison, with visible feature explanations",V.chg],
+    ["Query input","langdetect on the raw query","IndicLID for native and romanized text, IndicXlit transliteration, IndicTrans2 translation, digit normalization",V.chg],
+    ["OCR","Tesseract in the synopsis; absent from plan v2 ingestion steps","Tesseract hin + mar with word confidence stored per chunk and used in routing, fusion and the UI",V.str],
+    ["Chunking and citations","512/64 recursive splitter over extracted text, so chunks can span pages","Chunks stay inside one page with bounding boxes; a citation opens the page with the passage highlighted",V.chg],
+    ["Hallucination control","System prompt: “answer only from the context”","Evidence gate before generation, NLI check per sentence after it, calibrated abstention",V.chg],
+    ["Generator","Claude Haiku (plan) or QLoRA LLaMA-3.2-3B (deck)","Small local 4-bit model chosen by a Hindi/Marathi pilot, IndicTrans2 fallback, QLoRA as stretch",V.str],
+    ["Answer language","RQ4 is asked, with no mechanism","Answer in the question’s language and script, checked and repaired on mismatch",V.chg],
+    ["Models you train","Fine-tune E5-large, train BERT cross-encoder from base, QLoRA 3B generator","Router, fine-tuned pretrained reranker, gate calibration, optional NLI fine-tune",V.chg],
+    ["Evaluation data","IndicCorp, Wikipedia, NPTEL, gazettes, 15–20 custom docs, LLM-generated queries","Sakshya-Bench: ~400 human-checked questions with page-level gold, romanized and unanswerable slices; IndicQA and MIRACL-hi checks",V.chg],
+    ["Metrics","P@5, faithfulness, cross-lingual hit rate, latency, 5–10 user ratings","Adds nDCG@10, Recall@20, citation P/R, unsupported-claim rate, abstention P/R, AURC, script fidelity, RAM and ms per query",V.str],
+    ["Product scope","Multi-tenant SaaS with JWT, S3, Redis, analytics, Sentry, Vercel + Railway","Single-workspace app with upload, ask, highlighted evidence and a route explanation panel",V.chg],
+    ["Core stack","FastAPI, Next.js, PostgreSQL + pgvector (HNSW), multilingual-E5","Same",V.keep],
+    ["Team split","Two parallel tracks with sync points","Same split, with annotation shared and the research core done by week 8",V.keep],
+    ["Timeline","12 weeks (plan) vs 6 months (deck)","12 weeks, milestones aligned to Reviews 2 and 3",V.chg],
+  ];
+  document.getElementById('cmp').innerHTML = C.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join('');
+})();
+</script>

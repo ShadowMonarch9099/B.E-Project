@@ -1,0 +1,187 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [ 3 0 R 5 0 R ] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> >> >> /Contents 4 0 R >>
+endobj
+4 0 obj
+<< /Length 3695 >>
+stream
+BT
+/F2 16 Tf
+50 800 Td
+(Research Gaps: Multilingual Document Intelligence RAG) Tj
+/F1 10 Tf
+0 -28 Td
+/F2 11 Tf`n([RESEARCH GAPS IN MULTILINGUAL RAG LITERATURE]) Tj
+0 -14 Td
+/F1 10 Tf`n(Project: Multilingual Document Intelligence \(RAG\)) Tj
+0 -14 Td
+(Purpose: This review identifies the research space for a resource-efficient, trustworthy RAG) Tj
+0 -14 Td
+(system for private English and Indian-language document archives.) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+/F2 11 Tf`n([1. Investigating Language Preference of Multilingual RAG Systems - ACL Findings 2025]) Tj
+0 -14 Td
+/F1 10 Tf`n(Contribution: Analyses language preference in multilingual retrieval and generation and) Tj
+0 -14 Td
+(proposes DKM-RAG.) Tj
+0 -14 Td
+(Gap: It does not focus on private OCR-derived enterprise documents, page-level provenance,) Tj
+0 -14 Td
+(or Indian-language deployment. It motivates evaluating answer-language fidelity,) Tj
+0 -14 Td
+(Latin-script bias, and code-switching in the proposed system.) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+([2. Resource-Efficient Multilingual RAG: English-Only and Multilingual Embeddings for Indian) Tj
+0 -14 Td
+(Languages - 2026]) Tj
+0 -14 Td
+(Contribution: Uses an English embedding pipeline with output translation and reports) Tj
+0 -14 Td
+(resource savings for 22 Indian languages.) Tj
+0 -14 Td
+(Gap: English-only retrieval can lose domain-specific legal or technical meaning. The) Tj
+0 -14 Td
+(unresolved question is when direct multilingual retrieval, translation-based retrieval, or a) Tj
+0 -14 Td
+(hybrid route is best for private multilingual documents.) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+/F2 11 Tf`n([3. M3-RAG: Unified Multimodal and Multilingual RAG - 2025]) Tj
+0 -14 Td
+/F1 10 Tf`n(Contribution: Integrates multilingual text retrieval, image retrieval, cross-modal) Tj
+0 -14 Td
+(alignment, and modality routing.) Tj
+0 -14 Td
+(Gap: It does not establish trustworthy page-cited QA for heterogeneous private PDF, DOCX,) Tj
+0 -14 Td
+(and scanned-document collections under limited hardware. Tables and diagrams remain a future) Tj
+0 -14 Td
+(extension for the proposed project.) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+/F2 11 Tf`n([4. Translation-Based Embedding Strategies for Non-English Documents - 2024]) Tj
+0 -14 Td
+/F1 10 Tf`n(Contribution: Studies translation-based embedding strategies for non-English RAG.) Tj
+0 -14 Td
+(Gap: Translation may cause terminology drift, additional latency, and cost. It does not) Tj
+0 -14 Td
+(provide an adaptive policy identifying queries for which translation improves retrieval over) Tj
+0 -14 Td
+(multilingual embeddings.) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+/F2 11 Tf`n([5. A Multilingual Intelligent Document Processing System - 2025]) Tj
+0 -14 Td
+/F1 10 Tf`n(Contribution: Addresses multilingual document processing and question answering.) Tj
+0 -14 Td
+(Gap: A functional multilingual QA pipeline alone does not demonstrate retrieval-method) Tj
+0 -14 Td
+(comparisons, source-faithfulness, out-of-scope behaviour, or robust evaluation across) Tj
+0 -14 Td
+(document formats and languages.) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+/F2 11 Tf`n([6. LegalRAG: A Hybrid RAG System for Multilingual Legal Information Retrieval - 2025]) Tj
+0 -14 Td
+/F1 10 Tf`n(Contribution: Improves Bangla-English legal-gazette QA using relevance checking and query) Tj
+0 -14 Td
+(refinement.) Tj
+0 -14 Td
+(Gap: Evaluation is domain- and collection-specific. The authors identify difficulty with) Tj
+0 -14 Td
+(out-of-context questions. This motivates abstention, evidence sufficiency checks, and) Tj
+0 -14 Td
+(broader multilingual private-document evaluation.) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+([7. Hybrid Layered Retrieval and Task-Aware Embeddings for Efficient Persian RAG Systems -) Tj
+0 -14 Td
+(2026]) Tj
+0 -14 Td
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 1505 >>
+stream
+BT
+/F2 16 Tf
+50 800 Td
+(Research Gaps: Multilingual Document Intelligence RAG) Tj
+/F1 10 Tf
+0 -28 Td
+(Contribution: Uses task-aware query augmentation and layered hybrid dense-plus-BM25) Tj
+0 -14 Td
+(retrieval for Persian QA.) Tj
+0 -14 Td
+(Gap: The design is Persian- and task/FAQ-specific, while latency rises on limited GPUs. The) Tj
+0 -14 Td
+(proposed work examines a simpler deployable hybrid retrieval design for Indian languages,) Tj
+0 -14 Td
+(varying document type and hardware budget.) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+/F2 11 Tf`n([CONSOLIDATED GAP]) Tj
+0 -14 Td
+/F1 10 Tf`n(No selected study evaluates an end-to-end private-document RAG system that jointly compares) Tj
+0 -14 Td
+(direct multilingual, translation-based, and hybrid retrieval for English and Indian) Tj
+0 -14 Td
+(languages while measuring citation correctness, answer-language fidelity, OCR robustness,) Tj
+0 -14 Td
+(abstention, latency, and cost.) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+/F2 11 Tf`n([EVIDENCE-BASED RESEARCH QUESTIONS]) Tj
+0 -14 Td
+/F1 10 Tf`n(RQ1: Which retrieval strategy gives the best retrieval quality and cost for each language) Tj
+0 -14 Td
+(and document type?) Tj
+0 -14 Td
+(RQ2: Does hybrid dense-plus-lexical retrieval and cross-encoder reranking improve page-cited) Tj
+0 -14 Td
+(answer faithfulness?) Tj
+0 -14 Td
+(RQ3: Can evidence-sufficiency checks reduce unsupported answers without unacceptable) Tj
+0 -14 Td
+(latency?) Tj
+0 -14 Td
+(RQ4: How consistently does the system answer in the requested language?) Tj
+0 -14 Td
+ET
+endstream
+endobj
+xref
+0 7
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000123 00000 n 
+0000000362 00000 n 
+0000004109 00000 n 
+0000004348 00000 n 
+trailer
+<< /Size 7 /Root 1 0 R /Info << /Title (Research Gaps: Multilingual Document Intelligence RAG) /Author (MMCOE Project Team) >> >>
+startxref
+5905
+%%EOF

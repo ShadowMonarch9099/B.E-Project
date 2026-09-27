@@ -1,0 +1,243 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [ 3 0 R 5 0 R ] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> >> >> /Contents 4 0 R >>
+endobj
+4 0 obj
+<< /Length 3856 >>
+stream
+BT
+/F2 16 Tf
+50 800 Td
+(Project Synopsis: Multilingual Document Intelligence RAG) Tj
+/F1 10 Tf
+0 -28 Td
+/F2 11 Tf`n([PROJECT SYNOPSIS]) Tj
+0 -14 Td
+/F1 10 Tf`n(Title: Resource-Efficient, Citation-Grounded Multilingual Document Intelligence for Private) Tj
+0 -14 Td
+(Enterprise Archives) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+/F2 11 Tf`n([ABSTRACT]) Tj
+0 -14 Td
+/F1 10 Tf`n(Organizations hold private documents in English and regional languages across PDFs, DOCX) Tj
+0 -14 Td
+(files, and scanned images. Keyword search misses semantically related passages, while) Tj
+0 -14 Td
+(general-purpose language models can provide unsupported answers. This project develops and) Tj
+0 -14 Td
+(evaluates a multilingual Retrieval-Augmented Generation system that retrieves evidence from) Tj
+0 -14 Td
+(private document libraries and produces answers with page-level citations. The central study) Tj
+0 -14 Td
+(compares direct multilingual embeddings, translation-to-English embeddings, and an adaptive) Tj
+0 -14 Td
+(hybrid retrieval route. The system combines OCR-aware ingestion, semantic and lexical) Tj
+0 -14 Td
+(search, cross-encoder reranking, a lightweight answer generator, and abstention when) Tj
+0 -14 Td
+(evidence is insufficient. The intended contribution is a reproducible evaluation of) Tj
+0 -14 Td
+(retrieval accuracy, citation faithfulness, language fidelity, OCR robustness, latency, and) Tj
+0 -14 Td
+(resource cost for English and selected Indian languages.) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+/F2 11 Tf`n([PROBLEM STATEMENT]) Tj
+0 -14 Td
+/F1 10 Tf`n(Existing multilingual RAG research usually concentrates on one dimension: translation, a) Tj
+0 -14 Td
+(single low-resource language, multimodal retrieval, or a narrow legal corpus. There remains) Tj
+0 -14 Td
+(insufficient evidence on how to build a trustworthy and resource-efficient system for) Tj
+0 -14 Td
+(heterogeneous private documents in English and Indian languages, especially when source) Tj
+0 -14 Td
+(citations, OCR noise, language consistency, and constrained hardware are important.) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+/F2 11 Tf`n([AIM]) Tj
+0 -14 Td
+/F1 10 Tf`n(To design and evaluate a citation-grounded multilingual RAG system for private document) Tj
+0 -14 Td
+(collections that selects or combines retrieval strategies according to language, query, and) Tj
+0 -14 Td
+(document characteristics.) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+/F2 11 Tf`n([OBJECTIVES]) Tj
+0 -14 Td
+/F1 10 Tf`n(1. Ingest native PDFs, DOCX files, and scanned documents through parsing, OCR, language) Tj
+0 -14 Td
+(identification, and page-aware chunking.) Tj
+0 -14 Td
+(2. Compare direct multilingual embedding, translation-based embedding, and hybrid) Tj
+0 -14 Td
+(dense-plus-BM25 retrieval.) Tj
+0 -14 Td
+(3. Improve ranking using a multilingual cross-encoder reranker.) Tj
+0 -14 Td
+(4. Generate concise answers with page-level document citations and an explicit) Tj
+0 -14 Td
+(insufficient-evidence response.) Tj
+0 -14 Td
+(5. Evaluate retrieval quality, faithfulness, answer-language fidelity, latency, and resource) Tj
+0 -14 Td
+(use for English and selected Indian languages.) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+/F2 11 Tf`n([PROPOSED METHODOLOGY]) Tj
+0 -14 Td
+/F1 10 Tf`n(Ingestion: Extract text and metadata from PDF/DOCX; use Tesseract OCR for scans; detect) Tj
+0 -14 Td
+(language; split text into overlapping, page-preserving chunks.) Tj
+0 -14 Td
+(Indexing: Store chunk text, language, document ID, page number, and embeddings in PostgreSQL) Tj
+0 -14 Td
+(with pgvector HNSW. Maintain BM25 lexical retrieval alongside dense retrieval.) Tj
+0 -14 Td
+(Retrieval experiment: Run three conditions: \(A\) multilingual-E5 direct retrieval, \(B\)) Tj
+0 -14 Td
+(query/document translation followed by English embedding, and \(C\) hybrid dense-plus-BM25) Tj
+0 -14 Td
+(retrieval with cross-encoder reranking. An adaptive router may select the route based on) Tj
+0 -14 Td
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 3647 >>
+stream
+BT
+/F2 16 Tf
+50 800 Td
+(Project Synopsis: Multilingual Document Intelligence RAG) Tj
+/F1 10 Tf
+0 -28 Td
+(language confidence and query features.) Tj
+0 -14 Td
+(Generation and trust: Give the generator only reranked evidence chunks. Return cited claims) Tj
+0 -14 Td
+(with document/page references. If retrieval confidence or evidence coverage is low, return) Tj
+0 -14 Td
+(an abstention with suggested query refinement.) Tj
+0 -14 Td
+(Delivery: FastAPI backend with asynchronous ingestion; a Next.js interface for upload,) Tj
+0 -14 Td
+(querying, citation viewing, and streamed answers. Workspace isolation is an engineering) Tj
+0 -14 Td
+(feature, not the central research claim.) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+/F2 11 Tf`n([EVALUATION PLAN]) Tj
+0 -14 Td
+/F1 10 Tf`n(Dataset: Build a consented/private or public evaluation collection containing English and) Tj
+0 -14 Td
+(selected Indian-language documents, native PDFs and OCR scans, with manually checked) Tj
+0 -14 Td
+(question-answer-evidence triples.) Tj
+0 -14 Td
+(Retrieval metrics: Recall@k, MRR@10, nDCG@10, and per-language results.) Tj
+0 -14 Td
+(Answer metrics: human correctness, citation precision/recall, faithfulness or groundedness,) Tj
+0 -14 Td
+(and abstention precision for unanswerable questions.) Tj
+0 -14 Td
+(Operational metrics: end-to-end latency, throughput, GPU/CPU memory use, and cost per query.) Tj
+0 -14 Td
+(Robustness metrics: performance by document format, OCR quality, cross-lingual) Tj
+0 -14 Td
+(query-document pair, and requested answer language.) Tj
+0 -14 Td
+(Baselines: vanilla dense multilingual RAG, translation-only RAG, and hybrid retrieval) Tj
+0 -14 Td
+(without reranking or abstention.) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+/F2 11 Tf`n([EXPECTED CONTRIBUTIONS]) Tj
+0 -14 Td
+/F1 10 Tf`n(1. A controlled comparison of multilingual, translation-based, and hybrid retrieval for) Tj
+0 -14 Td
+(English and Indian-language private documents.) Tj
+0 -14 Td
+(2. A page-citation and evidence-sufficiency mechanism for more trustworthy answers.) Tj
+0 -14 Td
+(3. An evaluation protocol covering retrieval, groundedness, language behaviour, OCR) Tj
+0 -14 Td
+(robustness, latency, and cost.) Tj
+0 -14 Td
+(4. A deployable open-source-oriented architecture suitable for constrained academic) Tj
+0 -14 Td
+(hardware.) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+/F2 11 Tf`n([SCOPE AND LIMITATIONS]) Tj
+0 -14 Td
+/F1 10 Tf`n(The first implementation should claim support only for languages actually evaluated, for) Tj
+0 -14 Td
+(example English, Hindi, Marathi, and one or two additional Indian languages. Table/chart) Tj
+0 -14 Td
+(understanding requires a dedicated vision-language component and should be presented as) Tj
+0 -14 Td
+(future work unless implemented and tested. The system assists document search and does not) Tj
+0 -14 Td
+(provide legal, medical, or compliance advice.) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+/F2 11 Tf`n([KEY REFERENCES]) Tj
+0 -14 Td
+/F1 10 Tf`n(Park, J. and Lee, H. \(2025\). Investigating Language Preference of Multilingual RAG Systems.) Tj
+0 -14 Td
+(Findings of ACL 2025.) Tj
+0 -14 Td
+(Kabir, M. R. et al. \(2025\). LegalRAG: A Hybrid RAG System for Multilingual Legal Information) Tj
+0 -14 Td
+(Retrieval.) Tj
+0 -14 Td
+(Xu, J., Zhu, J., and Ba, Y. \(2025\). M3-RAG: Unified Multimodal and Multilingual) Tj
+0 -14 Td
+(Retrieval-Augmented Generation.) Tj
+0 -14 Td
+(Iscan, C., Ozara, M. F., and Akbulut, A. \(2024\). Enhancing RAG Pipeline Performance with) Tj
+0 -14 Td
+(Translation-Based Embedding Strategies for Non-English Documents.) Tj
+0 -14 Td
+(Zoughi, T. et al. \(2026\). Hybrid Layered Retrieval and Task-Aware Embeddings for Efficient) Tj
+0 -14 Td
+(Persian RAG Systems.) Tj
+0 -14 Td
+ET
+endstream
+endobj
+xref
+0 7
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000123 00000 n 
+0000000362 00000 n 
+0000004270 00000 n 
+0000004509 00000 n 
+trailer
+<< /Size 7 /Root 1 0 R /Info << /Title (Project Synopsis: Multilingual Document Intelligence RAG) /Author (MMCOE Project Team) >> >>
+startxref
+8208
+%%EOF

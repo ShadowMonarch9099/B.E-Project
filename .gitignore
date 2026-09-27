@@ -1,0 +1,24 @@
+# Office / OS temp files
+~$*
+*.tmp
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+
+# Node / Next.js
+node_modules/
+.next/
+
+# Model checkpoints and data
+*.pt
+*.bin
+*.safetensors
+*.gguf
+data/raw/
