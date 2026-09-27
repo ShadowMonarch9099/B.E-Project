@@ -18,6 +18,7 @@ A citation-grounded Retrieval-Augmented Generation system for private English, H
 | `Multilingual_RAG_Research_Gaps.pdf` | Literature review and research gaps (earlier draft) |
 | `RAG_Project_Detailed_Plan_v2.pdf` | Detailed implementation plan |
 | `BE_RAG_Review1_Redesigned.pptx` | Stage I (Review 1) presentation |
+| `BE_RAG_Review2.pptx` | Review 2 presentation (Sakshya), rebuilt from the Review 1 deck using the guide in `docs/Review2_Plan.md` §14 |
 | `create_rag_project_pdfs.ps1` | Script that generates the synopsis and research-gap PDFs |
 | `docs/Review2_Plan.md` | **Current project plan (Sakshya) for Review 2.** Supersedes the plan v2 PDF and Review 1 deck where they disagree |
 | `docs/sakshya.html` | Review of the plan and the "Sakshya" counter-proposal (open in a browser) |
