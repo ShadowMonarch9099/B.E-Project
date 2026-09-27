@@ -19,6 +19,7 @@ A citation-grounded Retrieval-Augmented Generation system for private English, H
 | `RAG_Project_Detailed_Plan_v2.pdf` | Detailed implementation plan |
 | `BE_RAG_Review1_Redesigned.pptx` | Stage I (Review 1) presentation |
 | `create_rag_project_pdfs.ps1` | Script that generates the synopsis and research-gap PDFs |
+| `docs/Review2_Plan.md` | **Current project plan (Sakshya) for Review 2.** Supersedes the plan v2 PDF and Review 1 deck where they disagree |
 | `docs/sakshya.html` | Review of the plan and the "Sakshya" counter-proposal (open in a browser) |
 
 ## Research questions
@@ -30,4 +31,4 @@ A citation-grounded Retrieval-Augmented Generation system for private English, H
 
 ## Planned stack
 
-FastAPI, Next.js, PostgreSQL + pgvector (HNSW), multilingual-E5, BM25, multilingual cross-encoder reranker, Tesseract OCR.
+FastAPI, Next.js, PostgreSQL + pgvector (HNSW), multilingual-E5, BM25 (IndicNLP tokens + character n-grams), fine-tuned multilingual cross-encoder reranker, Tesseract OCR (hin, mar, eng), AI4Bharat IndicLID / IndicXlit / IndicTrans2, a small local 4-bit instruct LLM, and a multilingual NLI verifier. See `docs/Review2_Plan.md` for details.
