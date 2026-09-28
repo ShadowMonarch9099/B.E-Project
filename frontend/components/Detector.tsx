@@ -5,6 +5,7 @@ import { detectFile, getHealth, runOcr } from "@/lib/api";
 import { formatBytes, percent } from "@/lib/format";
 import { createLimiter } from "@/lib/limit";
 import type { Health, Item, OcrState } from "@/lib/types";
+import AskBar from "./AskBar";
 import ResultCard from "./ResultCard";
 
 const DEFAULT_LIMITS = { max_file_mb: 200, max_files: 20 };
@@ -103,6 +104,7 @@ export default function Detector() {
   };
 
   const done = items.filter((it) => it.state === "done");
+  const askable = done.map((it) => ({ id: it.id, name: it.name }));
   const kinds = done.reduce<Record<string, number>>((acc, it) => {
     if (it.state === "done") acc[it.result.type.kind] = (acc[it.result.type.kind] ?? 0) + 1;
     return acc;
@@ -205,6 +207,8 @@ export default function Detector() {
           </ol>
         </section>
       )}
+
+      {askable.length > 0 && <AskBar docs={askable} />}
     </>
   );
 }

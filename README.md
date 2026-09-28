@@ -30,6 +30,7 @@ The first slices of the ingestion pipeline (plan §6.1 steps 1-2):
 
 - **Type detection:** upload any file and see what type of document it is, detected from its content rather than its name, plus how Sakshya v1 would ingest it (parse, OCR, or detect only).
 - **OCR:** scanned PDFs and images are read automatically with Tesseract (Marathi, Hindi, English). Each page shows its text, its mean word confidence, and a "Check the page" badge when the scan is hard to read. PDF pages that already have a text layer are read directly.
+- **Ask bar (first step of the chatbot):** once a document is analysed, a question box stays fixed at the bottom of the window, with a picker when several documents are loaded. Answering is not connected yet; retrieval, the evidence gate and cited answers (plan §6.3–6.7) come next.
 - **Legacy fonts:** Devanagari typed in pre-Unicode fonts (Kruti Dev, DVB-TT Surekh, Shivaji, ...) has a text layer that is nonsense ("भारत" stored as "Hkkjr"). Sakshya detects it and OCRs those pages instead; Word files in such fonts get a warning.
 
 No ML is trained here: type detection uses the prebuilt [Google Magika](https://github.com/google/magika) model and OCR uses [Tesseract](https://github.com/tesseract-ocr/tesseract). See `docs/prebuilt_models.md`.
