@@ -1,5 +1,5 @@
 import io
-import os
+from pathlib import Path
 
 import pymupdf
 import pytest
@@ -9,14 +9,12 @@ from PIL import Image
 from app.main import app
 from app.ocr import engine_status, run_ocr
 
-FONT_DIR = "/usr/share/fonts/truetype/lohit-devanagari"
+# Bundled (OFL licence) so the test pages render the same on Windows, macOS and Linux.
+FONT_DIR = str(Path(__file__).parent / "fixtures" / "fonts")
 FONT_FILE = "Lohit-Devanagari.ttf"
 
-pytestmark = [
-    pytest.mark.skipif(not engine_status()["available"], reason="Tesseract with eng/hin/mar is not installed"),
-    pytest.mark.skipif(not os.path.exists(os.path.join(FONT_DIR, FONT_FILE)),
-                       reason="Lohit Devanagari font needed to render the test page"),
-]
+pytestmark = pytest.mark.skipif(not engine_status()["available"],
+                                reason="Tesseract with eng/hin/mar is not installed")
 
 HTML = """<div style='font-family: Lohit; font-size: 13pt; line-height: 1.5'>
 <p><b>Government of Maharashtra</b><br>Revenue and Forest Department</p>
