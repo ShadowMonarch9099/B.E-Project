@@ -24,16 +24,29 @@ A citation-grounded Retrieval-Augmented Generation system for private English, H
 | `docs/prebuilt_models.md` | Prebuilt models for detection and extraction, mapped to the plan's stages |
 | `docs/sakshya.html` | Review of the plan and the "Sakshya" counter-proposal (open in a browser) |
 
-## The app (Sakshya v0.1: document type detection)
+## The app (Sakshya v0.2: type detection and OCR)
 
-The first slice of the ingestion pipeline (plan §6.1 step 1): upload any file and see what type of document it is, detected from its content rather than its name, plus how Sakshya v1 would ingest it (parse, OCR, or detect only). No ML is trained here; type detection uses the prebuilt [Google Magika](https://github.com/google/magika) model. See `docs/prebuilt_models.md`.
+The first slices of the ingestion pipeline (plan §6.1 steps 1-2):
+
+- **Type detection:** upload any file and see what type of document it is, detected from its content rather than its name, plus how Sakshya v1 would ingest it (parse, OCR, or detect only).
+- **OCR:** scanned PDFs and images are read automatically with Tesseract (English, Hindi, Marathi). Each page shows its text, its mean word confidence, and a "Check the page" badge when the scan is hard to read. PDF pages that already have a text layer are read directly.
+
+No ML is trained here: type detection uses the prebuilt [Google Magika](https://github.com/google/magika) model and OCR uses [Tesseract](https://github.com/tesseract-ocr/tesseract). See `docs/prebuilt_models.md`.
 
 | Folder | What it is |
 | --- | --- |
-| `backend/` | FastAPI service: `POST /api/detect` (multipart `files`), `GET /api/health`. Files are read in memory and never stored |
+| `backend/` | FastAPI service: `POST /api/detect` (multipart `files`), `POST /api/ocr` (multipart `file`), `GET /api/health`. Files are read in memory and never stored |
 | `frontend/` | Next.js + TypeScript site: drag-and-drop upload, per-file results, monochrome theme |
 
 ### Run it locally
+
+**Install Tesseract first** (needed for OCR; type detection works without it):
+
+- Windows: run the [UB Mannheim installer](https://github.com/UB-Mannheim/tesseract/wiki). On the components page, under *Additional language data*, tick **Hindi** and **Marathi**. The backend finds the default install path (`C:\Program Files\Tesseract-OCR\tesseract.exe`) by itself; for another location set `SAKSHYA_TESSERACT_CMD` to the full path of `tesseract.exe`.
+- Ubuntu/Debian: `sudo apt install tesseract-ocr tesseract-ocr-hin tesseract-ocr-mar`
+- macOS: `brew install tesseract tesseract-lang`
+
+The status line above the upload box says whether OCR is ready.
 
 ```bash
 # 1. Backend (Python 3.11+)
@@ -49,6 +62,8 @@ npm run dev                                         # open http://localhost:3000
 ```
 
 The frontend forwards `/api/*` to `BACKEND_URL` (default `http://localhost:8000`). Or run both with `docker compose up --build`.
+
+OCR settings (environment variables for the backend): `SAKSHYA_OCR_LANGS` (default `eng+hin+mar`), `SAKSHYA_OCR_MAX_PAGES` (default `10` pages per file), `SAKSHYA_TESSERACT_CMD` (path to the Tesseract binary).
 
 Tests: `cd backend && .venv/bin/python -m pytest`.
 

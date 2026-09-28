@@ -7,6 +7,7 @@ This note lists prebuilt, open models that fit the stages of the Review 2 plan (
 | Stage | Model | What it does | Notes |
 | --- | --- | --- | --- |
 | File type detection (§6.1 step 1) | [Google Magika](https://github.com/google/magika) `standard_v3_3` | Deep-learning content-type detector: ~1 MB model, 200+ types, runs on CPU in milliseconds ([paper](https://arxiv.org/pdf/2409.13768)) | Used as-is from `pip install magika`. **Finding:** it labels plain Devanagari (Hindi/Marathi) text as "unknown", so the backend adds a UTF-8 text check before falling back to the file extension. |
+| OCR for scans (§6.1 step 2) | [Tesseract](https://github.com/tesseract-ocr/tesseract) 5 with `eng`, `hin`, `mar` language data, via `pytesseract` | LSTM OCR; per-word confidence and boxes; PDF pages rendered at 300 DPI | **Finding:** language order matters. On our trilingual test page, `hin+mar+eng` read the digit 1 as a danda ("142" → "42", "18,40,000" → "8,40,000") with mean confidence 90.4; `eng+hin+mar` read every number correctly, kept Devanagari digits (१४२), and scored 95.5. One page only, so this is re-checked on Sakshya-Bench. |
 
 Everything else in the current app is a plain parser, not a model: PyMuPDF (PDF pages and text-layer check), python-docx, Pillow and `zipfile`.
 
@@ -14,7 +15,6 @@ Everything else in the current app is a plain parser, not a model: PyMuPDF (PDF 
 
 | Plan stage | Model named in the plan | Link |
 | --- | --- | --- |
-| OCR for scans (§6.1 step 2) | Tesseract 5 with `hin`, `mar`, `eng` | [tesseract-ocr](https://github.com/tesseract-ocr/tesseract) |
 | Language + script ID per block (§6.1 step 4) | AI4Bharat IndicLID | [AI4Bharat/IndicLID](https://github.com/AI4Bharat/IndicLID) |
 | Transliteration of romanized queries (§6.2) | AI4Bharat IndicXlit | [AI4Bharat/IndicXlit](https://github.com/AI4Bharat/IndicXlit) |
 | English shadow index, translate route (§6.1, §6.3) | AI4Bharat IndicTrans2 (distilled for CPU) | [AI4Bharat/IndicTrans2](https://github.com/AI4Bharat/IndicTrans2) |

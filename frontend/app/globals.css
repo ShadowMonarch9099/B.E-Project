@@ -13,6 +13,9 @@
   --display: var(--font-display), "Noto Sans Devanagari", system-ui, sans-serif;
   --body: var(--font-body), "Noto Sans Devanagari", system-ui, sans-serif;
   --mono: var(--font-mono), ui-monospace, Consolas, monospace;
+  /* Document text (OCR output, file names). Hind draws Devanagari digits (१४२) with Latin
+     shapes (142), which would misreport survey and GR numbers; Mukta draws them correctly. */
+  --doc: var(--font-display), "Noto Sans Devanagari", system-ui, sans-serif;
   --radius: 10px;
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   color-scheme: light;
@@ -450,6 +453,7 @@ h2 {
 
 .filename {
   margin: 0;
+  font-family: var(--doc);
   font-weight: 600;
   font-size: 1.02rem;
   overflow: hidden;
@@ -637,6 +641,10 @@ dd {
   color: var(--ink-2);
 }
 
+.deva-digits {
+  font-family: var(--doc);
+}
+
 .key {
   display: inline-block;
   width: 10px;
@@ -668,6 +676,140 @@ dd {
   margin: 10px 0 0;
   font-size: 0.88rem;
   color: var(--ink-2);
+}
+
+/* ---------- OCR ---------- */
+
+.ocr {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--line);
+  animation: rise 0.5s var(--ease) both;
+}
+
+.ocr__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 16px;
+}
+
+.ocr__label {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-3);
+}
+
+.ocr__engine {
+  margin-left: 10px;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--ink-2);
+}
+
+.ocr__actions {
+  display: flex;
+  gap: 16px;
+}
+
+.ocr__summary {
+  margin: 8px 0 0;
+  font-size: 0.95rem;
+}
+
+.ocr__pages {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.ocr-page {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  transition: border-color 0.2s;
+}
+
+.ocr-page[open] {
+  border-color: var(--ink-3);
+}
+
+.ocr-page summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.ocr-page summary::-webkit-details-marker {
+  display: none;
+}
+
+.ocr-page summary::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid var(--ink);
+  border-bottom: 1.5px solid var(--ink);
+  transform: rotate(-45deg);
+  transition: transform 0.25s var(--ease);
+}
+
+.ocr-page[open] summary::before {
+  transform: rotate(45deg);
+}
+
+.ocr-page__num {
+  font-weight: 600;
+}
+
+.ocr-page__meta {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+}
+
+/* "Check the page": a small dashed stamp, the artifact's badge for low-confidence OCR (plan N3). */
+.check-badge {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  border: 1.5px dashed var(--line-strong);
+  border-radius: 4px;
+  transform: rotate(-3deg);
+  animation: stamp-press-small 0.5s 0.2s var(--ease) both;
+}
+
+.ocr-text {
+  margin: 0;
+  font-family: var(--doc);
+  padding: 4px 16px 16px 33px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.98rem;
+  line-height: 1.7;
+  max-height: 420px;
+  overflow-y: auto;
+  animation: fade-in 0.4s both;
+}
+
+.ocr .note {
+  padding: 0 16px 12px 33px;
+}
+
+@keyframes stamp-press-small {
+  0% { opacity: 0; transform: scale(1.6) rotate(-10deg); }
+  100% { opacity: 1; transform: scale(1) rotate(-3deg); }
 }
 
 /* ---------- footer ---------- */

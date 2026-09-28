@@ -115,6 +115,13 @@ def stamp_for(label: str, extensions: list[str] | None = None) -> str:
     return label.upper()[:5]
 
 
+def needs_ocr(label: str, pdf_text_layer: str | None, encrypted: bool) -> bool:
+    """True for scanned or mixed PDFs and for images: the files v1 sends to OCR."""
+    if label == "pdf":
+        return not encrypted and pdf_text_layer in {"scanned", "mixed"}
+    return label in OCR_IMAGE_LABELS
+
+
 def ingestion_route(label: str, pdf_text_layer: str | None, encrypted: bool) -> tuple[str, str]:
     """Return (status, route) for Sakshya v1: status is in_scope, blocked or out_of_scope."""
     if label == "pdf":
@@ -123,14 +130,14 @@ def ingestion_route(label: str, pdf_text_layer: str | None, encrypted: bool) -> 
         if pdf_text_layer == "native":
             return "in_scope", "Parse the text layer (PyMuPDF), then split into page-anchored chunks."
         if pdf_text_layer == "scanned":
-            return "in_scope", "Scanned PDF: OCR every page with Tesseract (hin + mar + eng)."
+            return "in_scope", "Scanned PDF: OCR every page with Tesseract (English, Hindi, Marathi)."
         if pdf_text_layer == "mixed":
             return "in_scope", "Parse pages that have a text layer; OCR the pages that do not."
         return "in_scope", "Parse the PDF; pages without a text layer go to OCR."
     if label == "docx":
         return "in_scope", "Convert to PDF (LibreOffice) so citations open a real page, then parse."
     if label in OCR_IMAGE_LABELS:
-        return "in_scope", "Treat as a scan: OCR with Tesseract (hin + mar + eng)."
+        return "in_scope", "Treat as a scan: OCR with Tesseract (English, Hindi, Marathi)."
     if label in {"doc", "odt", "rtf"}:
         return "out_of_scope", "Not ingested in v1. Save it as DOCX or PDF to include it."
     return "out_of_scope", "Detected only. Version 1 ingests PDF, DOCX and scanned images (plan section 3)."

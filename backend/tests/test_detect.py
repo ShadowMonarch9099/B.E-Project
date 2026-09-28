@@ -59,6 +59,7 @@ def test_native_pdf():
     assert r["type"]["kind"] == "PDF"
     assert r["pdf_text_layer"] == "native"
     assert r["ingestion"]["status"] == "in_scope"
+    assert r["ingestion"]["needs_ocr"] is False
     assert r["extension_check"]["status"] == "match"
     assert {"label": "Pages", "value": "2"} in r["facts"]
 
@@ -68,6 +69,7 @@ def test_scanned_pdf_goes_to_ocr():
     assert r["type"]["label"] == "pdf"
     assert r["pdf_text_layer"] == "scanned"
     assert "OCR" in r["ingestion"]["route"]
+    assert r["ingestion"]["needs_ocr"] is True
 
 
 def test_docx_with_devanagari():
@@ -83,6 +85,7 @@ def test_png_image():
     assert r["type"]["kind"] == "Image"
     assert {"label": "Dimensions", "value": "320 × 200 px"} in r["facts"]
     assert r["ingestion"]["status"] == "in_scope"
+    assert r["ingestion"]["needs_ocr"] is True
 
 
 def test_markdown():

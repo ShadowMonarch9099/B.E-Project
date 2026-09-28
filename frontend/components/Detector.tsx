@@ -1,9 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
-import { detectFile, getHealth } from "@/lib/api";
+import { detectFile, getHealth, runOcr } from "@/lib/api";
 import { formatBytes, percent } from "@/lib/format";
-import type { Health, Item } from "@/lib/types";
+import type { Health, Item, OcrState } from "@/lib/types";
 import ResultCard from "./ResultCard";
 
 const DEFAULT_LIMITS = { max_file_mb: 50, max_files: 20 };
@@ -16,6 +16,7 @@ export default function Detector() {
   const [notice, setNotice] = useState<string | null>(null);
   const inputId = useId();
   const dragDepth = useRef(0);
+  const files = useRef(new Map<string, File>()); // kept so OCR can be run (or retried) after detection
 
   useEffect(() => {
     getHealth()
@@ -29,16 +30,33 @@ export default function Detector() {
     setItems((prev) => prev.map((it) => (it.id === id ? next : it)));
   }, []);
 
+  const setOcr = useCallback((id: string, ocr: OcrState) => {
+    setItems((prev) => prev.map((it) => (it.id === id && it.state === "done" ? { ...it, ocr } : it)));
+  }, []);
+
+  // Scanned PDFs and images go to OCR (plan section 6.1 step 2) as soon as their type is known.
+  const startOcr = useCallback(
+    (id: string) => {
+      const file = files.current.get(id);
+      if (!file) return;
+      setOcr(id, { state: "running" });
+      runOcr(file)
+        .then((data) => setOcr(id, { state: "done", data }))
+        .catch((err: Error) => setOcr(id, { state: "error", message: err.message }));
+    },
+    [setOcr],
+  );
+
   const handleFiles = useCallback(
     (list: FileList | null) => {
       if (!list || list.length === 0) return;
-      let files = Array.from(list);
+      let picked = Array.from(list);
       setNotice(null);
-      if (files.length > limits.max_files) {
+      if (picked.length > limits.max_files) {
         setNotice(`Only the first ${limits.max_files} files were taken. Upload the rest in another batch.`);
-        files = files.slice(0, limits.max_files);
+        picked = picked.slice(0, limits.max_files);
       }
-      const batch: Item[] = files.map((f) => ({
+      const batch: Item[] = picked.map((f) => ({
         id: crypto.randomUUID(),
         name: f.name,
         size: f.size,
@@ -47,8 +65,9 @@ export default function Detector() {
       }));
       setItems((prev) => [...batch, ...prev]);
 
-      files.forEach((file, i) => {
+      picked.forEach((file, i) => {
         const base = { id: batch[i].id, name: file.name, size: file.size };
+        files.current.set(base.id, file);
         if (file.size > limits.max_file_mb * 1024 * 1024) {
           update(base.id, { ...base, state: "error", message: `Larger than ${limits.max_file_mb} MB.` });
           return;
@@ -58,11 +77,14 @@ export default function Detector() {
             ? { ...base, state: "uploading", progress: fraction }
             : { ...base, state: "analysing" });
         })
-          .then((result) => update(base.id, { ...base, state: "done", result }))
+          .then((result) => {
+            update(base.id, { ...base, state: "done", result });
+            if (result.ingestion.needs_ocr) startOcr(base.id);
+          })
           .catch((err: Error) => update(base.id, { ...base, state: "error", message: err.message }));
       });
     },
-    [limits, update],
+    [limits, update, startOcr],
   );
 
   const onDrop = (e: React.DragEvent) => {
@@ -85,7 +107,11 @@ export default function Detector() {
         {offline
           ? "Detector offline: start the backend on port 8000"
           : health
-            ? `Detector ready · ${health.detector.name} ${health.detector.version} (${health.detector.model})`
+            ? `Detector ready · ${health.detector.name} ${health.detector.version} (${health.detector.model}) · ${
+                health.ocr.available
+                  ? `OCR: ${health.ocr.engine} ${health.ocr.version} (${health.ocr.languages.join("+")})`
+                  : "OCR unavailable"
+              }`
             : "Connecting to the detector…"}
       </div>
 
@@ -142,7 +168,10 @@ export default function Detector() {
             <h2>
               Results <span className="count">{items.length}</span>
             </h2>
-            <button type="button" className="btn-text" onClick={() => setItems([])}>
+            <button type="button" className="btn-text" onClick={() => {
+                setItems([]);
+                files.current.clear();
+              }}>
               Clear all
             </button>
           </div>
@@ -159,7 +188,7 @@ export default function Detector() {
             {items.map((it, i) => (
               <li key={it.id} className="card" style={{ "--i": Math.min(i, 8) } as React.CSSProperties}>
                 {it.state === "done" ? (
-                  <ResultCard result={it.result} />
+                  <ResultCard result={it.result} ocr={it.ocr} onRetryOcr={() => startOcr(it.id)} />
                 ) : (
                   <Pending item={it} />
                 )}

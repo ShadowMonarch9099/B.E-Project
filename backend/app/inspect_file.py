@@ -72,7 +72,7 @@ def _valid_share(text: str) -> float:
     return valid / len(chars)
 
 
-def _page_has_text_layer(text: str) -> bool:
+def page_has_text_layer(text: str) -> bool:
     stripped = text.strip()
     return len(stripped) >= MIN_PAGE_CHARS and _valid_share(stripped) >= MIN_VALID_SHARE
 
@@ -93,7 +93,7 @@ def _pdf(data: bytes, facts: Facts) -> None:
         texts: list[str] = []
         for i in range(checked):
             text = doc[i].get_text()
-            if _page_has_text_layer(text):
+            if page_has_text_layer(text):
                 with_text += 1
             texts.append(text)
         if checked:

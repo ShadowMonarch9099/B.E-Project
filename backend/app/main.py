@@ -1,4 +1,4 @@
-"""Sakshya API: document type detection (first slice of plan section 6.1).
+"""Sakshya API: document type detection and OCR (plan section 6.1, steps 1-2).
 
 Files are analysed in memory and never stored.
 """
@@ -10,7 +10,9 @@ import magika
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
-from .detection import analyse, get_magika
+from . import catalog
+from .detection import analyse, detect as detect_type, get_magika
+from .ocr import OcrUnavailable, engine_status, run_ocr
 
 MAX_FILE_MB = int(os.environ.get("SAKSHYA_MAX_FILE_MB", "50"))
 MAX_FILES = int(os.environ.get("SAKSHYA_MAX_FILES", "20"))
@@ -23,7 +25,7 @@ async def lifespan(_: FastAPI):
     yield
 
 
-app = FastAPI(title="Sakshya API", version="0.1.0", lifespan=lifespan)
+app = FastAPI(title="Sakshya API", version="0.2.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=os.environ.get("SAKSHYA_CORS_ORIGINS", "http://localhost:3000").split(","),
@@ -37,6 +39,7 @@ def health() -> dict:
     return {
         "status": "ok",
         "detector": {"name": "Magika", "version": magika.__version__, "model": get_magika().get_model_name()},
+        "ocr": engine_status(),
         "limits": {"max_file_mb": MAX_FILE_MB, "max_files": MAX_FILES},
     }
 
@@ -54,3 +57,22 @@ def detect(files: list[UploadFile] = File(...)) -> dict:
             continue
         results.append(analyse(data, name))
     return {"results": results}
+
+
+@app.post("/api/ocr")
+def ocr(file: UploadFile = File(...)) -> dict:
+    """OCR one scanned PDF or image. PDF pages that already have a text layer are read directly."""
+    name = file.filename or "untitled"
+    data = file.file.read(MAX_FILE_BYTES + 1)
+    if len(data) > MAX_FILE_BYTES:
+        raise HTTPException(status_code=413, detail=f"File is larger than {MAX_FILE_MB} MB.")
+    label = detect_type(data, name).label
+    if label != "pdf" and label not in catalog.OCR_IMAGE_LABELS:
+        raise HTTPException(status_code=422, detail="OCR works on PDFs and images only.")
+    try:
+        result = run_ocr(data, label)
+    except OcrUnavailable as exc:
+        raise HTTPException(status_code=503, detail=f"OCR is not available: {exc}.") from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return {"filename": name, **result}

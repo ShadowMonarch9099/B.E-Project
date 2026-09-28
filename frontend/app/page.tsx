@@ -15,13 +15,14 @@ export default function Home() {
 
       <main>
         <section className="hero">
-          <p className="eyebrow">Step 1 of ingestion · type detection</p>
+          <p className="eyebrow">Ingestion steps 1–2 · type detection and OCR</p>
           <h1>
             What kind of document <span className="nowrap">is this?</span>
           </h1>
           <p className="lede">
-            Upload any file. Sakshya reads its content, not just its name, to tell you what it is,
-            and shows how it would enter the pipeline: parsed, sent to OCR, or held back.
+            Upload any file. Sakshya reads its content, not just its name, to tell you what it is
+            and how it enters the pipeline. Scanned PDFs and images are read with OCR in English,
+            Hindi and Marathi.
           </p>
         </section>
 
@@ -34,6 +35,10 @@ export default function Home() {
           Type detection by{" "}
           <a href="https://github.com/google/magika" target="_blank" rel="noreferrer">
             Google Magika
+          </a>{" "}
+          and OCR by{" "}
+          <a href="https://github.com/tesseract-ocr/tesseract" target="_blank" rel="noreferrer">
+            Tesseract
           </a>
           , running locally
         </span>

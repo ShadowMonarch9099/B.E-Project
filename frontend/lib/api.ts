@@ -1,4 +1,4 @@
-import type { DetectionResult, Health } from "./types";
+import type { DetectionResult, Health, OcrResult } from "./types";
 
 export async function getHealth(): Promise<Health> {
   const res = await fetch("/api/health", { cache: "no-store" });
@@ -36,4 +36,18 @@ export function detectFile(
     xhr.open("POST", "/api/detect");
     xhr.send(form);
   });
+}
+
+export async function runOcr(file: File): Promise<OcrResult> {
+  const form = new FormData();
+  form.append("file", file, file.name);
+  let res: Response;
+  try {
+    res = await fetch("/api/ocr", { method: "POST", body: form });
+  } catch {
+    throw new Error("Could not reach the OCR service. Is the backend running?");
+  }
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.detail ?? `OCR failed (${res.status}).`);
+  return body as OcrResult;
 }

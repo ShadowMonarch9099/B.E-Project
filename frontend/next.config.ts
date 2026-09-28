@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
   experimental: {
     // Proxied request bodies are cut at 10 MB by default; the backend accepts 50 MB files.
     proxyClientMaxBodySize: "60mb",
+    // OCR of a multi-page scan can take longer than the default 30 s proxy timeout.
+    proxyTimeout: 300_000,
   },
   async rewrites() {
     return [{ source: "/api/:path*", destination: `${backend}/api/:path*` }];

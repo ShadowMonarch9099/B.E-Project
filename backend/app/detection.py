@@ -205,6 +205,7 @@ def analyse(data: bytes, filename: str) -> dict:
         "facts": [{"label": k, "value": v} for k, v in facts.items],
         "scripts": facts.scripts,
         "pdf_text_layer": facts.pdf_text_layer,
-        "ingestion": {"status": status, "route": route},
+        "ingestion": {"status": status, "route": route,
+                      "needs_ocr": catalog.needs_ocr(det.label, facts.pdf_text_layer, facts.encrypted)},
         "note": facts.note,
     }

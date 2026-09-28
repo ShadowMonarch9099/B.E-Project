@@ -1,7 +1,16 @@
 import { formatBytes, INGESTION_LABEL, METHOD_LABEL, percent, TEXT_LAYER_LABEL } from "@/lib/format";
-import type { DetectionResult } from "@/lib/types";
+import type { DetectionResult, OcrState } from "@/lib/types";
+import OcrPanel from "./OcrPanel";
 
-export default function ResultCard({ result: r }: { result: DetectionResult }) {
+export default function ResultCard({
+  result: r,
+  ocr,
+  onRetryOcr,
+}: {
+  result: DetectionResult;
+  ocr?: OcrState;
+  onRetryOcr: () => void;
+}) {
   const ext = r.extension_check;
   const confidence = r.detection.confidence;
 
@@ -89,7 +98,11 @@ export default function ResultCard({ result: r }: { result: DetectionResult }) {
                 {r.scripts.other > 0 && (
                   <span><i className="key key--other" />Other {percent(r.scripts.other)}</span>
                 )}
-                {r.scripts.devanagari_digits && <span lang="hi">Devanagari digits (१२३) present</span>}
+                {r.scripts.devanagari_digits && (
+                  <span>
+                    Devanagari digits (<span className="deva-digits" lang="hi">१२३</span>) present
+                  </span>
+                )}
               </span>
             </dd>
           </div>
@@ -101,6 +114,7 @@ export default function ResultCard({ result: r }: { result: DetectionResult }) {
         {r.ingestion.route}
       </p>
       {r.note && <p className="note">{r.note}</p>}
+      {ocr && <OcrPanel ocr={ocr} filename={r.filename} onRetry={onRetryOcr} />}
     </article>
   );
 }
