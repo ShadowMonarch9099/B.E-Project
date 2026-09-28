@@ -1,12 +1,17 @@
 # Run the whole app with: docker compose up --build   (then open http://localhost:3000)
+# Upload limit: set SAKSHYA_MAX_FILE_MB in your shell or a .env file (default 200).
 services:
   backend:
     build: ./backend
     ports: ["8000:8000"]
+    environment:
+      SAKSHYA_MAX_FILE_MB: ${SAKSHYA_MAX_FILE_MB:-200}
   frontend:
     build:
       context: ./frontend
       args:
         BACKEND_URL: http://backend:8000
     ports: ["3000:3000"]
+    environment:
+      SAKSHYA_MAX_FILE_MB: ${SAKSHYA_MAX_FILE_MB:-200}
     depends_on: [backend]

@@ -68,7 +68,15 @@ OCR settings (environment variables for the backend): `SAKSHYA_OCR_LANGS` (defau
 
 Tests: `cd backend && .venv/bin/python -m pytest`.
 
-**Testing with a large PDF:** uploads are limited to 50 MB, so cut a few pages out first:
+**Upload limit:** 200 MB per file by default (20 files per batch; the site uploads two at a time). To change it, set `SAKSHYA_MAX_FILE_MB` in **both** terminals before starting the backend and the frontend, because the frontend's forwarding limit uses the same value:
+
+```powershell
+$env:SAKSHYA_MAX_FILE_MB=500     # Windows PowerShell; on macOS/Linux: export SAKSHYA_MAX_FILE_MB=500
+```
+
+The backend and the frontend's forwarding each hold a copy of the file while it is read, so very large limits need enough RAM: a 164 MB PDF added about 340 MB in total while it was being checked.
+
+**Testing with a PDF over the limit:** cut a few pages out first:
 
 ```bash
 cd backend

@@ -80,6 +80,7 @@ export type OcrState =
   | { state: "error"; message: string };
 
 export type Item =
+  | { id: string; name: string; size: number; state: "queued" }
   | { id: string; name: string; size: number; state: "uploading"; progress: number }
   | { id: string; name: string; size: number; state: "analysing" }
   | { id: string; name: string; size: number; state: "done"; result: DetectionResult; ocr?: OcrState }

@@ -140,3 +140,15 @@ def test_detect_endpoint_multiple_files(client):
     ]
     results = client.post("/api/detect", files=files).json()["results"]
     assert [r["type"]["label"] for r in results] == ["pdf", "markdown", "png"]
+
+
+def test_files_over_the_limit_are_refused(client, monkeypatch):
+    import app.main as main
+
+    monkeypatch.setattr(main, "MAX_FILE_MB", 1)
+    monkeypatch.setattr(main, "MAX_FILE_BYTES", 1024 * 1024)
+    big = b"%PDF-1.4\n" + b"0" * (1024 * 1024 + 10)
+    results = client.post("/api/detect", files=[("files", ("big.pdf", big, "application/pdf"))]).json()["results"]
+    assert results == [{"filename": "big.pdf", "error": "File is larger than 1 MB."}]
+    res = client.post("/api/ocr", files={"file": ("big.pdf", big, "application/pdf")})
+    assert res.status_code == 413

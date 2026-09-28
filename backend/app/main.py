@@ -14,7 +14,7 @@ from . import catalog
 from .detection import analyse, detect as detect_type, get_magika
 from .ocr import OcrUnavailable, engine_status, run_ocr
 
-MAX_FILE_MB = int(os.environ.get("SAKSHYA_MAX_FILE_MB", "50"))
+MAX_FILE_MB = int(os.environ.get("SAKSHYA_MAX_FILE_MB", "200"))
 MAX_FILES = int(os.environ.get("SAKSHYA_MAX_FILES", "20"))
 MAX_FILE_BYTES = MAX_FILE_MB * 1024 * 1024
 

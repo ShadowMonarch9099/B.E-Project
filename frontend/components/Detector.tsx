@@ -3,10 +3,16 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { detectFile, getHealth, runOcr } from "@/lib/api";
 import { formatBytes, percent } from "@/lib/format";
+import { createLimiter } from "@/lib/limit";
 import type { Health, Item, OcrState } from "@/lib/types";
 import ResultCard from "./ResultCard";
 
-const DEFAULT_LIMITS = { max_file_mb: 50, max_files: 20 };
+const DEFAULT_LIMITS = { max_file_mb: 200, max_files: 20 };
+
+// Large files are held in memory while the backend reads them, so upload two at a time
+// and OCR one file at a time (each OCR job already uses several CPU cores).
+const uploadSlot = createLimiter(2);
+const ocrSlot = createLimiter(1);
 
 export default function Detector() {
   const [items, setItems] = useState<Item[]>([]);
@@ -40,7 +46,7 @@ export default function Detector() {
       const file = files.current.get(id);
       if (!file) return;
       setOcr(id, { state: "running" });
-      runOcr(file)
+      ocrSlot(() => runOcr(file))
         .then((data) => setOcr(id, { state: "done", data }))
         .catch((err: Error) => setOcr(id, { state: "error", message: err.message }));
     },
@@ -60,8 +66,7 @@ export default function Detector() {
         id: crypto.randomUUID(),
         name: f.name,
         size: f.size,
-        state: "uploading",
-        progress: 0,
+        state: "queued",
       }));
       setItems((prev) => [...batch, ...prev]);
 
@@ -72,10 +77,13 @@ export default function Detector() {
           update(base.id, { ...base, state: "error", message: `Larger than ${limits.max_file_mb} MB.` });
           return;
         }
-        detectFile(file, (fraction) => {
-          update(base.id, fraction < 1
-            ? { ...base, state: "uploading", progress: fraction }
-            : { ...base, state: "analysing" });
+        uploadSlot(() => {
+          update(base.id, { ...base, state: "uploading", progress: 0 });
+          return detectFile(file, (fraction) => {
+            update(base.id, fraction < 1
+              ? { ...base, state: "uploading", progress: fraction }
+              : { ...base, state: "analysing" });
+          });
         })
           .then((result) => {
             update(base.id, { ...base, state: "done", result });
@@ -212,6 +220,7 @@ function Pending({ item }: { item: Item }) {
           {item.name}
         </p>
         <p className="meta">{formatBytes(item.size)}</p>
+        {item.state === "queued" && <p className="meta">Waiting to upload…</p>}
         {item.state === "uploading" && (
           <>
             <div className="bar bar--progress" aria-label={`Uploading ${percent(item.progress)}`}>
