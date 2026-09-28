@@ -2,8 +2,9 @@
 
 These are plain parsers (PyMuPDF, python-docx, Pillow, zipfile), not models.
 The PDF text-layer check follows plan section 6.1 step 1: a page counts as
-having a usable text layer when it has enough characters and most of them are
-valid Latin or Devanagari text. Pages without one would go to OCR.
+having a usable text layer when it has enough characters, most of them are
+valid Latin or Devanagari text, and it is not Devanagari typed in a legacy
+(non-Unicode) font. Pages without a usable text layer go to OCR.
 """
 
 import io
@@ -11,10 +12,13 @@ import re
 import zipfile
 from dataclasses import dataclass, field
 
+from .legacy_fonts import is_legacy_font, legacy_spans, looks_legacy
+
 MAX_PDF_PAGES_CHECKED = 60
 MAX_TEXT_CHARS = 400_000
 MIN_PAGE_CHARS = 20
 MIN_VALID_SHARE = 0.5
+LEGACY_SPAN_SHARE = 0.2  # a page is legacy when this much of its text is in legacy fonts
 
 
 @dataclass
@@ -77,9 +81,25 @@ def page_has_text_layer(text: str) -> bool:
     return len(stripped) >= MIN_PAGE_CHARS and _valid_share(stripped) >= MIN_VALID_SHARE
 
 
+def classify_page(page) -> tuple[str, str, set[str]]:
+    """(kind, text, legacy font names) for a PyMuPDF page; kind is "text", "legacy" or "none".
+
+    "legacy" means the page has a text layer, but it is Devanagari in a pre-Unicode font,
+    so the text cannot be used and the page must be OCR'd.
+    """
+    text = page.get_text()
+    if not page_has_text_layer(text):
+        return "none", text, set()
+    legacy_chars, total, fonts = legacy_spans(page)
+    if (total and legacy_chars / total >= LEGACY_SPAN_SHARE) or looks_legacy(text):
+        return "legacy", text, fonts
+    return "text", text, set()
+
+
 def _pdf(data: bytes, facts: Facts) -> None:
     import pymupdf
 
+    pymupdf.TOOLS.mupdf_display_errors(False)  # malformed-but-readable PDFs otherwise flood the log
     with pymupdf.open(stream=data, filetype="pdf") as doc:
         if doc.needs_pass:
             facts.encrypted = True
@@ -89,18 +109,24 @@ def _pdf(data: bytes, facts: Facts) -> None:
         pages = doc.page_count
         facts.add("Pages", pages)
         checked = min(pages, MAX_PDF_PAGES_CHECKED)
-        with_text = 0
-        texts: list[str] = []
+        counts = {"text": 0, "legacy": 0, "none": 0}
+        legacy_fonts: set[str] = set()
+        texts: list[str] = []  # only usable (Unicode) text feeds the script mix
         for i in range(checked):
-            text = doc[i].get_text()
-            if page_has_text_layer(text):
-                with_text += 1
-            texts.append(text)
+            kind, text, fonts = classify_page(doc[i])
+            counts[kind] += 1
+            legacy_fonts |= fonts
+            if kind == "text":
+                texts.append(text)
         if checked:
-            facts.pdf_text_layer = ("native" if with_text == checked
-                                    else "scanned" if with_text == 0 else "mixed")
+            facts.pdf_text_layer = ("native" if counts["text"] == checked
+                                    else "scanned" if counts["none"] == checked
+                                    else "legacy" if counts["legacy"] == checked else "mixed")
             suffix = "" if checked == pages else f" (first {checked} checked)"
-            facts.add("Pages with a text layer", f"{with_text} of {checked}{suffix}")
+            facts.add("Pages with a usable text layer", f"{counts['text']} of {checked}{suffix}")
+            if counts["legacy"]:
+                facts.add("Pages in a legacy Devanagari font", f"{counts['legacy']} of {checked}{suffix}")
+                facts.add("Legacy fonts", ", ".join(sorted(legacy_fonts)) or "not named; found from the text")
         meta = doc.metadata or {}
         facts.add("Title", (meta.get("title") or "").strip())
         facts.add("Author", (meta.get("author") or "").strip())
@@ -120,6 +146,16 @@ def _docx(data: bytes, facts: Facts) -> None:
     facts.add("Words", len(text.split()))
     facts.add("Title", (document.core_properties.title or "").strip())
     facts.add("Author", (document.core_properties.author or "").strip())
+
+    runs = [r for p in document.paragraphs for r in p.runs if r.text.strip()]
+    fonts = {r.font.name for r in runs if r.font.name and is_legacy_font(r.font.name)}
+    legacy_chars = sum(len(r.text) for r in runs if r.font.name in fonts)
+    total_chars = sum(len(r.text) for r in runs)
+    if (total_chars and legacy_chars / total_chars >= LEGACY_SPAN_SHARE) or looks_legacy(text):
+        facts.add("Legacy Devanagari font", ", ".join(sorted(fonts)) or "found from the text")
+        facts.note = ("This Word file is typed in a legacy (non-Unicode) Devanagari font, so its text "
+                      "is not real Hindi or Marathi. Save it as PDF and upload that to OCR it.")
+        return
     facts.scripts = script_mix(text)
 
 

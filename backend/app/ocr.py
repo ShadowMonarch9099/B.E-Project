@@ -6,7 +6,8 @@ bounding box, and each page gets an OCR confidence equal to its mean word
 confidence. Low-confidence pages get a "check the page" flag (plan N3).
 
 Only PDF pages without a usable text layer are OCR'd; pages that already have
-one are read from the text layer.
+one are read from the text layer. A text layer in a legacy (non-Unicode)
+Devanagari font is not usable, so those pages are OCR'd too.
 """
 
 import io
@@ -18,14 +19,16 @@ from functools import lru_cache
 
 from PIL import Image, ImageOps
 
-from .inspect_file import page_has_text_layer
+from .inspect_file import classify_page
 
 # Several pages run in parallel, so each Tesseract process uses one thread.
 os.environ.setdefault("OMP_THREAD_LIMIT", "1")
 
-# English first: on our trilingual test page, "hin" first read the digit 1 as a danda
-# (142 -> 42) and lowered confidence (90.4 vs 95.5). One page only; re-check on Sakshya-Bench.
-OCR_LANGS = os.environ.get("SAKSHYA_OCR_LANGS", "eng+hin+mar")
+# Language order matters. "hin" first read the digit 1 as a danda on our test page
+# (142 -> 42). On 7 scanned pages of real Maharashtra GRs, "mar+hin+eng" had the lowest
+# character error rate (19.3%) and the most amounts read exactly (60%); "eng+hin+mar"
+# was 19.6% and 56%. Small samples: re-check on Sakshya-Bench.
+OCR_LANGS = os.environ.get("SAKSHYA_OCR_LANGS", "mar+hin+eng")
 OCR_MAX_PAGES = int(os.environ.get("SAKSHYA_OCR_MAX_PAGES", "10"))
 PDF_DPI = 300
 LOW_CONFIDENCE = 60.0  # mean word confidence (0-100) below which a page is flagged
@@ -78,6 +81,7 @@ class PageResult:
     width: int | None = None
     height: int | None = None
     has_ink: bool = False
+    ocr_reason: str | None = None  # "no_text_layer" or "legacy_font" for OCR'd PDF pages
 
     def check_reason(self) -> str | None:
         """Why a reader should check this page against the original, if at all."""
@@ -98,6 +102,7 @@ class PageResult:
             "confidence": None if self.confidence is None else round(self.confidence, 1),
             "check_page": reason is not None,
             "check_reason": reason,
+            "ocr_reason": self.ocr_reason,
             "word_count": len(self.words) if self.source == "ocr" else len(self.text.split()),
             "size": {"width": self.width, "height": self.height} if self.width else None,
             "words": self.words,
@@ -151,10 +156,11 @@ def ocr_image(image: Image.Image, page: int) -> PageResult:
     return PageResult(page, "ocr", "\n\n".join(paragraphs), mean, words, image.width, image.height, has_ink)
 
 
-def _pdf_pages(data: bytes) -> tuple[list[tuple[int, object]], int]:
-    """(page number, rendered image or text-layer text) for the first OCR_MAX_PAGES pages."""
+def _pdf_pages(data: bytes) -> tuple[list[tuple[int, object, str | None]], int]:
+    """(page number, rendered image or text-layer text, OCR reason) for the first OCR_MAX_PAGES pages."""
     import pymupdf
 
+    pymupdf.TOOLS.mupdf_display_errors(False)
     items = []
     with pymupdf.open(stream=data, filetype="pdf") as doc:
         if doc.needs_pass:
@@ -162,22 +168,23 @@ def _pdf_pages(data: bytes) -> tuple[list[tuple[int, object]], int]:
         total = doc.page_count
         for i in range(min(total, OCR_MAX_PAGES)):
             page = doc[i]
-            text = page.get_text()
-            if page_has_text_layer(text):
-                items.append((i + 1, text.strip()))
+            kind, text, _ = classify_page(page)
+            if kind == "text":
+                items.append((i + 1, text.strip(), None))
             else:
                 pix = page.get_pixmap(dpi=PDF_DPI, colorspace=pymupdf.csGRAY)
-                items.append((i + 1, Image.open(io.BytesIO(pix.tobytes("png")))))
+                reason = "legacy_font" if kind == "legacy" else "no_text_layer"
+                items.append((i + 1, Image.open(io.BytesIO(pix.tobytes("png"))), reason))
     return items, total
 
 
-def _image_pages(data: bytes) -> tuple[list[tuple[int, object]], int]:
+def _image_pages(data: bytes) -> tuple[list[tuple[int, object, str | None]], int]:
     items = []
     with Image.open(io.BytesIO(data)) as im:
         total = getattr(im, "n_frames", 1)
         for i in range(min(total, OCR_MAX_PAGES)):
             im.seek(i)
-            items.append((i + 1, im.copy()))
+            items.append((i + 1, im.copy(), None))
     return items, total
 
 
@@ -188,13 +195,16 @@ def run_ocr(data: bytes, label: str) -> dict:
         raise OcrUnavailable(status["error"])
 
     items, total = _pdf_pages(data) if label == "pdf" else _image_pages(data)
-    to_ocr = [(n, img) for n, img in items if isinstance(img, Image.Image)]
+    to_ocr = [(n, img) for n, img, _ in items if isinstance(img, Image.Image)]
     workers = max(1, min(4, os.cpu_count() or 1, len(to_ocr)))
     with ThreadPoolExecutor(max_workers=workers) as pool:
         ocr_results = {r.page: r for r in pool.map(lambda item: ocr_image(item[1], item[0]), to_ocr)}
+    for n, _, reason in items:
+        if n in ocr_results:
+            ocr_results[n].ocr_reason = reason
 
     pages = [ocr_results[n] if n in ocr_results else PageResult(n, "text_layer", content)
-             for n, content in items]
+             for n, content, _ in items]
     ocr_pages = [p for p in pages if p.source == "ocr"]
     confs = [p.confidence for p in ocr_pages if p.words]
     return {
@@ -207,6 +217,7 @@ def run_ocr(data: bytes, label: str) -> dict:
             "max_pages": OCR_MAX_PAGES,
             "mean_confidence": round(sum(confs) / len(confs), 1) if confs else None,
             "check_pages": [p.page for p in ocr_pages if p.check_reason()],
+            "legacy_font_pages": [p.page for p in ocr_pages if p.ocr_reason == "legacy_font"],
             "low_confidence_threshold": LOW_CONFIDENCE,
         },
         "pages": [p.as_dict() for p in pages],

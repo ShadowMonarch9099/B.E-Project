@@ -32,4 +32,5 @@ export const TEXT_LAYER_LABEL: Record<string, string> = {
   native: "Native: text layer on every page",
   scanned: "Scanned: no text layer",
   mixed: "Mixed: some pages need OCR",
+  legacy: "Legacy font: the text is not Unicode, so pages need OCR",
 };

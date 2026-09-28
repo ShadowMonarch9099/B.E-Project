@@ -93,6 +93,13 @@ export default function OcrPanel({
           </>
         )}
       </p>
+      {s.legacy_font_pages.length > 0 && (
+        <p className="note">
+          {s.legacy_font_pages.length === 1 ? "Page" : "Pages"} {s.legacy_font_pages.join(", ")} had a text
+          layer in a legacy (non-Unicode) Devanagari font, so {s.legacy_font_pages.length === 1 ? "it was" : "they were"}{" "}
+          read with OCR instead.
+        </p>
+      )}
       {s.truncated && (
         <p className="note">
           Only the first {s.max_pages} of {s.pages_total} pages were read.
@@ -105,7 +112,7 @@ export default function OcrPanel({
             <summary>
               <span className="ocr-page__num">Page {p.page}</span>
               <span className="ocr-page__meta">
-                {p.source === "ocr" ? "OCR" : "Text layer"}
+                {p.source === "text_layer" ? "Text layer" : p.ocr_reason === "legacy_font" ? "OCR · legacy font" : "OCR"}
                 {p.confidence !== null && ` · ${Math.round(p.confidence)}%`}
                 {` · ${p.word_count} words`}
               </span>

@@ -27,7 +27,7 @@ export interface DetectionResult {
   };
   facts: { label: string; value: string }[];
   scripts: { devanagari: number; latin: number; other: number; devanagari_digits: boolean } | null;
-  pdf_text_layer: "native" | "scanned" | "mixed" | null;
+  pdf_text_layer: "native" | "scanned" | "mixed" | "legacy" | null;
   ingestion: { status: IngestionStatus; route: string; needs_ocr: boolean };
   note: string | null;
 }
@@ -53,6 +53,7 @@ export interface OcrPage {
   confidence: number | null;
   check_page: boolean;
   check_reason: "low_confidence" | "no_text" | null;
+  ocr_reason: "no_text_layer" | "legacy_font" | null;
   word_count: number;
 }
 
@@ -67,6 +68,7 @@ export interface OcrResult {
     max_pages: number;
     mean_confidence: number | null;
     check_pages: number[];
+    legacy_font_pages: number[];
     low_confidence_threshold: number;
   };
   pages: OcrPage[];

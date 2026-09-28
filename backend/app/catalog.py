@@ -116,9 +116,9 @@ def stamp_for(label: str, extensions: list[str] | None = None) -> str:
 
 
 def needs_ocr(label: str, pdf_text_layer: str | None, encrypted: bool) -> bool:
-    """True for scanned or mixed PDFs and for images: the files v1 sends to OCR."""
+    """True for scanned, legacy-font or mixed PDFs and for images: the files v1 sends to OCR."""
     if label == "pdf":
-        return not encrypted and pdf_text_layer in {"scanned", "mixed"}
+        return not encrypted and pdf_text_layer in {"scanned", "mixed", "legacy"}
     return label in OCR_IMAGE_LABELS
 
 
@@ -131,8 +131,12 @@ def ingestion_route(label: str, pdf_text_layer: str | None, encrypted: bool) -> 
             return "in_scope", "Parse the text layer (PyMuPDF), then split into page-anchored chunks."
         if pdf_text_layer == "scanned":
             return "in_scope", "Scanned PDF: OCR every page with Tesseract (English, Hindi, Marathi)."
+        if pdf_text_layer == "legacy":
+            return "in_scope", ("The text layer is Devanagari in a legacy (non-Unicode) font, so it "
+                                "cannot be read directly: OCR every page with Tesseract (English, Hindi, Marathi).")
         if pdf_text_layer == "mixed":
-            return "in_scope", "Parse pages that have a text layer; OCR the pages that do not."
+            return "in_scope", ("Parse pages that have a usable text layer; OCR the rest "
+                                "(scanned pages and pages in a legacy font).")
         return "in_scope", "Parse the PDF; pages without a text layer go to OCR."
     if label == "docx":
         return "in_scope", "Convert to PDF (LibreOffice) so citations open a real page, then parse."
