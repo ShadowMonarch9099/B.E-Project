@@ -118,6 +118,9 @@ export default function DocumentCard({
           </p>
         </div>
       )}
+      {doc.status === "indexed" && stats.shadow?.state === "queued" && (
+        <p className="meta">Searchable now. The English index for the translate route is built when no other document is being indexed.</p>
+      )}
       {doc.status === "indexed" && stats.shadow?.state === "failed" && (
         <p className="note">The English index could not be built; the translate route falls back to direct search.</p>
       )}

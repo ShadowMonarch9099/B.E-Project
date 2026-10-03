@@ -90,6 +90,46 @@ def queue_length() -> int:
     return _queue.qsize()
 
 
+# The English shadow index (translation of every Hindi/Marathi chunk) is the slowest stage on a
+# CPU, so it has its own worker, which starts a document only while no document is waiting to be
+# ingested: a new upload becomes searchable first, and the translate route falls back to the
+# direct route until its document's shadow index is ready.
+_shadow_queue: "queue.Queue[str]" = queue.Queue()
+_shadow_worker: threading.Thread | None = None
+IDLE_POLL_S = 2.0
+
+
+def _shadow_work() -> None:
+    import time
+
+    while True:
+        doc_id = _shadow_queue.get()
+        try:
+            while _queue.unfinished_tasks:  # ingestion first
+                time.sleep(IDLE_POLL_S)
+            if language.needs_shadow(doc_id):
+                _shadow(doc_id)
+        except Cancelled:
+            pass
+        except Exception:
+            log.exception("English shadow index failed for %s", doc_id)
+        finally:
+            _shadow_queue.task_done()
+
+
+def enqueue_shadow(doc_id: str) -> None:
+    global _shadow_worker
+    if os.environ.get("SAKSHYA_INGEST_INLINE") == "1":
+        _shadow(doc_id)
+        return
+    _set_stats(doc_id, shadow={"state": "queued", "done": 0, "total": None})
+    _shadow_queue.put(doc_id)
+    with _worker_lock:
+        if _shadow_worker is None or not _shadow_worker.is_alive():
+            _shadow_worker = threading.Thread(target=_shadow_work, name="shadow", daemon=True)
+            _shadow_worker.start()
+
+
 def resume_pending() -> None:
     """Re-queue documents a previous run left unfinished (called once at startup)."""
     with session_scope() as s:
@@ -237,7 +277,7 @@ def _ingest(doc_id: str) -> None:
              **({"text_check": check.as_dict()} if check is not None else {})}
     _update(doc_id, status="indexed", stage=None, indexed_at=utcnow(), notes=notes, stats=stats)
     if language.SHADOW_ON:
-        _shadow(doc_id)
+        enqueue_shadow(doc_id)
 
 
 def _identify(doc_id: str) -> dict:
@@ -298,7 +338,7 @@ def backfill(wait: bool = False) -> None:
                         _update(doc_id, status="indexed", stage=None)
                         _set_stats(doc_id, embedding_model=get_embedder().name)
                     if language.needs_shadow(doc_id):
-                        _shadow(doc_id)
+                        enqueue_shadow(doc_id)
                 except Cancelled:
                     pass
                 except Exception as exc:

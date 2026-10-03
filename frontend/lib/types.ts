@@ -68,7 +68,7 @@ export interface DocStats {
   scripts?: ScriptMix | null;
   languages?: Record<string, number>;
   shadow?: {
-    state: "pending" | "building" | "ready" | "failed" | "off";
+    state: "pending" | "queued" | "building" | "ready" | "failed" | "off";
     done?: number;
     total?: number | null;
     translated?: number;

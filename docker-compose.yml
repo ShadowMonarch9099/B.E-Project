@@ -1,6 +1,8 @@
-# Run the whole app with: docker compose up --build   (then open http://localhost:3000)
+# Run the whole app:   docker compose up --build        (then open http://localhost:3000)
 # Only the database, for local development:  docker compose up -d db
-# Upload limit: set SAKSHYA_MAX_FILE_MB in your shell or a .env file (default 200).
+# API keys: put them in backend/.env (gitignored; see backend/.env.example). The file is read at
+# run time by the backend container and never copied into an image.
+# Upload limit: set SAKSHYA_MAX_FILE_MB in your shell or a .env file next to this one (default 200).
 services:
   db:
     image: pgvector/pgvector:pg16
@@ -9,7 +11,7 @@ services:
       POSTGRES_PASSWORD: sakshya
       POSTGRES_DB: sakshya
     # 5433 on the host, so it does not clash with a PostgreSQL already installed on 5432.
-    ports: ["5433:5432"]
+    ports: ["${SAKSHYA_DB_PORT:-5433}:5432"]
     volumes: ["pgdata:/var/lib/postgresql/data"]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U sakshya -d sakshya"]
@@ -18,11 +20,16 @@ services:
       retries: 20
   backend:
     build: ./backend
-    ports: ["8000:8000"]
+    ports: ["${SAKSHYA_BACKEND_PORT:-8000}:8000"]
+    env_file:
+      - path: ./backend/.env
+        required: false
     environment:
       SAKSHYA_MAX_FILE_MB: ${SAKSHYA_MAX_FILE_MB:-200}
       SAKSHYA_DATABASE_URL: postgresql+psycopg://sakshya:sakshya@db:5432/sakshya
       SAKSHYA_DATA_DIR: /data
+      HF_HOME: /data/hf
+    # uploads, page images and the downloaded models (about 5 GB after first start)
     volumes: ["appdata:/data"]
     depends_on:
       db:
@@ -32,10 +39,12 @@ services:
       context: ./frontend
       args:
         BACKEND_URL: http://backend:8000
-    ports: ["3000:3000"]
+    ports: ["${SAKSHYA_FRONTEND_PORT:-3000}:3000"]
     environment:
       SAKSHYA_MAX_FILE_MB: ${SAKSHYA_MAX_FILE_MB:-200}
-    depends_on: [backend]
+    depends_on:
+      backend:
+        condition: service_healthy
 
 volumes:
   pgdata:

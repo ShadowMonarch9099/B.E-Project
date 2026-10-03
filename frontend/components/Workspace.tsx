@@ -45,7 +45,7 @@ export default function Workspace() {
   }, [refresh]);
 
   // Poll while any document is still being ingested.
-  const anyPending = docs?.some((d) => isPending(d) || d.stats.shadow?.state === "building" || d.stats.shadow?.state === "pending") ?? false;
+  const anyPending = docs?.some((d) => isPending(d) || d.stats.shadow?.state === "building" || d.stats.shadow?.state === "pending" || d.stats.shadow?.state === "queued") ?? false;
   useEffect(() => {
     if (!anyPending) return;
     const t = setTimeout(refresh, POLL_MS);

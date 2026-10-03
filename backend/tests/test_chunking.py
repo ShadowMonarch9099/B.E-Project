@@ -148,3 +148,21 @@ def test_a_scrap_at_the_end_of_a_page_joins_the_chunk_before_it():
     text, layout = layout_from(body + ["Page 3"])
     chunks = chunk_page(3, text, layout, count=estimate)
     assert chunks[-1].text_raw.endswith("Page 3") and chunks[-1].token_count > 40
+
+
+def test_spaces_drawn_in_another_font_still_separate_words():
+    """A DOCX converted by LibreOffice (Docker image): Devanagari runs in Lohit, the spaces between
+    them in DejaVu, which PyMuPDF puts on lines of their own (the text came out as one word)."""
+    from pathlib import Path
+
+    import pymupdf
+
+    from app.ingest.pages import native_page
+
+    path = Path(__file__).parent / "fixtures" / "libreoffice_marathi.pdf"
+    with pymupdf.open(path) as doc:
+        assert "वसतिगृहपरिपत्रक" in doc[0].get_text()  # the defect
+        page = native_page(doc[0], 1)
+    lines = [" ".join(w["t"] for w in line) for para in page.paragraphs for line in para]
+    assert lines[0] == "वसतिगृह परिपत्रक"
+    assert "विद्यार्थी बारा हजार रुपये आहे." in lines

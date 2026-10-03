@@ -141,9 +141,22 @@ Results go to `backend/eval/results/` (gitignored); reports quoted in the projec
 | `GET /api/conversations?doc_id=…` · `GET /api/conversations/{id}` | List conversations; one conversation with its messages |
 | `POST /api/conversations/{id}/messages` | Ask (`{"question": …}`, optionally `"route"`); the answer streams back as Server-Sent Events (`status`, `retrieval`, `delta`, `answer`, `done`) |
 
+### Run it with Docker (Windows, macOS or Linux)
+
+You need only [Docker Desktop](https://www.docker.com/products/docker-desktop/) (or Docker Engine with the Compose plugin on Linux).
+
+```bash
+cp backend/.env.example backend/.env      # optional: add GROQ_API_KEY / OPENROUTER_API_KEY / NVIDIA_API_KEY
+docker compose up --build                 # first build ~10-20 min; open http://localhost:3000
+```
+
+The backend image has Tesseract (English, Hindi, Marathi), LibreOffice with Devanagari fonts, and CPU-only PyTorch. On first start it downloads the models (about 5 GB: E5, the reranker, IndicLID, IndicXlit, NLLB-200) into the `appdata` volume, so later starts are quick; `/api/health` → `models` shows their progress. Uploads and pages stay in the `appdata` and `pgdata` volumes. `backend/.env` is read when the backend container starts and is never copied into an image (`backend/.dockerignore`). To run a second copy next to a development setup, change the host ports and the project name: `SAKSHYA_DB_PORT=5434 SAKSHYA_BACKEND_PORT=8001 SAKSHYA_FRONTEND_PORT=3001 docker compose -p sakshya-demo up --build`.
+
 ### Run it locally
 
 You need **Python 3.11+**, **Node 20+**, **Docker** (for the database) and **Tesseract**.
+
+On Windows on ARM (e.g. Snapdragon laptops) use the x64 build of Python 3.11: some packages (fasttext, CTranslate2) have no Windows-ARM wheels, and x64 Python runs under emulation.
 
 **1. Tesseract** (OCR; type detection works without it):
 
@@ -177,7 +190,23 @@ npm run dev                                         # open http://localhost:3000
 
 The backend creates and upgrades its tables on startup. If the database is not running, the site still detects and OCRs files, and says that documents cannot be stored. The frontend forwards `/api/*` to `BACKEND_URL` (default `http://localhost:8000`). Or run everything with `docker compose up --build`.
 
-Settings are environment variables, listed with their defaults in `backend/.env.example`. The main ones: `SAKSHYA_DATABASE_URL`, `SAKSHYA_DATA_DIR`, `SAKSHYA_MAX_FILE_MB`, `SAKSHYA_OCR_LANGS` (default `mar+hin+eng`), `SAKSHYA_TESSERACT_CMD`, `SAKSHYA_LIBREOFFICE_CMD`.
+Settings are environment variables, listed with their defaults in `backend/.env.example` (copy it to `backend/.env`; variables already set in the shell win). The main ones:
+
+| Variable | Default | What it does |
+| --- | --- | --- |
+| `GROQ_API_KEY`, `OPENROUTER_API_KEY`, `NVIDIA_API_KEY` | – | Answer providers, tried in `SAKSHYA_LLM_ORDER` (default `groq,openrouter,nvidia`) |
+| `SAKSHYA_GROQ_MODEL`, `SAKSHYA_OPENROUTER_MODEL`, `SAKSHYA_NVIDIA_MODEL` | `openai/gpt-oss-120b` | The model on each provider (`python -m app.llm models` lists them) |
+| `ANTHROPIC_API_KEY`, `SAKSHYA_LLM_MODEL` | –, `claude-opus-5-5` | The Claude provider, used when none of the three keys is set |
+| `SAKSHYA_LLM_PROVIDER` | `auto` | `auto`, `chain`, `groq`, `openrouter`, `nvidia` or `anthropic` |
+| `HF_TOKEN` | – | Lets the translator use IndicTrans2 (gated) instead of NLLB-200 |
+| `SAKSHYA_DATABASE_URL` | `postgresql+psycopg://sakshya:sakshya@localhost:5433/sakshya` | PostgreSQL 16 + pgvector |
+| `SAKSHYA_DATA_DIR`, `SAKSHYA_MODEL_DIR` | `<repo>/data`, `<data>/models` | Uploads and downloaded models |
+| `SAKSHYA_GATE_TAU`, `SAKSHYA_TOP_K`, `SAKSHYA_TOP_N` | `0.15`, `40`, `6` | Evidence gate, candidates reranked, passages sent to the answer model |
+| `SAKSHYA_NLI` | `off` | NLI check of each cited sentence |
+| `SAKSHYA_TEXT_CHECK` | `on` | Compare Devanagari text layers with OCR of one page |
+| `SAKSHYA_MAX_FILE_MB` | `200` | Upload limit (set it for the frontend too) |
+| `SAKSHYA_OCR_LANGS`, `SAKSHYA_OCR_WORKERS`, `SAKSHYA_TESSERACT_CMD` | `mar+hin+eng`, `4`, found automatically | OCR |
+| `SAKSHYA_LIBREOFFICE_CMD` | found automatically | DOCX → PDF |
 
 **Tests:** `cd backend && .venv/bin/python -m pytest -q`. They use a throwaway SQLite database, so they need no server. To run them against PostgreSQL, create an empty database whose name ends in `_test` and set `SAKSHYA_TEST_DATABASE_URL`, e.g. `postgresql+psycopg://sakshya:sakshya@localhost:5433/sakshya_test`.
 

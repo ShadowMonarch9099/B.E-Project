@@ -190,3 +190,24 @@ def test_queued_ingestion_does_not_hold_the_request(monkeypatch):
         pipeline.enqueue(f"doc-{i}")  # returns at once
     assert done.wait(5) and seen == ["doc-0", "doc-1", "doc-2"]
     assert pipeline._worker.name == "ingest"
+
+
+def test_the_english_index_waits_until_ingestion_is_idle(monkeypatch):
+    import threading
+    import time
+
+    from app.ingest import language, pipeline
+
+    built = threading.Event()
+    monkeypatch.delenv("SAKSHYA_INGEST_INLINE")
+    monkeypatch.setattr(pipeline, "IDLE_POLL_S", 0.05)
+    monkeypatch.setattr(pipeline, "_set_stats", lambda doc_id, **f: None)
+    monkeypatch.setattr(language, "needs_shadow", lambda doc_id: True)
+    monkeypatch.setattr(pipeline, "_shadow", lambda doc_id: built.set())
+    busy = type("Queue", (), {"unfinished_tasks": 1})()  # a document still being ingested
+    monkeypatch.setattr(pipeline, "_queue", busy)
+    pipeline.enqueue_shadow("doc-x")
+    time.sleep(0.3)
+    assert not built.is_set()  # ingestion first
+    busy.unfinished_tasks = 0
+    assert built.wait(5)

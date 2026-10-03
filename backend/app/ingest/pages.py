@@ -71,6 +71,64 @@ def _round_box(x0, y0, x1, y1) -> list[float]:
     return [round(x0, 1), round(y0, 1), round(x1, 1), round(y1, 1)]
 
 
+LONG_WORD = 14  # mean letters per word above which a page's spaces were probably lost
+
+
+def _mean_word_length(words) -> float:
+    letters = [sum(ch.isalpha() or "ऀ" <= ch <= "ॿ" for ch in w[4]) for w in words]
+    letters = [n for n in letters if n]
+    return sum(letters) / len(letters) if letters else 0.0
+
+
+def _spaced_words(page) -> list[tuple]:
+    """Words split at whitespace and at the space glyphs drawn between them in another font.
+    LibreOffice writes Devanagari runs in one font (Lohit) and the spaces between them in another
+    (DejaVu); PyMuPDF puts those spaces on lines of their own, so "वसतिगृह शुल्क" came out as
+    "वसतिगृहशुल्क". Each space glyph's box still sits exactly between the two words, so a line is
+    split wherever a space box lies between two of its characters (and overlaps it vertically).
+    Character gaps alone cannot be used: a vowel sign such as ि gets a zero-width box."""
+    raw = page.get_text("rawdict")
+    lines, spaces = [], []
+    for b, block in enumerate(raw["blocks"]):
+        for li, line in enumerate(block.get("lines", [])):
+            chars = [ch for span in line["spans"] for ch in span["chars"]]
+            if chars and all(ch["c"].isspace() for ch in chars):
+                spaces.extend(ch["bbox"] for ch in chars)
+            else:
+                lines.append((b, li, chars))
+
+    def space_between(prev, cur) -> bool:
+        lo, hi = prev[0], cur[0]
+        for sx0, sy0, sx1, sy1 in spaces:
+            mid = (sx0 + sx1) / 2
+            overlap = min(sy1, cur[3]) - max(sy0, cur[1])
+            if lo < mid <= hi and overlap > 0.3 * min(sy1 - sy0, cur[3] - cur[1]):
+                return True
+        return False
+
+    out = []
+    for b, li, chars in lines:
+        word, box, prev, n = "", None, None, 0
+        for ch in chars:
+            c, bbox = ch["c"], ch["bbox"]
+            split = c.isspace() or (prev is not None and space_between(prev, bbox))
+            if split:
+                if word.strip():
+                    out.append((*box, word, b, li, n))
+                    n += 1
+                word, box = "", None
+                if c.isspace():
+                    prev = None
+                    continue
+            word += c
+            box = list(bbox) if box is None else [min(box[0], bbox[0]), min(box[1], bbox[1]),
+                                                  max(box[2], bbox[2]), max(box[3], bbox[3])]
+            prev = bbox
+        if word.strip():
+            out.append((*box, word, b, li, n))
+    return out
+
+
 def native_page(page, page_no: int, source: str = "native") -> ExtractedPage:
     """Words from the text layer, grouped by PyMuPDF's blocks (paragraphs) and lines."""
     import pymupdf
@@ -79,7 +137,10 @@ def native_page(page, page_no: int, source: str = "native") -> ExtractedPage:
     width, height = page.rect.width, page.rect.height
     paragraphs: list[list[list[dict]]] = []
     last_block = last_line = None
-    for x0, y0, x1, y1, text, block, line, _ in page.get_text("words"):
+    words = page.get_text("words")
+    if _mean_word_length(words) > LONG_WORD:
+        words = _spaced_words(page)
+    for x0, y0, x1, y1, text, block, line, _ in words:
         text = text.replace("\x00", "")  # PostgreSQL text cannot hold NUL
         if not text.strip():
             continue
