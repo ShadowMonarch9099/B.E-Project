@@ -23,6 +23,7 @@ A citation-grounded Retrieval-Augmented Generation system for private English, H
 | `docs/Review2_Plan.md` | **Current project plan (Sakshya) for Review 2.** Supersedes the plan v2 PDF and Review 1 deck where they disagree |
 | `docs/prebuilt_models.md` | Prebuilt models for detection and extraction, mapped to the plan's stages |
 | `docs/sakshya.html` | Review of the plan and the "Sakshya" counter-proposal (open in a browser) |
+| `docs/demo.md` | The four walkthrough scenarios run on real Sakshya-Bench documents |
 
 ## The app (Sakshya v0.9)
 
