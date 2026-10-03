@@ -36,6 +36,9 @@ What works now, by plan section:
 - **DOCX** (§6.2 step 3) is converted to PDF with LibreOffice headless so citations point to real pages. Without LibreOffice, a DOCX is read paragraph by paragraph and its card says so.
 - **Page-anchored chunks** (§6.2 steps 5–7): each page is split on paragraph and sentence boundaries into passages of about 200–350 tokens (counted with multilingual-E5's own tokenizer), with a one-sentence overlap inside the page. **A chunk never crosses a page**: a paragraph that runs onto the next page becomes two chunks, each citing its own page. Every chunk stores its page, paragraph and position, the boxes of its lines (PDF points, from PyMuPDF words or from Tesseract word boxes), its source (native / ocr / docx), mean OCR confidence and script. The sentence splitter knows common abbreviations ("Survey No. 142", "क्र. १४२", "दि.") so it does not cut there.
 - **Normalization** (§6.2 step 5): the IndicNLP normalizer for Devanagari, Unicode NFC, and Devanagari digits mapped to ASCII (१४२ → 142) in the indexed text; the original text is kept for display.
+- **Three indexes over the chunks** (§6.2 step 8):
+  - *Lexical*: BM25 (the `bm25s` library) over IndicNLP word tokens, and a second BM25 over character 3–5-grams of each word, which still match OCR-damaged or inflected words. Built in memory from the database and rebuilt when the indexed chunks change. PostgreSQL full-text search is not used, because it has no Marathi configuration.
+  - *Dense*: [multilingual-E5-base](https://huggingface.co/intfloat/multilingual-e5-base) with its `passage: ` / `query: ` prefixes, vectors in pgvector with an HNSW index (cosine). `SAKSHYA_EMBED_MODEL=intfloat/multilingual-e5-large` switches to the large model (a budget variable in the plan); each model keeps its own vectors and HNSW index, and documents missing vectors for the current model are embedded in the background at startup. On this laptop (Snapdragon X Elite running x64 Python under emulation) E5-base embeds about 8 passages of 250 tokens per second; a query takes about 50 ms.
 
 No ML is trained here: type detection uses the prebuilt [Google Magika](https://github.com/google/magika) model and OCR uses [Tesseract](https://github.com/tesseract-ocr/tesseract). See `docs/prebuilt_models.md`.
 
@@ -57,6 +60,7 @@ No ML is trained here: type detection uses the prebuilt [Google Magika](https://
 | `GET /api/documents/{id}/file` | The PDF the viewer opens (`?original=true` for the uploaded file) |
 | `POST /api/documents/{id}/reindex` | Detect and ingest the stored file again |
 | `DELETE /api/documents/{id}` | Delete the document, its pages and its files |
+| `GET /api/search?q=…&doc_id=…&k=10` | Top hits from each index (BM25 words, BM25 character n-grams, E5 dense), for checking retrieval |
 
 ### Run it locally
 

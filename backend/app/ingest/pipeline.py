@@ -18,12 +18,14 @@ from .. import storage
 from ..catalog import OCR_IMAGE_LABELS
 from ..db import Chunk, Document, Page, session_scope
 from ..db.models import utcnow
+from ..index import dense
 from ..inspect_file import script_mix
 from ..ocr import engine_status
 from . import docx_convert, tokens
 from .chunking import chunk_page
 from .normalize import normalize, script_of
 from .pages import ExtractedPage, docx_paragraphs, extract_pdf, image_to_pdf
+from ..ml.embedder import get_embedder
 
 log = logging.getLogger("sakshya.ingest")
 
@@ -180,5 +182,51 @@ def _ingest(doc_id: str) -> None:
             row.stage = "ocr" if page.source == "ocr" else "reading"
 
     chunks = _chunk_document(doc_id)
-    stats = {**_page_stats(doc_id), "chunks": chunks, "tokenizer": tokens.tokenizer_name()}
+    _embed(doc_id)
+    stats = {**_page_stats(doc_id), "chunks": chunks, "tokenizer": tokens.tokenizer_name(),
+             "embedding_model": get_embedder().name}
     _update(doc_id, status="indexed", stage=None, indexed_at=utcnow(), notes=notes, stats=stats)
+
+
+def _embed(doc_id: str) -> None:
+    """Embed every chunk with multilingual-E5 (plan section 6.2 step 8)."""
+    _update(doc_id, stage="embedding", progress_done=0, progress_total=0)
+    dense.embed_chunks(doc_id, on_progress=lambda done, total: _update(doc_id, progress_done=done,
+                                                                       progress_total=total))
+
+
+def backfill_embeddings(wait: bool = False) -> None:
+    """Embed indexed documents that have no vectors for the current model (a new model, or
+    documents indexed before the dense index existed). Runs in the background at startup,
+    so loading or downloading the model never delays the server."""
+
+    def work() -> None:
+        with session_scope() as s:
+            ids = s.scalars(select(Document.id).where(Document.status == "indexed")
+                            .order_by(Document.created_at)).all()
+        missing = [i for i in ids if not dense.has_embeddings(i)]
+        if missing:
+            log.info("Embedding %d indexed document(s) for %s", len(missing), get_embedder().name)
+        for doc_id in missing:
+            with _lock:
+                try:
+                    _update(doc_id, status="processing")
+                    _embed(doc_id)
+                    with session_scope() as s:
+                        doc = s.get(Document, doc_id)
+                        if doc is not None:
+                            doc.status, doc.stage = "indexed", None
+                            doc.stats = {**(doc.stats or {}), "embedding_model": get_embedder().name}
+                except Cancelled:
+                    pass
+                except Exception as exc:
+                    log.exception("Embedding failed for %s", doc_id)
+                    try:
+                        _update(doc_id, status="failed", stage=None, error=f"{type(exc).__name__}: {exc}"[:500])
+                    except Cancelled:
+                        pass
+
+    thread = threading.Thread(target=work, name="embed-backfill", daemon=True)
+    thread.start()
+    if wait:
+        thread.join()

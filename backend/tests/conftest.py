@@ -15,6 +15,10 @@ os.environ["SAKSHYA_DATA_DIR"] = _tmp
 os.environ["SAKSHYA_DATABASE_URL"] = _pg or f"sqlite:///{_tmp}/sakshya-test.db".replace("\\", "/")
 # Unit tests never call the Claude API; the live smoke test reads the real key itself.
 os.environ.setdefault("SAKSHYA_TEST_MODE", "1")
+# Unit tests use small stand-ins instead of downloading the 1 GB+ models; tests of the real
+# models run when the model is already in the Hugging Face cache (see test_indexes.py).
+if os.environ.get("SAKSHYA_TEST_REAL_MODELS") != "1":
+    os.environ["SAKSHYA_EMBEDDER"] = "hash"
 
 if _pg:
     from sqlalchemy import create_engine, make_url, text

@@ -16,3 +16,6 @@ pgvector>=0.3
 indic-nlp-library>=0.92
 transformers>=4.44
 sentencepiece>=0.2
+# Indexes (plan section 6.2 step 8). PyTorch CPU wheels: pip install torch --index-url https://download.pytorch.org/whl/cpu
+torch>=2.3
+bm25s>=0.2
