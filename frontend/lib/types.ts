@@ -52,6 +52,7 @@ export interface Health {
   };
   database: { available: boolean; dialect: string; error: string | null };
   docx_converter: { name: string; available: boolean };
+  llm?: LlmStatus;
   limits: { max_file_mb: number; max_files: number };
 }
 
@@ -121,3 +122,90 @@ export type UploadItem =
   | { id: string; name: string; size: number; state: "analysing" }
   | { id: string; name: string; size: number; state: "rejected"; detail: string; detection: DetectionResult }
   | { id: string; name: string; size: number; state: "error"; message: string };
+
+// ---------- conversations (backend/app/api/conversations.py, app/answer/service.py) ----------
+
+export interface Citation {
+  id: number; // chunk id
+  doc_id: string;
+  filename: string;
+  page_no: number;
+  para_idx: number;
+  chunk_idx: number;
+  anchor: "page" | "paragraph";
+  lang: string | null;
+  script: string | null;
+  source: "native" | "ocr" | "docx";
+  ocr_conf: number | null;
+  check_page: boolean;
+  bbox: number[][];
+  page_width: number | null;
+  page_height: number | null;
+  cited_text?: string;
+  label?: string;
+}
+
+export interface NearestPage extends Citation {
+  score: number;
+  snippet: string;
+}
+
+export interface Gate {
+  passed: boolean;
+  score: number;
+  tau: number;
+  reason: string;
+}
+
+export interface AnswerPayload {
+  kind: "answer";
+  segments: { text: string; citations: Citation[] }[];
+  status: "complete" | "cut_short" | "refused";
+  model: string;
+  fallback_used: boolean;
+  refusal_category: string | null;
+  route: string;
+  gate: Gate;
+  query_log_id?: number;
+}
+
+export interface AbstainPayload {
+  kind: "abstain";
+  reason: string;
+  gate: Gate;
+  nearest: NearestPage[];
+  route: string;
+  query_log_id?: number;
+}
+
+export interface ErrorPayload {
+  kind: "error";
+  code: string;
+  message: string;
+  nearest: NearestPage[];
+  query_log_id?: number;
+}
+
+export interface ChatMessage {
+  id: number;
+  role: "user" | "assistant";
+  content: string;
+  status: "complete" | "abstained" | "cut_short" | "refused" | "error";
+  payload: AnswerPayload | AbstainPayload | ErrorPayload | Record<string, unknown>;
+  created_at: string | null;
+}
+
+export interface Conversation {
+  id: string;
+  doc_id: string | null;
+  title: string | null;
+  created_at: string | null;
+  messages?: ChatMessage[];
+}
+
+export interface LlmStatus {
+  provider: string;
+  configured: boolean;
+  model: string;
+  effort: string | null;
+}

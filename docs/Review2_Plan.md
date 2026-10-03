@@ -26,6 +26,7 @@ Team: Tanmay Gosavi (BA18), Kush Honkalse (BA20) · Guide: Mr. Rishikesh C. Yeol
 13. [Changes from earlier documents](#13-changes-from-earlier-documents)
 14. [Deck revision guide for Review 2](#14-deck-revision-guide-for-review-2)
 15. [Open items](#15-open-items)
+16. [Decision log](#16-decision-log)
 
 ---
 
@@ -426,3 +427,31 @@ Slide-by-slide changes to turn `BE_RAG_Review1_Redesigned.pptx` into the Review 
 3. **Rebuild the deck** from §14.
 4. **Regenerate the synopsis PDF** (`create_rag_project_pdfs.ps1`) if the guide wants the synopsis updated to match this plan; the enhanced synopsis is already mostly consistent, except the reference list (add papers 2, 5 and the tools in §12.2).
 5. **Add collaborators** (teammate and guide) to the GitHub repository.
+
+---
+
+## 16. Decision log
+
+Decisions that change something in this plan, newest last. Each says what changed, why, and what it costs us.
+
+### 2026-10-03 · Build every component without training; answers from the Claude API for now
+
+**Decision.** Model training may not be possible in the time and on the hardware we have, so every component of §6 is built *without training*, and the generator is a hosted API for now:
+
+| Plan component | Plan (§6–7) | Built now | What makes it trainable later |
+| --- | --- | --- | --- |
+| Generator (§7.3) | Local 2–4B instruct model, 4-bit | **Claude API (Anthropic)**, `claude-opus-5-5`, effort `medium`, with the API's citations feature | All calls go through one `AnswerProvider` interface (`backend/app/llm/`); a local model is a second provider, with no change to retrieval or the UI |
+| Learned router (N1, §6.5) | Gradient-boosted trees on oracle labels | Rule-based router over the same cheap features | Every question's features, chosen route and per-route scores are written to `query_logs`: the router's training data |
+| Cross-encoder reranker (§7.1) | Fine-tuned multilingual cross-encoder | Pretrained `cross-encoder/mmarco-mMiniLMv2-L12-H384-v1`, used as-is | Hard negatives can be mined from `query_logs` |
+| Evidence-gate calibrator (N4) | Logistic regression; τ from risk–coverage | Hand-set threshold τ on the best reranker score, chosen by sweeping τ on the dev split and reading the risk–coverage curve (no training) | The same curve and features feed a calibrator later |
+| NLI verifier (§7.1) | Fine-tuned mDeBERTa-v3 XNLI | Pretrained multilingual mDeBERTa-v3 XNLI, used as-is, optional, on top of a citation check | Claim–passage pairs from logged answers |
+
+**Out of scope now, recorded as future work:** QLoRA fine-tuning of a generator, E5 contrastive fine-tuning, reranker fine-tuning, the trained router, and the trained gate.
+
+**Why.** It keeps the research questions answerable: RQ1 (route comparison) needs no trained component, and the plan's hypotheses about the router (H2) and the gate (H5) can still be tested with transparent rules as the baseline the trained versions must beat. A hosted generator removes the riskiest part of §7.3 (weak Marathi generation from a small local model) while the rest of the pipeline is built and measured.
+
+**What it costs.** This deviates from §7.3's "no hosted LLM API in the system". For each question that passes the evidence gate, **the top 6 retrieved passages (never a whole document) and the question are sent to the Anthropic API**. The ask bar says so on screen. Questions below the gate never leave the machine; neither does anything else (OCR, retrieval, the indexes). Answers cost money per question (see the README), and need an API key, read from `ANTHROPIC_API_KEY`; without a key, detection, OCR, search and abstention keep working and the UI explains how to add one. Claims in the report about privacy must say that passages are sent to a hosted model while this decision stands.
+
+**Also decided on the same day.**
+- *IndicTrans2 is gated on Hugging Face* (it needs an account that accepts its terms and an `HF_TOKEN`). Until the team sets one, the translate route uses Helsinki-NLP OPUS-MT (Apache-2.0, ungated) as a stand-in, and every translation records which model made it, so results from the two are never mixed silently.
+- *IndicXlit* ships only as fairseq checkpoints, and fairseq does not install on Python 3.11 / Windows. The plan is to run the official IndicXlit weights with a small PyTorch loader in `backend/app/ml/` instead of the fairseq package (phase 6 of the build).

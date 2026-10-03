@@ -4,8 +4,8 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { deleteDocument, getHealth, listDocuments, reindexDocument, uploadDocument } from "@/lib/api";
 import { formatBytes, isPending, percent } from "@/lib/format";
 import { createLimiter } from "@/lib/limit";
-import type { DocSummary, Health, UploadItem } from "@/lib/types";
-import AskBar from "./AskBar";
+import type { Citation, DocSummary, Health, UploadItem } from "@/lib/types";
+import Chat from "./Chat";
 import DocumentCard from "./DocumentCard";
 import ResultCard from "./ResultCard";
 
@@ -131,6 +131,12 @@ export default function Workspace() {
     handleFiles(e.dataTransfer.files);
   };
 
+  // Opens the cited page of the original document. (The in-app viewer with the passage
+  // highlighted replaces this in phase 5.)
+  const openCitation = useCallback((c: Citation) => {
+    window.open(`/api/documents/${c.doc_id}/file#page=${c.page_no}`, "_blank", "noopener");
+  }, []);
+
   const indexed = (docs ?? []).filter((d) => d.status === "indexed");
   const askable = indexed.map((d) => ({ id: d.id, name: d.filename }));
   const count = (docs?.length ?? 0) + uploads.length;
@@ -232,7 +238,7 @@ export default function Workspace() {
         </section>
       )}
 
-      {askable.length > 0 && <AskBar docs={askable} />}
+      {askable.length > 0 && <Chat docs={askable} llm={health?.llm} onOpen={openCitation} />}
     </>
   );
 }

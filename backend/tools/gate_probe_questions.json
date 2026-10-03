@@ -1,0 +1,33 @@
+{
+  "about": "Questions used once to pick the starting evidence-gate threshold (tau). Written by hand from the team's two sample GRs; not Sakshya-Bench, and not a result. 'answerable' was checked by reading the GR text.",
+  "documents": {
+    "rusa": "higher_education_grants__native.pdf",
+    "transfers": "animal_husbandry_transfers__native.pdf"
+  },
+  "questions": [
+    {"doc": "rusa", "answerable": true, "q": "What is the ratio of central and state share for grants under RUSA?"},
+    {"doc": "rusa", "answerable": true, "q": "राष्ट्रीय उच्चतर शिक्षा अभियानासाठी एकूण किती निधी मंजूर करण्यात आला?"},
+    {"doc": "rusa", "answerable": true, "q": "RUSA yojanet kendra ani rajya hissa kiti aahe?"},
+    {"doc": "rusa", "answerable": true, "q": "Which universities received infrastructure grants under RUSA 1.0?"},
+    {"doc": "rusa", "answerable": true, "q": "When did the state cabinet decide to implement RUSA in Maharashtra?"},
+    {"doc": "rusa", "answerable": true, "q": "Model Degree College Hingoli la kiti anudan milale?"},
+    {"doc": "rusa", "answerable": true, "q": "How much Faculty Improvement grant did St. Xavier Institute of Education get?"},
+    {"doc": "rusa", "answerable": true, "q": "उच्च व तंत्र शिक्षण विभागाचा हा शासन निर्णय कोणत्या तारखेचा आहे?"},
+    {"doc": "transfers", "answerable": true, "q": "Where has Dr. Ashish Jayvant Patil been transferred?"},
+    {"doc": "transfers", "answerable": true, "q": "डॉ. सचिन शशिकांत वंजारी यांची बदली कोठे करण्यात आली?"},
+    {"doc": "transfers", "answerable": true, "q": "Under which act are these transfers made?"},
+    {"doc": "transfers", "answerable": true, "q": "pashudhan vikas adhikari badlya kontya vibhagatil aahet?"},
+    {"doc": "transfers", "answerable": true, "q": "Whose retirement left the post at Vadhgaon Bandhe vacant?"},
+    {"doc": "transfers", "answerable": true, "q": "Which officer goes to the mobile guidance team of Zilla Parishad Satara?"},
+    {"doc": "transfers", "answerable": false, "q": "टाइफाइड कंजुगेट वैक्सीन किस उम्र में दी जाती है?"},
+    {"doc": "rusa", "answerable": false, "q": "What is the income limit for the Gharkul housing scheme?"},
+    {"doc": "transfers", "answerable": false, "q": "third year me ATKT ke liye kitne backlog allowed hai?"},
+    {"doc": "rusa", "answerable": false, "q": "Who won the cricket world cup in 2011?"},
+    {"doc": "rusa", "answerable": false, "q": "पीक विमा योजनेसाठी अर्ज कसा करावा?"},
+    {"doc": "transfers", "answerable": false, "q": "What compensation did the Collector fix for land in Survey No. 142?"},
+    {"doc": "transfers", "answerable": false, "q": "KYC update ki last date kya hai low-risk customers ke liye?"},
+    {"doc": "rusa", "answerable": false, "q": "soybean var kid padli tar konti favarni karavi?"},
+    {"doc": "transfers", "answerable": false, "q": "What is the monthly salary of a Pashudhan Vikas Adhikari?"},
+    {"doc": "rusa", "answerable": false, "q": "RUSA 3.0 madhe kiti nidhi aahe?"}
+  ]
+}

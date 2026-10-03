@@ -13,13 +13,14 @@ from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
 from . import catalog, config
-from .api import documents, search
+from .api import conversations, documents, search
 from .db import init_db
 from .db.session import status as db_status
 from .detection import analyse, detect as detect_type, get_magika
 from .ingest import docx_convert
 from .ingest.pipeline import backfill_embeddings, resume_pending
-from .ml import embedder
+from .llm import get_provider
+from .ml import embedder, reranker
 from .ocr import OcrUnavailable, engine_status, run_ocr
 
 logging.basicConfig(level=os.environ.get("SAKSHYA_LOG_LEVEL", "INFO"),
@@ -49,6 +50,7 @@ app.add_middleware(
 )
 app.include_router(documents.router)
 app.include_router(search.router)
+app.include_router(conversations.router)
 
 
 @app.get("/api/health")
@@ -60,6 +62,8 @@ def health() -> dict:
         "database": db_status(),
         "docx_converter": {"name": "LibreOffice", **docx_convert.status()},
         "embedder": embedder.status(),
+        "reranker": reranker.status(),
+        "llm": get_provider().status(),
         "limits": {"max_file_mb": MAX_FILE_MB, "max_files": MAX_FILES},
     }
 
