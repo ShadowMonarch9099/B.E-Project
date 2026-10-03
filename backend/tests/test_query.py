@@ -124,3 +124,44 @@ def test_real_translation_gives_an_english_view(monkeypatch):
 
     out = NllbTranslator().to_english(["घरकुल योजना साठी उत्पन्नाची मर्यादा किती आहे?"], "mr")[0]
     assert "income" in out.lower()
+
+
+def _indiclid_or_skip():
+    from app.ml import langid
+
+    if not langid.models_present():
+        pytest.skip("IndicLID models are not downloaded")
+    return langid.get_langid()
+
+
+def test_english_with_the_is_not_romanized_hindi():
+    """"the" is also a romanized Hindi word ("were"); it once turned every English passage Hindi."""
+    lid = _indiclid_or_skip()
+    passage = ("Emphasise the importance of a balanced and nutritious diet during pregnancy. The diet of the woman "
+               "should include more food. You should know how to calculate the EDD and communicate this to the woman.")
+    assert lid.identify(passage).lang == "en"
+    assert lid.identify("What is the area of the land under the scheme?").lang == "en"
+    hinglish = lid.identify("third year me ATKT ke liye kitne backlog allowed hai?")
+    assert hinglish.lang == "hi" and hinglish.romanized
+    assert lid.identify("gharkul yojana sathi utpannachi maryada kiti ahe?").lang == "mr"
+
+
+def test_transliteration_keeps_english_words_and_spells_function_words():
+    from app.retrieval import query as q
+
+    calls = []
+
+    def fake_xlit(word, lang):
+        calls.append(word)
+        return {"ghar": "घर", "dino": "दिनो"}.get(word, word.upper())
+
+    import app.ml.xlit as xlit
+
+    original = xlit.transliterate_word
+    xlit.transliterate_word = fake_xlit
+    try:
+        out = q.transliterate_query("ghar pe delivery ke liye ATKT 3 dino?", "hi", keep={"delivery"})
+    finally:
+        xlit.transliterate_word = original
+    assert out == "घर पे delivery के लिए ATKT 3 दिनो?"
+    assert calls == ["ghar", "dino"]  # function words, English words and acronyms never reach IndicXlit

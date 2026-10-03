@@ -73,16 +73,42 @@ class QueryAnalysis:
         return asdict(self)
 
 
-def transliterate_query(text: str, lang: str) -> str:
-    """Romanized words -> Devanagari with IndicXlit; acronyms, numbers and punctuation kept."""
+# Short function words, which IndicXlit transliterates poorly on their own ("ke" -> "केई",
+# "to" -> "टो"): their standard spelling.
+FUNCTION_WORDS = {
+    "hi": {"ke": "के", "ki": "की", "ka": "का", "ko": "को", "se": "से", "me": "में", "mein": "में", "hai": "है",
+           "hain": "हैं", "to": "तो", "toh": "तो", "pe": "पे", "par": "पर", "liye": "लिए", "aur": "और",
+           "nahi": "नहीं", "nahin": "नहीं", "kya": "क्या", "kitne": "कितने", "kitna": "कितना", "kitni": "कितनी",
+           "kaise": "कैसे", "kab": "कब", "kahan": "कहाँ", "kaun": "कौन", "hota": "होता", "hoti": "होती",
+           "hote": "होते", "hui": "हुई", "hua": "हुआ", "karna": "करना", "chahiye": "चाहिए", "bhi": "भी",
+           "ye": "ये", "yeh": "यह", "wo": "वो", "woh": "वह", "tak": "तक", "ya": "या", "jab": "जब"},
+    "mr": {"ahe": "आहे", "aahe": "आहे", "ahet": "आहेत", "aahet": "आहेत", "kiti": "किती", "sathi": "साठी",
+           "saathi": "साठी", "ani": "आणि", "aani": "आणि", "la": "ला", "chi": "ची", "cha": "चा", "che": "चे",
+           "chya": "च्या", "madhe": "मध्ये", "madhye": "मध्ये", "kay": "काय", "kasa": "कसा", "kashi": "कशी",
+           "kuthe": "कुठे", "kevha": "केव्हा", "nahi": "नाही", "pahije": "पाहिजे", "zali": "झाली", "zala": "झाला",
+           "ka": "का", "va": "व", "kon": "कोण", "konta": "कोणता", "konti": "कोणती"},
+}
+
+
+def transliterate_query(text: str, lang: str, keep: set[str] | frozenset = frozenset()) -> str:
+    """Romanized words -> Devanagari with IndicXlit. Acronyms, numbers, punctuation and the
+    English words of a code-mixed question (`keep`, from IndicLID) stay as written; common
+    function words take their standard spelling."""
     from ..ml.xlit import transliterate_word
 
+    keep = {w.lower() for w in keep}
+    table = FUNCTION_WORDS.get(lang, {})
     parts = []
     for tok in _TOKEN.findall(text):
-        if tok.isalpha() and not (len(tok) >= 2 and tok.isupper()):
-            parts.append(transliterate_word(tok.lower(), lang))
-        else:
+        low = tok.lower()
+        if not tok.isalpha() or (len(tok) >= 2 and tok.isupper()):
             parts.append(tok)
+        elif low in table:
+            parts.append(table[low])
+        elif low in keep:
+            parts.append(tok)
+        else:
+            parts.append(transliterate_word(low, lang))
     return "".join(parts)
 
 
@@ -114,7 +140,8 @@ def analyse_query(question: str, options: AnalysisOptions | None = None) -> Quer
             a.code_mix = round(len(a.english_words) / len(words), 3) if words else 0.0
 
     def transliterate() -> None:
-        a.devanagari = normalize(transliterate_query(question, a.lang), a.lang, digits=opts.digits)
+        a.devanagari = normalize(transliterate_query(question, a.lang, set(a.english_words)), a.lang,
+                                 digits=opts.digits)
 
     def translate() -> None:
         from ..ml.translate import get_translator

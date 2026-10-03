@@ -13,7 +13,7 @@
       "languages": [
         "mr"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": true,
       "department": "सामान्य प्रशासन विभाग (पासुन २४-जून-२०२६)",
       "date": "02-10-2026",
@@ -21,7 +21,12 @@
       "size_bytes": 1419200,
       "pages": 1,
       "text_layer": "scanned",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "mr": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "train"
     },
     {
       "id": "mh-gr-02",
@@ -34,15 +39,20 @@
       "languages": [
         "mr"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "department": "वित्त विभाग",
       "date": "01-10-2026",
       "sha256": "07ca396bb3b1e7d86922c03b3d222b1d519c265f79d96630e39315847cefda99",
       "size_bytes": 309297,
       "pages": 2,
       "text_layer": "native",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "mr": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "train"
     },
     {
       "id": "mh-gr-03",
@@ -55,15 +65,20 @@
       "languages": [
         "mr"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "department": "वित्त विभाग",
       "date": "01-10-2026",
       "sha256": "79094ac9af3c3418f8d545441618e4a5e0eeff5753de9b745d9d04e23a4cbe09",
       "size_bytes": 403934,
       "pages": 8,
       "text_layer": "native",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "mr": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "train"
     },
     {
       "id": "mh-gr-04",
@@ -76,15 +91,20 @@
       "languages": [
         "mr"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "department": "अन्‍न, नागरी पुरवठा व ग्राहक संरक्षण विभाग",
       "date": "01-10-2026",
       "sha256": "c4601c0f287cb5db107cebd3439fe483dc326510dfcbc040ec4d2f11a1e8af71",
       "size_bytes": 202690,
       "pages": 8,
       "text_layer": "native",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "mr": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "train"
     },
     {
       "id": "mh-gr-05",
@@ -97,15 +117,20 @@
       "languages": [
         "mr"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "department": "सामान्य प्रशासन विभाग (पासुन २४-जून-२०२६)",
       "date": "01-10-2026",
       "sha256": "9087dc99bfcd58bab73d2f4af17b0013f419296492d679e45517319490f9e2b9",
       "size_bytes": 138874,
       "pages": 1,
       "text_layer": "native",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "mr": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "train"
     },
     {
       "id": "mh-gr-06",
@@ -116,17 +141,24 @@
       "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
       "redistribute": false,
       "languages": [
-        "mr"
+        "mr",
+        "en"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "department": "सामान्य प्रशासन विभाग (पासुन २४-जून-२०२६)",
       "date": "01-10-2026",
       "sha256": "c9eaee34d63d4511fd22ae76f3c581d0132e0355d001faf51985d3e93fdbb717",
       "size_bytes": 307602,
       "pages": 2,
       "text_layer": "native",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "en": 0.175,
+        "mr": 0.825
+      },
+      "ocr_share": 1.0,
+      "split": "dev"
     },
     {
       "id": "mh-gr-07",
@@ -137,17 +169,24 @@
       "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
       "redistribute": false,
       "languages": [
-        "mr"
+        "mr",
+        "en"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "department": "उच्च व तंत्र शिक्षण विभाग",
       "date": "01-10-2026",
       "sha256": "0867ea7ad282c83b7d32b050ad81a31e7480c19b60ee23910d4d26a5af9afaf5",
       "size_bytes": 190377,
       "pages": 7,
       "text_layer": "native",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "en": 0.109,
+        "mr": 0.891
+      },
+      "ocr_share": 1.0,
+      "split": "train"
     },
     {
       "id": "mh-gr-08",
@@ -160,15 +199,22 @@
       "languages": [
         "mr"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "department": "विधी व न्याय विभाग",
       "date": "01-10-2026",
       "sha256": "e9b71ea0129c4f4e1b7bc4d825e0fcd1b79a26df382a6a5adcce76fb5c3773bf",
       "size_bytes": 455498,
       "pages": 6,
       "text_layer": "native",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "en": 0.018,
+        "hi": 0.055,
+        "mr": 0.928
+      },
+      "ocr_share": 1.0,
+      "split": "train"
     },
     {
       "id": "mh-gr-09",
@@ -179,17 +225,24 @@
       "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
       "redistribute": false,
       "languages": [
-        "mr"
+        "mr",
+        "en"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "department": "अल्पसंख्याक विकास विभाग",
       "date": "01-10-2026",
       "sha256": "4f623897f5b97464f4769642e849ebabcbb0f3b3970fa9e445cef8b87d9a15b3",
       "size_bytes": 245698,
       "pages": 7,
       "text_layer": "native",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "en": 0.405,
+        "mr": 0.595
+      },
+      "ocr_share": 1.0,
+      "split": "test"
     },
     {
       "id": "mh-gr-10",
@@ -202,15 +255,20 @@
       "languages": [
         "mr"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "department": "अल्पसंख्याक विकास विभाग",
       "date": "01-10-2026",
       "sha256": "4042b83e012f2546e6c5d29ea383bc77f2fc7af5bf2d5dd07970b75ee1481815",
       "size_bytes": 222881,
       "pages": 3,
       "text_layer": "native",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "mr": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "train"
     },
     {
       "id": "kop-laq-01",
@@ -223,13 +281,18 @@
       "languages": [
         "mr"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "sha256": "1af4e666b98f85f69c53f62bdd522dc5949c00b0b8e11e30923d5a81233c9b65",
       "size_bytes": 108868,
       "pages": 1,
       "text_layer": "broken",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "mr": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "test"
     },
     {
       "id": "kop-laq-02",
@@ -242,13 +305,18 @@
       "languages": [
         "mr"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "sha256": "f7e5c034971c2158971e2bfc2ece0916568eeab91e837ec25964e7749137c565",
       "size_bytes": 199055,
       "pages": 14,
       "text_layer": "broken",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "mr": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "test"
     },
     {
       "id": "kop-laq-03",
@@ -261,13 +329,18 @@
       "languages": [
         "mr"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "sha256": "c7e72b270d6dc21ec1059f677db751f0d480d6cfd2737f2aa30270032ac792c9",
       "size_bytes": 188990,
       "pages": 26,
       "text_layer": "broken",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "mr": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "dev"
     },
     {
       "id": "kop-laq-04",
@@ -280,13 +353,19 @@
       "languages": [
         "mr"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "sha256": "029b55d3a359abbec411773baa03ee0cad542e81d3625382fef61839f9ed25be",
       "size_bytes": 241380,
       "pages": 16,
       "text_layer": "broken",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "mr": 0.992,
+        "unknown": 0.008
+      },
+      "ocr_share": 1.0,
+      "split": "train"
     },
     {
       "id": "kop-laq-05",
@@ -299,13 +378,18 @@
       "languages": [
         "mr"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "sha256": "104743100e08faded8687ab37dcc8874018252f2ea076a2be46acce57e0d1efb",
       "size_bytes": 897509,
       "pages": 9,
       "text_layer": "broken",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "mr": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "train"
     },
     {
       "id": "kop-laq-06",
@@ -318,13 +402,18 @@
       "languages": [
         "mr"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "sha256": "3d0871526d5d2cf9296d6f8bdb019937041f9567efdd46ece9b1241cbcc9311b",
       "size_bytes": 356687,
       "pages": 46,
       "text_layer": "broken",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "mr": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "test"
     },
     {
       "id": "kop-laq-07",
@@ -337,13 +426,18 @@
       "languages": [
         "mr"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "sha256": "d007c02d89df93e86737af3375e56168ecfbd9ec57fb1bc409ae297170d485f3",
       "size_bytes": 656461,
       "pages": 70,
       "text_layer": "broken",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "mr": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "train"
     },
     {
       "id": "kop-notice-01",
@@ -356,13 +450,19 @@
       "languages": [
         "mr"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": true,
       "sha256": "5e04fef15e2b8914eb40b8266954d27a141b16fe5b57c0d0c68096dc88e45e4b",
       "size_bytes": 1139306,
       "pages": 3,
       "text_layer": "scanned",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "en": 0.075,
+        "mr": 0.925
+      },
+      "ocr_share": 1.0,
+      "split": "train"
     },
     {
       "id": "kop-notice-02",
@@ -373,15 +473,20 @@
       "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
       "redistribute": false,
       "languages": [
-        "mr"
+        "en"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": false,
       "sha256": "4eced860524579f849a01c57f231b99fe4fe34067a315e301ab99ba8b1e309b1",
       "size_bytes": 2044257,
       "pages": 2,
       "text_layer": "native",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "en": 1.0
+      },
+      "ocr_share": 0.0,
+      "split": "train"
     },
     {
       "id": "kop-notice-03",
@@ -394,13 +499,18 @@
       "languages": [
         "mr"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": true,
       "sha256": "475dfbde18e489a8d43681832e40c24d6dc991685b4df118591265fdeccedec8",
       "size_bytes": 966912,
       "pages": 2,
       "text_layer": "scanned",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "mr": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "dev"
     },
     {
       "id": "kop-notice-04",
@@ -413,13 +523,18 @@
       "languages": [
         "mr"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": true,
       "sha256": "a97c08eaa35dd1f8268e299938c0530e880cf2f9639b10142609541f5235cfbf",
       "size_bytes": 838964,
       "pages": 3,
       "text_layer": "scanned",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "mr": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "train"
     },
     {
       "id": "kop-notice-05",
@@ -432,13 +547,18 @@
       "languages": [
         "mr"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": true,
       "sha256": "46b7421dc2a80cb96e2b8a7441ab177e6a3f69d75942b68476e0bde453f14dc3",
       "size_bytes": 1900526,
       "pages": 2,
       "text_layer": "scanned",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "mr": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "train"
     },
     {
       "id": "kop-notice-06",
@@ -451,13 +571,18 @@
       "languages": [
         "mr"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": false,
       "sha256": "9638bc1b7aee99e82eb37e0597d7b8943f16fd2e6c646f0671e904dab53ebb4c",
       "size_bytes": 330391,
       "pages": 1,
       "text_layer": "native",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "mr": 1.0
+      },
+      "ocr_share": 0.0,
+      "split": "train"
     },
     {
       "id": "kop-notice-07",
@@ -470,13 +595,18 @@
       "languages": [
         "mr"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": false,
       "sha256": "86ee784ac7b3a6c7f02026e4ee8b94599261898d63b9b7ff2ad6f5a98f57256c",
       "size_bytes": 270857,
       "pages": 1,
       "text_layer": "native",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "mr": 1.0
+      },
+      "ocr_share": 0.0,
+      "split": "train"
     },
     {
       "id": "kop-notice-08",
@@ -489,13 +619,18 @@
       "languages": [
         "mr"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": true,
       "sha256": "31ee10bcff51bb686aaba82d1940d8fdc84804c4beab2816804a33f0e886e000",
       "size_bytes": 1726078,
       "pages": 6,
       "text_layer": "scanned",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "mr": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "test"
     },
     {
       "id": "kop-charter-01",
@@ -508,13 +643,18 @@
       "languages": [
         "mr"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "sha256": "4c65142359433148ee8e370d40279566a423d9e8a16997f7d06cc51d495d42ea",
       "size_bytes": 745722,
       "pages": 15,
       "text_layer": "mixed",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "mr": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "test"
     },
     {
       "id": "kop-charter-02",
@@ -527,13 +667,18 @@
       "languages": [
         "mr"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "sha256": "d0479074d693866c0553323b553fe72979b462f720327db588a87132041fc89f",
       "size_bytes": 507669,
       "pages": 11,
       "text_layer": "native",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "mr": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "test"
     },
     {
       "id": "sol-laq-01",
@@ -544,15 +689,23 @@
       "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
       "redistribute": false,
       "languages": [
-        "mr"
+        "mr",
+        "en"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "sha256": "74071970bdb877819e00da2cb76aed7e92929b990f292ef9f2f73485977d5415",
       "size_bytes": 1938693,
       "pages": 141,
       "text_layer": "native",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "mr": 0.525,
+        "en": 0.461,
+        "hi": 0.015
+      },
+      "ocr_share": 0.794,
+      "split": "test"
     },
     {
       "id": "sol-laq-02",
@@ -563,15 +716,23 @@
       "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
       "redistribute": false,
       "languages": [
-        "mr"
+        "mr",
+        "en"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "sha256": "d669ecc3c1f95642abc9cef2ef57f0b6717045aa7375ae7b5b7e058cf7f0b134",
       "size_bytes": 1583325,
       "pages": 92,
       "text_layer": "native",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "mr": 0.509,
+        "en": 0.458,
+        "hi": 0.033
+      },
+      "ocr_share": 0.761,
+      "split": "test"
     },
     {
       "id": "sol-laq-03",
@@ -584,13 +745,18 @@
       "languages": [
         "mr"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": true,
       "sha256": "6fb8134fd655032f8c2db7e279351777cb515ace884629616e780d23dfab9a64",
       "size_bytes": 1946464,
       "pages": 5,
       "text_layer": "scanned",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "mr": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "test"
     },
     {
       "id": "sol-laq-04",
@@ -603,13 +769,18 @@
       "languages": [
         "mr"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "sha256": "92f69cefa3bb7d0d02d9c2d4cb4d13c2ccac2c5ee95653a612dd9bcf5ca3efee",
       "size_bytes": 2730457,
       "pages": 14,
       "text_layer": "mixed",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "mr": 1.0
+      },
+      "ocr_share": 0.929,
+      "split": "train"
     },
     {
       "id": "sol-laq-05",
@@ -622,13 +793,20 @@
       "languages": [
         "mr"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": true,
       "sha256": "68cce773d42371084abfbf4c72aab9f2dc291264f0bf783639bb8706ae6d3a45",
       "size_bytes": 2321056,
       "pages": 17,
       "text_layer": "scanned",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "en": 0.034,
+        "hi": 0.061,
+        "mr": 0.906
+      },
+      "ocr_share": 1.0,
+      "split": "dev"
     },
     {
       "id": "sol-laq-06",
@@ -639,15 +817,20 @@
       "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
       "redistribute": false,
       "languages": [
-        "mr"
+        "en"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "sha256": "176e264b7f91772510ecde5aeb3fe38c74b9f84e28e5210fb20a1301a0aaf240",
       "size_bytes": 68153,
       "pages": 1,
       "text_layer": "legacy",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "en": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "dev"
     },
     {
       "id": "bpl-notice-01",
@@ -660,13 +843,18 @@
       "languages": [
         "hi"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "sha256": "2dad27856a8e4f0cffafdfcf959664078f3f2d7ab73dcbd4fc2087ef9b7a5273",
       "size_bytes": 1690349,
       "pages": 24,
       "text_layer": "broken",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "hi": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "train"
     },
     {
       "id": "bpl-notice-02",
@@ -679,13 +867,18 @@
       "languages": [
         "hi"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "sha256": "c836d7f6722aeff4702f903b31a174054bb583f03200d371be1b4e5d3d87c9e6",
       "size_bytes": 857683,
       "pages": 9,
       "text_layer": "broken",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "hi": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "test"
     },
     {
       "id": "bpl-notice-03",
@@ -698,13 +891,18 @@
       "languages": [
         "hi"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "sha256": "348ee675bb2d6024eb7fad4b40bb676fd31ed398eed8743ddcb720787ba163ef",
       "size_bytes": 202732,
       "pages": 6,
       "text_layer": "native",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "hi": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "test"
     },
     {
       "id": "bpl-notice-04",
@@ -715,15 +913,22 @@
       "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
       "redistribute": false,
       "languages": [
+        "mr",
         "hi"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": false,
       "sha256": "9009ea201018c9a97495ad0dd856e55971aa487299473e55be8c30a4ef63eca5",
       "size_bytes": 390724,
       "pages": 2,
       "text_layer": "native",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "hi": 0.149,
+        "mr": 0.851
+      },
+      "ocr_share": 0.0,
+      "split": "test"
     },
     {
       "id": "bpl-notice-05",
@@ -736,13 +941,18 @@
       "languages": [
         "hi"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "sha256": "a55153147e91dd85a922efa8f2007c47931990735fce4eabd9aeb9d815569b8d",
       "size_bytes": 3110665,
       "pages": 22,
       "text_layer": "broken",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "hi": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "train"
     },
     {
       "id": "bpl-notice-06",
@@ -755,13 +965,18 @@
       "languages": [
         "hi"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "sha256": "9be2fd45b5aaf739212e924730fa537af5449896ab6c3784be51b0aa9ed9734a",
       "size_bytes": 132858,
       "pages": 6,
       "text_layer": "broken",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "hi": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "test"
     },
     {
       "id": "bpl-notice-07",
@@ -774,13 +989,18 @@
       "languages": [
         "hi"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "sha256": "2d6ff6b1d59f4dc206d1f39480f4519859a510abbce3c4426690663a08c13470",
       "size_bytes": 1351199,
       "pages": 9,
       "text_layer": "legacy",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "hi": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "dev"
     },
     {
       "id": "bpl-notice-08",
@@ -793,13 +1013,18 @@
       "languages": [
         "hi"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "sha256": "0ccf353b4dba9e8b7f3c7b647c5ef64179efdacdbefd52c4da5e1d2fa96b9d4b",
       "size_bytes": 2499576,
       "pages": 13,
       "text_layer": "broken",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "hi": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "train"
     },
     {
       "id": "pat-notice-01",
@@ -812,13 +1037,18 @@
       "languages": [
         "hi"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": true,
       "sha256": "8756a60ad73d8ba87384e47f10f35383e25d3dc4e5e038e2b010a8f98bf9e729",
       "size_bytes": 153933,
       "pages": 4,
       "text_layer": "scanned",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "hi": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "dev"
     },
     {
       "id": "pat-notice-02",
@@ -831,13 +1061,18 @@
       "languages": [
         "hi"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": true,
       "sha256": "22643bcc6df1df45c352a1ccd0271c9b95a04dfa8334523d576e125847c121e0",
       "size_bytes": 561008,
       "pages": 1,
       "text_layer": "scanned",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "hi": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "test"
     },
     {
       "id": "pat-notice-03",
@@ -848,15 +1083,21 @@
       "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
       "redistribute": false,
       "languages": [
-        "hi"
+        "en"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": false,
       "sha256": "45fd16b157fb8c84f4349f244276c33d4b63178235970785b5f5266d52c44dda",
       "size_bytes": 2841127,
       "pages": 9,
       "text_layer": "native",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "en": 0.941,
+        "hi": 0.059
+      },
+      "ocr_share": 0.0,
+      "split": "train"
     },
     {
       "id": "pat-notice-04",
@@ -867,15 +1108,22 @@
       "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
       "redistribute": false,
       "languages": [
-        "hi"
+        "hi",
+        "en"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": true,
       "sha256": "973e3ba507e0e3cd9d2d857205e0d408328d7fc7d132db35668a185b5fd1bd6f",
       "size_bytes": 2417318,
       "pages": 3,
       "text_layer": "scanned",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "en": 0.268,
+        "hi": 0.732
+      },
+      "ocr_share": 1.0,
+      "split": "train"
     },
     {
       "id": "pat-notice-05",
@@ -888,13 +1136,18 @@
       "languages": [
         "hi"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": true,
       "sha256": "4031d22d54568f3dd170b8cdb94fc84031fe35b69d62ec73d608f01116ac27b6",
       "size_bytes": 252429,
       "pages": 2,
       "text_layer": "scanned",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "hi": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "test"
     },
     {
       "id": "pat-notice-06",
@@ -907,13 +1160,19 @@
       "languages": [
         "hi"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": true,
       "sha256": "45596f1f7bd1f9f3783074b9a17cabb0a4a170b13ca0d50d8b9996c28c797731",
       "size_bytes": 773161,
       "pages": 6,
       "text_layer": "scanned",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "hi": 0.958,
+        "mr": 0.042
+      },
+      "ocr_share": 1.0,
+      "split": "test"
     },
     {
       "id": "nhm-asha-hi-01",
@@ -926,13 +1185,19 @@
       "languages": [
         "hi"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "sha256": "dff8d319c1ac095402f2679237efe657c648b79c16d9a6f6d9aed5d5ae441e93",
       "size_bytes": 494979,
       "pages": 54,
       "text_layer": "mixed",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "en": 0.015,
+        "hi": 0.985
+      },
+      "ocr_share": 0.981,
+      "split": "train"
     },
     {
       "id": "nhm-asha-hi-02",
@@ -945,13 +1210,19 @@
       "languages": [
         "hi"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "sha256": "3609d2559e90c09b8050d3dce76d183d26d02cb44d906c5e6421062bd61c86c8",
       "size_bytes": 7902278,
       "pages": 78,
       "text_layer": "mixed",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "en": 0.047,
+        "hi": 0.953
+      },
+      "ocr_share": 1.0,
+      "split": "train"
     },
     {
       "id": "nhm-asha-hi-03",
@@ -964,13 +1235,19 @@
       "languages": [
         "hi"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "sha256": "54d1d41ab02c81b02b15152fcb7445e464686b7d3446bde7fa7d83cfaa20b9bb",
       "size_bytes": 3037226,
       "pages": 89,
       "text_layer": "mixed",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "en": 0.021,
+        "hi": 0.979
+      },
+      "ocr_share": 1.0,
+      "split": "train"
     },
     {
       "id": "nhm-asha-hi-04",
@@ -981,15 +1258,23 @@
       "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
       "redistribute": false,
       "languages": [
-        "hi"
+        "hi",
+        "en"
       ],
-      "languages_source": "expected from the publisher's listing page",
-      "scanned": false,
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
+      "scanned": true,
       "sha256": "4c771bfdad8b99e49c335268af44b079596d5322b026a774ca64ef9a470b5de4",
       "size_bytes": 2664775,
       "pages": 36,
       "text_layer": "mixed",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "en": 0.298,
+        "hi": 0.657,
+        "mr": 0.045
+      },
+      "ocr_share": 0.944,
+      "split": "train"
     },
     {
       "id": "nhm-asha-en-01",
@@ -1002,13 +1287,18 @@
       "languages": [
         "en"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": false,
       "sha256": "d57863e94498a63ef210920482058c03c918d25738f52f2506ec6a5c9be204c1",
       "size_bytes": 597246,
       "pages": 101,
       "text_layer": "native",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "en": 1.0
+      },
+      "ocr_share": 0.0,
+      "split": "train"
     },
     {
       "id": "nhm-asha-en-02",
@@ -1021,13 +1311,18 @@
       "languages": [
         "en"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": false,
       "sha256": "7a85cc664c2ee0c8bb37135eb111117d20420988e92817b00c13cd284f3a81d9",
       "size_bytes": 1507955,
       "pages": 43,
       "text_layer": "mixed",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "en": 1.0
+      },
+      "ocr_share": 0.07,
+      "split": "train"
     },
     {
       "id": "nhm-asha-en-03",
@@ -1040,13 +1335,18 @@
       "languages": [
         "en"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": false,
       "sha256": "d58397ca32c0b84a80c04dcdad3d37b5d08532c6972b17e79684db776597af3b",
       "size_bytes": 987467,
       "pages": 35,
       "text_layer": "mixed",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "en": 1.0
+      },
+      "ocr_share": 0.114,
+      "split": "dev"
     },
     {
       "id": "nhm-asha-en-04",
@@ -1059,13 +1359,18 @@
       "languages": [
         "en"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": false,
       "sha256": "eb3c5708b05aa8449e8e623cbc7fe985045cd2f38b1c80abc8e794f39a53a060",
       "size_bytes": 971280,
       "pages": 33,
       "text_layer": "mixed",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "en": 1.0
+      },
+      "ocr_share": 0.121,
+      "split": "train"
     },
     {
       "id": "nhm-asha-en-05",
@@ -1078,13 +1383,19 @@
       "languages": [
         "en"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": false,
       "sha256": "cf022896ce48b9665ebf64e4c0942aa5eb5fa61fbe8755a64545d0080db3ddae",
       "size_bytes": 444559,
       "pages": 58,
       "text_layer": "mixed",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "unknown": 0.0,
+        "en": 1.0
+      },
+      "ocr_share": 0.052,
+      "split": "test"
     },
     {
       "id": "nhm-asha-en-06",
@@ -1097,13 +1408,19 @@
       "languages": [
         "en"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": false,
       "sha256": "9982c3e3a487d7f57da523ac37abdc721802a7b1cae6ae2a7574e4f12d8d5f21",
       "size_bytes": 3510633,
       "pages": 77,
       "text_layer": "mixed",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "en": 1.0,
+        "hi": 0.0
+      },
+      "ocr_share": 0.091,
+      "split": "test"
     },
     {
       "id": "nhm-asha-en-07",
@@ -1116,13 +1433,18 @@
       "languages": [
         "en"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": false,
       "sha256": "4ca167e99b6624fcd2b000d2b66eee99fd249d223e8ccf8193e62ebcdb5c6f38",
       "size_bytes": 2493282,
       "pages": 88,
       "text_layer": "mixed",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "en": 1.0
+      },
+      "ocr_share": 0.136,
+      "split": "train"
     },
     {
       "id": "nhm-asha-en-08",
@@ -1135,13 +1457,19 @@
       "languages": [
         "en"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": false,
       "sha256": "93e6fb6dbfe4cd5f1eaa1e2f944c0487b8d4091bd2571383bce6556202e8c298",
       "size_bytes": 1438034,
       "pages": 36,
       "text_layer": "mixed",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "en": 0.98,
+        "mr": 0.02
+      },
+      "ocr_share": 0.083,
+      "split": "test"
     },
     {
       "id": "nhm-asha-en-09",
@@ -1154,13 +1482,18 @@
       "languages": [
         "en"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": true,
       "sha256": "384193683d56e6c22bdc359428b54606a2bdb53f9092c1d8b164fcc4f1552a70",
       "size_bytes": 738113,
       "pages": 2,
       "text_layer": "scanned",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "en": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "train"
     },
     {
       "id": "nhm-asha-en-10",
@@ -1173,13 +1506,18 @@
       "languages": [
         "en"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": false,
       "sha256": "563ddb0a4f23c16bed186e14c88d6c60e3f33fadcf7d4810175da41f391a794f",
       "size_bytes": 2093967,
       "pages": 152,
       "text_layer": "mixed",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "en": 1.0
+      },
+      "ocr_share": 0.046,
+      "split": "test"
     },
     {
       "id": "nhm-asha-en-11",
@@ -1192,13 +1530,19 @@
       "languages": [
         "en"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": false,
       "sha256": "74659f0878fd7a528a6c5dff4bdf60fb756fb5eea57b7248ada79027abaec3dd",
       "size_bytes": 1685397,
       "pages": 155,
       "text_layer": "mixed",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "mr": 0.003,
+        "en": 0.997
+      },
+      "ocr_share": 0.032,
+      "split": "train"
     },
     {
       "id": "nhm-asha-en-12",
@@ -1211,13 +1555,18 @@
       "languages": [
         "en"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": true,
       "sha256": "442dc61e7d263cde0f7bb1444bf0dd3635f34c431e3c149eeebbc900a11261c2",
       "size_bytes": 5442025,
       "pages": 80,
       "text_layer": "scanned",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "en": 1.0
+      },
+      "ocr_share": 1.0,
+      "split": "test"
     },
     {
       "id": "nhm-asha-en-13",
@@ -1230,13 +1579,18 @@
       "languages": [
         "en"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": false,
       "sha256": "3f4275eda522a98df73d56784a4dc839304245962cc8639396500dfc32473281",
       "size_bytes": 1059430,
       "pages": 32,
       "text_layer": "mixed",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "en": 1.0
+      },
+      "ocr_share": 0.156,
+      "split": "train"
     },
     {
       "id": "nhm-asha-en-14",
@@ -1249,33 +1603,44 @@
       "languages": [
         "en"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": false,
       "sha256": "5ba6899d35b268653f577e440dd836eca3ec58cae595ec43b5d37ff3f44159b1",
       "size_bytes": 598022,
       "pages": 72,
       "text_layer": "mixed",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "en": 1.0
+      },
+      "ocr_share": 0.069,
+      "split": "dev"
     },
     {
       "id": "coi-diglot",
-      "title": "The Constitution of India (Hindi-English diglot edition)",
+      "title": "The Constitution of India, as on 1 May 2024 (English text of the diglot pocket edition)",
       "url": "https://cdnbbsr.s3waas.gov.in/s380537a945c7aaa788ccfcdf1b99b5d8f/uploads/2024/07/20240716890312078.pdf",
       "source_page": "https://legislative.gov.in/constitution-of-india/",
       "publisher": "Legislative Department, Ministry of Law and Justice",
       "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
       "redistribute": false,
       "languages": [
-        "en",
-        "hi"
+        "en"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": false,
       "sha256": "819ba7adc5e5ae4063f26c82472283ba682ddb662e5a7f864cf26984d99b26ed",
       "size_bytes": 2413611,
       "pages": 402,
       "text_layer": "native",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "mr": 0.004,
+        "en": 0.992,
+        "hi": 0.005
+      },
+      "ocr_share": 0.0,
+      "split": "test"
     },
     {
       "id": "sppu-01",
@@ -1286,15 +1651,22 @@
       "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
       "redistribute": false,
       "languages": [
-        "en"
+        "en",
+        "mr"
       ],
-      "languages_source": "expected from the publisher's listing page",
+      "languages_source": "IndicLID over the indexed chunks (share of tokens, at least 10%)",
       "scanned": true,
       "sha256": "28fc35a1c22e80d4a77d59af23464650e02084d6be333804e46bff6a580288e4",
       "size_bytes": 480578,
       "pages": 1,
       "text_layer": "scanned",
-      "detected_type": "pdf"
+      "detected_type": "pdf",
+      "language_mix": {
+        "en": 0.862,
+        "mr": 0.138
+      },
+      "ocr_share": 1.0,
+      "split": "train"
     }
   ],
   "frozen": null

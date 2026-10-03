@@ -35,10 +35,14 @@ IN_SCOPE = {"eng_Latn": "en", "hin_Deva": "hi", "mar_Deva": "mr", "hin_Latn": "h
 FTR_CONFIDENT = 0.6  # IndicLID's own threshold for sending romanized text on to its BERT stage
 
 # Common romanized function words. Overlapping words ("nahi", "ka", "pan") count for both.
+# Words that are also common English ("the", "me", "par", "tar", "la", "var", "pan") are left
+# out of the override below: "the" (Hindi "were") once turned every English passage Hindi.
 HINDI_WORDS = set("""hai hain ho hoga hogi ke ki ka ko se me mein liye kitne kitna kitni kya kaise kab kahan kaun
 kyon kyun aur nahi nahin bhi toh tha thi the chahiye wala wali wale sakte sakta sakti karna karne karte diya gaya
 raha rahi rahe apne unke uske iska iske yeh ye woh wo agar lekin par tak saath sath milta milti milega jata jati
 jate hota hoti hote""".split())
+ENGLISH_TOO = {"the", "me", "par", "tar", "la", "var", "pan", "ho", "ye", "wo", "kay", "kon", "hate", "to"}
+OVERRIDE_SHARE = 0.2  # Hindi/Marathi function words must be at least this share of the words
 MARATHI_WORDS = set("""ahe aahe aahet ahet kiti ani aani sathi saathi kay kasa kashi kase kuthe kevha konta konti
 konte kontya kon madhe madhye mdhe la chi cha che chya tar var pan nahi naahi hote hota hoti kara karave karavi
 karayla karaycha lagtat lagte milte miltat milel dyave mhanje pahije asel aste astat karta kartat zala zali jhala
@@ -134,8 +138,9 @@ class IndicLID:
             return LangResult(lang, label, round(raw[label], 4), script, False, restricted, self.name)
 
         words = [w.lower() for w in _LATIN_WORD.findall(text)]
-        hi_hits = sum(w in HINDI_WORDS for w in words)
-        mr_hits = sum(w in MARATHI_WORDS for w in words)
+        hi_hits = sum(w in HINDI_WORDS and w not in ENGLISH_TOO for w in words)
+        mr_hits = sum(w in MARATHI_WORDS and w not in ENGLISH_TOO for w in words)
+        share = (hi_hits + mr_hits) / len(words) if words else 0.0
         confident = raw[label] >= FTR_CONFIDENT and label in IN_SCOPE
         if confident:
             lang = IN_SCOPE[label]
@@ -143,7 +148,9 @@ class IndicLID:
             lang = "mr" if mr_hits + restricted["mr"] > hi_hits + restricted["hi"] else "hi"
         else:
             lang = max(restricted, key=restricted.get) if total > 0 else "en"
-        if lang == "en" and (hi_hits + mr_hits) >= 2:  # "ke liye ... hai": English words, Hindi grammar
+        # "ke liye ... hai": English words, Hindi grammar. Only when such words are a real share of
+        # the text, so a long English passage with a stray "to" or "ko" stays English.
+        if lang == "en" and (hi_hits + mr_hits) >= 2 and share >= OVERRIDE_SHARE:
             lang = "mr" if mr_hits > hi_hits else "hi"
         return LangResult(lang, label, round(raw[label], 4), script, lang in ("hi", "mr"), restricted, self.name)
 
