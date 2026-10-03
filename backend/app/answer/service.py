@@ -55,11 +55,16 @@ def message_view(m: Message) -> dict:
             "created_at": m.created_at.isoformat() if m.created_at else None}
 
 
-def query_features(question: str) -> dict:
+def query_features(question: str, analysis=None) -> dict:
     """The cheap question features logged with every query (the router's training data)."""
     words = question.split()
-    return {"length_chars": len(question), "length_words": len(words), "script": script_of(question),
-            "has_digit": any(ch.isdigit() for ch in question)}
+    out = {"length_chars": len(question), "length_words": len(words), "script": script_of(question),
+           "has_digit": any(ch.isdigit() for ch in question)}
+    if analysis is not None:
+        out.update(lang=analysis.lang, lang_confidence=analysis.lang_confidence, romanized=analysis.romanized,
+                   code_mix=analysis.code_mix, has_number_or_id=bool(analysis.numbers),
+                   views=sorted(analysis.views()))
+    return out
 
 
 def _load(conversation_id: str) -> tuple[list[str] | None, list[Turn]]:
@@ -122,7 +127,10 @@ def _answer_payload(result: AnswerResult, r: Retrieval) -> dict:
 
 
 def _retrieval_view(r: Retrieval) -> dict:
+    a = r.analysis
     return {"route": r.route, "gate": r.gate.as_dict(), "latency_ms": r.latency_ms,
+            "query": {"lang": a.lang, "romanized": a.romanized, "views": a.views(), "numbers": a.numbers}
+            if a else None,
             "top": [{"chunk_id": c.chunk_id, "page_no": r.chunks[c.chunk_id].page_no,
                      "filename": r.chunks[c.chunk_id].filename, "rerank": round(c.rerank or 0, 4)}
                     for c in r.top]}
@@ -138,8 +146,8 @@ async def ask(conversation_id: str, question: str) -> AsyncIterator[tuple[str, d
     yield "retrieval", _retrieval_view(r)
     provider = get_provider()
     base_log = dict(conversation_id=conversation_id, doc_ids=doc_ids or [], question=question,
-                    views={"as_typed": question, "normalized": r.normalized},
-                    features=query_features(question), route=r.route,
+                    views=r.analysis.as_log() if r.analysis else {"as_typed": question},
+                    features=query_features(question, r.analysis), route=r.route,
                     route_reason="fixed route (rule-based router comes in phase 8)", route_scores={},
                     candidates=r.log(), reranked=[c.as_log() for c in r.top], gate=r.gate.as_dict(),
                     config={"top_k": TOP_K, "top_n": TOP_N, "tau": GATE_TAU, "weights": WEIGHTS,

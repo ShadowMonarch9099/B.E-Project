@@ -44,6 +44,8 @@ DATABASE_URL = os.environ.get(
 )
 DATA_DIR = Path(os.environ.get("SAKSHYA_DATA_DIR", REPO_DIR / "data")).resolve()
 UPLOAD_DIR = DATA_DIR / "uploads"
+# Downloaded and converted models that are not in the Hugging Face cache (IndicLID, NLLB).
+MODEL_DIR = Path(os.environ.get("SAKSHYA_MODEL_DIR", DATA_DIR / "models")).resolve()
 
 # Ingestion
 OCR_WORKERS = _int("SAKSHYA_OCR_WORKERS", 4)

@@ -20,7 +20,7 @@ from .detection import analyse, detect as detect_type, get_magika
 from .ingest import docx_convert
 from .ingest.pipeline import backfill_embeddings, resume_pending
 from .llm import get_provider
-from .ml import embedder, reranker
+from .ml import embedder, langid, reranker, translate, warmup
 from .ocr import OcrUnavailable, engine_status, run_ocr
 
 logging.basicConfig(level=os.environ.get("SAKSHYA_LOG_LEVEL", "INFO"),
@@ -35,6 +35,7 @@ MAX_FILE_BYTES = config.MAX_FILE_BYTES
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     get_magika()  # load the model once at startup, not on the first upload
+    warmup.start()  # the retrieval and language models load in the background
     if init_db():
         resume_pending()
         backfill_embeddings()
@@ -63,6 +64,9 @@ def health() -> dict:
         "docx_converter": {"name": "LibreOffice", **docx_convert.status()},
         "embedder": embedder.status(),
         "reranker": reranker.status(),
+        "langid": langid.status(),
+        "translator": translate.status(),
+        "models": warmup.status(),
         "llm": get_provider().status(),
         "limits": {"max_file_mb": MAX_FILE_MB, "max_files": MAX_FILES},
     }

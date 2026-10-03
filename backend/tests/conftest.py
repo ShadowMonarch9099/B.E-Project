@@ -12,6 +12,8 @@ import tempfile
 _tmp = tempfile.mkdtemp(prefix="sakshya-test-")
 _pg = os.environ.get("SAKSHYA_TEST_DATABASE_URL")
 os.environ["SAKSHYA_DATA_DIR"] = _tmp
+# Models stay where the app downloads them (<repo>/data/models), not in the throwaway folder.
+os.environ.setdefault("SAKSHYA_MODEL_DIR", os.path.join(os.path.dirname(__file__), "..", "..", "data", "models"))
 os.environ["SAKSHYA_DATABASE_URL"] = _pg or f"sqlite:///{_tmp}/sakshya-test.db".replace("\\", "/")
 # Unit tests never call the Claude API; the live smoke test reads the real key itself.
 os.environ.setdefault("SAKSHYA_TEST_MODE", "1")
@@ -20,6 +22,7 @@ os.environ.setdefault("SAKSHYA_TEST_MODE", "1")
 if os.environ.get("SAKSHYA_TEST_REAL_MODELS") != "1":
     os.environ["SAKSHYA_EMBEDDER"] = "hash"
     os.environ["SAKSHYA_RERANKER"] = "overlap"
+    os.environ["SAKSHYA_QUERY_MODELS"] = "off"  # IndicLID, IndicXlit, translation
 # The answer model is always the scripted fake in unit tests (no key, no cost); the live
 # smoke test in test_answer.py builds the real provider itself.
 os.environ["SAKSHYA_LLM_PROVIDER"] = "fake"

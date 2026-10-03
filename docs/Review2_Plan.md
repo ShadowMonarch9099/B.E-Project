@@ -453,5 +453,19 @@ Decisions that change something in this plan, newest last. Each says what change
 **What it costs.** This deviates from §7.3's "no hosted LLM API in the system". For each question that passes the evidence gate, **the top 6 retrieved passages (never a whole document) and the question are sent to the Anthropic API**. The ask bar says so on screen. Questions below the gate never leave the machine; neither does anything else (OCR, retrieval, the indexes). Answers cost money per question (see the README), and need an API key, read from `ANTHROPIC_API_KEY`; without a key, detection, OCR, search and abstention keep working and the UI explains how to add one. Claims in the report about privacy must say that passages are sent to a hosted model while this decision stands.
 
 **Also decided on the same day.**
-- *IndicTrans2 is gated on Hugging Face* (it needs an account that accepts its terms and an `HF_TOKEN`). Until the team sets one, the translate route uses Helsinki-NLP OPUS-MT (Apache-2.0, ungated) as a stand-in, and every translation records which model made it, so results from the two are never mixed silently.
-- *IndicXlit* ships only as fairseq checkpoints, and fairseq does not install on Python 3.11 / Windows. The plan is to run the official IndicXlit weights with a small PyTorch loader in `backend/app/ml/` instead of the fairseq package (phase 6 of the build).
+- *IndicTrans2 is gated on Hugging Face* (it needs an account that accepts its terms and an `HF_TOKEN`). It stays the plan's translator and is used whenever such a token is set. Every translation records which model made it, so results from different translators are never mixed silently.
+- *IndicXlit* ships only as fairseq checkpoints, and fairseq does not install on Python 3.11 / Windows. The official IndicXlit weights are run with a small PyTorch re-implementation of fairseq's transformer inference (`backend/app/ml/xlit.py`): the same dictionaries, language tokens and beam search (beam 5). The official engine's optional rescoring with word-frequency tables (850 MB) is not used.
+
+### 2026-10-03 · Translation stand-in: NLLB-200, not OPUS-MT
+
+**Decision.** Until IndicTrans2 is available, translation to English uses Meta's **NLLB-200 distilled 600M**, run with CTranslate2 in int8.
+
+**Why.** Helsinki-NLP OPUS-MT (the first stand-in) produced unrelated English for all 5 Marathi test sentences we tried (for example "घरकुल योजना साठी उत्पन्नाची मर्यादा किती आहे?" → "What's the price of a gift?"); its multilingual `mul-en` model was no better. A wrong English view would actively mislead retrieval. NLLB translated the same sentences sensibly ("What is the income limit for household schemes?"). In PyTorch it took 5–11 s per sentence on our laptop; with CTranslate2 int8, 0.5–0.9 s, which makes both the question's English view and the English shadow index of chunks practical. Small samples, checked by reading; the translate route's real quality is measured in the evaluation (RQ1).
+
+**What it costs.** NLLB-200's licence is CC-BY-NC 4.0 (non-commercial). That suits this academic project, but anything beyond it must switch to IndicTrans2 (MIT). Translations are approximate ("राष्ट्रीय उच्चतर शिक्षा अभियान" came out as "National Higher Penalty Mission"), which is one reason the translate route is compared, not assumed.
+
+### 2026-10-03 · Language ID: IndicLID's FastText models only
+
+**Decision.** IndicLID-FTN and IndicLID-FTR are used as-is; IndicLID's third stage (an IndicBERT classifier for romanized text the FastText model is unsure about, 969 MB) is not. Low-confidence romanized questions are settled by a short list of romanized Hindi and Marathi function words, and the scores are also reported restricted to English / Hindi / Marathi.
+
+**Why.** FTR alone misread code-mixed questions ("third year me ATKT ke liye kitne backlog allowed hai?" as 56% English; "KYC update ki last date kya hai …" as Assamese). With the restriction and the word list, all 12 probe questions got the right language and romanized flag. The BERT stage remains an option if the evaluation shows romanized language ID errors.

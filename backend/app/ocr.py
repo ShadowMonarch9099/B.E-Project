@@ -21,8 +21,10 @@ from PIL import Image, ImageOps
 
 from .inspect_file import classify_page
 
-# Several pages run in parallel, so each Tesseract process uses one thread.
-os.environ.setdefault("OMP_THREAD_LIMIT", "1")
+# Several pages run in parallel, so each Tesseract process uses one thread. The limit is set
+# only in Tesseract's own environment (see _configure): set process-wide, OMP_THREAD_LIMIT
+# would also cap PyTorch at one thread and make the reranker several times slower.
+TESSERACT_ENV = {**os.environ, "OMP_THREAD_LIMIT": "1"}
 
 # Language order matters. "hin" first read the digit 1 as a danda on our test page
 # (142 -> 42). On 7 scanned pages of real Maharashtra GRs, "mar+hin+eng" had the lowest
@@ -54,6 +56,17 @@ def _configure() -> None:
         cmd = WINDOWS_DEFAULT
     if cmd:
         pytesseract.pytesseract.tesseract_cmd = cmd
+    mod = pytesseract.pytesseract
+    if not getattr(mod.subprocess_args, "_sakshya", False):
+        original = mod.subprocess_args
+
+        def subprocess_args(include_stdout=True):
+            kwargs = original(include_stdout)
+            kwargs["env"] = TESSERACT_ENV
+            return kwargs
+
+        subprocess_args._sakshya = True
+        mod.subprocess_args = subprocess_args
 
 
 @lru_cache(maxsize=1)
