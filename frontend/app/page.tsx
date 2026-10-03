@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Workspace from "@/components/Workspace";
 
 export default function Home() {
@@ -10,7 +11,12 @@ export default function Home() {
             साक्ष्य
           </span>
         </div>
-        <span className="header-note">Multilingual document intelligence · MMCOE Pune</span>
+        <nav className="header-nav">
+          <span className="header-note">Multilingual document intelligence · MMCOE Pune</span>
+          <Link className="btn-text" href="/annotate">
+            Sakshya-Bench
+          </Link>
+        </nav>
       </header>
 
       <main>

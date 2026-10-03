@@ -61,6 +61,28 @@ Pick an indexed document in the ask bar at the bottom of the page and ask in Eng
 
 Every question is written to the `query_logs` table: the question, its views and features, the route and the router's reason, every route's probe scores, the candidate lists with each source's rank and score, reranker scores, the gate decision, whether the model was called, the model's usage, and the latency of each stage. These rows are the training data for a future learned router and the raw material for the evaluation.
 
+### Sakshya-Bench (plan §8)
+
+The benchmark is built by hand; nothing in it is generated and accepted unchecked.
+
+- **Documents.** `backend/bench/manifest.json` lists the public documents: title, source URL and the page it was listed on, publisher, licence note, language(s), and, once fetched, SHA-256, size, page count and text layer (native, scanned, legacy font, broken). They are Maharashtra GRs, district collectorate notices (land acquisition, Lok Adalat, electoral rolls) from Kolhapur, Solapur, Bhopal and Patna, National Health Mission ASHA modules in English and Hindi, an SPPU notice and the Hindi–English Constitution. None of the sources states an open licence, so the files are **not** in git: `fetch` downloads them again from the source to `data/bench/docs/` and warns if a file changed (different SHA-256).
+- **Questions.** The **Sakshya-Bench** link in the header opens `/annotate`. An annotator writes a question (or checks a drafted one), picks its slice (same language, cross-language, romanized/code-mixed, unanswerable), and selects the evidence span on the gold page; the span's boxes are taken from the page's word boxes. A question drafted by an LLM is stored as a *draft* and is exported only after a person verifies it.
+- **Double annotation.** About 15% of questions (a fixed hash of the question id) go to a second queue. The second annotator sees the question but not the first answer, and cannot be the first annotator. `stats` reports Cohen's κ on the gold page and token-F1 on the spans.
+- **Splits are by document** (about 50 / 15 / 35% train / dev / test, within each language and scanned/native group) and are frozen before any tuning: after `freeze`, the test split cannot change and documents added later go to train or dev only.
+
+```bash
+cd backend
+.venv/bin/python -m app.bench fetch            # download the documents, record SHA-256, pages, text layer
+.venv/bin/python -m app.bench upload           # add them to the running app (for annotation)
+.venv/bin/python -m app.bench facts            # record each document's language mix and OCR share
+.venv/bin/python -m app.bench splits           # assign document splits
+.venv/bin/python -m app.bench freeze           # freeze them (once, before tuning)
+.venv/bin/python -m app.bench stats            # counts, agreement, manifest summary
+.venv/bin/python -m app.bench export bench.jsonl   # verified questions with gold page, span, boxes and split
+```
+
+The same data is available over HTTP: `POST/GET /api/bench/questions`, `POST /api/bench/questions/{id}/verify`, `GET /api/bench/second?annotator=…`, `POST /api/bench/questions/{id}/second`, `GET /api/bench/stats`, `GET /api/bench/export` (JSONL) and `GET /api/bench/manifest`.
+
 **How τ was chosen (a starting value, not a result).** `backend/tools/gate_probe.py` runs 24 hand-written questions over two of the sample GRs (`backend/tools/gate_probe_questions.json`). With the question as typed only (phase 4), the 14 answerable questions' best reranker scores were 0.077–1.000 and the 10 unanswerable ones' 0.002–0.063. With the phase 6 views, romanized answerable questions rose sharply ("RUSA yojanet kendra ani rajya hissa kiti aahe?" 0.077 → 0.992, "Model Degree College Hingoli la kiti anudan milale?" 0.586 → 0.984), but so did some romanized off-topic ones: "RUSA 3.0 madhe kiti nidhi aahe?" (the GR covers RUSA 1.0 and 2.0) went from 0.063 to 0.401. Answerable now span 0.171–1.000 and unanswerable 0.002–0.401, so no threshold separates them; τ = 0.15 answers 14 of 14 and abstains on 9 of 10, and the near-miss is left to the answer model's "the documents do not say" rule. τ will be re-chosen from the risk–coverage curve on the Sakshya-Bench dev split.
 
 **The API key.** Answers need an Anthropic API key: copy `backend/.env.example` to `backend/.env`, set `ANTHROPIC_API_KEY=...`, and restart the backend. `backend/.env` is gitignored; the key is read by the SDK on the server and never sent to the browser or logged. Without a key everything else works (upload, OCR, search, abstention, the viewer), and an answered question explains how to add the key. **Privacy:** for each question that passes the evidence gate, the question and its top 6 passages are sent to the Anthropic API (decision log, `docs/Review2_Plan.md` §16); nothing else leaves the machine.

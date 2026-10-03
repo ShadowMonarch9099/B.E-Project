@@ -30,8 +30,13 @@ class Facts:
     note: str | None = None
 
     def add(self, label: str, value) -> None:
-        if value not in (None, ""):
-            self.items.append((label, str(value)))
+        if value in (None, ""):
+            return
+        # Metadata can hold control characters ("Adobe PSL 1.3e for Canon\x00"); PostgreSQL
+        # rejects NUL in text and JSON, so they are dropped.
+        value = "".join(ch for ch in str(value) if ch >= " " or ch in "\t\n").strip()
+        if value:
+            self.items.append((label, value))
 
 
 def _is_devanagari(ch: str) -> bool:

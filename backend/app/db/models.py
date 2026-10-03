@@ -211,3 +211,46 @@ class QueryLog(Base):
     latency_ms: Mapped[dict] = mapped_column(JSONType, default=dict)
     config: Mapped[dict] = mapped_column(JSONType, default=dict)
     error: Mapped[str | None] = mapped_column(Text)
+
+
+class BenchQuestion(Base):
+    """A Sakshya-Bench question (plan section 8.2), written or checked by a person."""
+
+    __tablename__ = "bench_questions"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    text: Mapped[str] = mapped_column(Text)
+    slice: Mapped[str] = mapped_column(String(24))  # same_language / cross_language / romanized / unanswerable
+    lang: Mapped[str | None] = mapped_column(String(8))
+    script: Mapped[str | None] = mapped_column(String(16))
+    answerable: Mapped[bool] = mapped_column(Boolean, default=True)
+    doc_id: Mapped[str | None] = mapped_column(ForeignKey("documents.id", ondelete="SET NULL"), index=True)
+    status: Mapped[str] = mapped_column(String(16), default="verified")  # draft (e.g. LLM-drafted) / verified
+    needs_second: Mapped[bool] = mapped_column(Boolean, default=False)  # chosen for double annotation
+    created_by: Mapped[str] = mapped_column(String(64))
+    notes: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    annotations: Mapped[list["BenchAnnotation"]] = relationship(back_populates="question", cascade="all, delete-orphan",
+                                                               passive_deletes=True)
+
+
+class BenchAnnotation(Base):
+    """The gold document, page and evidence span of a question, by one annotator."""
+
+    __tablename__ = "bench_annotations"
+    __table_args__ = (UniqueConstraint("question_id", "role"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    question_id: Mapped[str] = mapped_column(ForeignKey("bench_questions.id", ondelete="CASCADE"), index=True)
+    annotator: Mapped[str] = mapped_column(String(64))
+    role: Mapped[str] = mapped_column(String(16))  # primary / second
+    gold_doc_id: Mapped[str | None] = mapped_column(ForeignKey("documents.id", ondelete="SET NULL"))
+    gold_page: Mapped[int | None] = mapped_column(Integer)
+    span_start: Mapped[int | None] = mapped_column(Integer)
+    span_end: Mapped[int | None] = mapped_column(Integer)
+    span_text: Mapped[str | None] = mapped_column(Text)
+    bbox: Mapped[list | None] = mapped_column(JSONType)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    question: Mapped[BenchQuestion] = relationship(back_populates="annotations")

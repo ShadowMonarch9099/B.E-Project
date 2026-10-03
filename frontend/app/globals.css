@@ -1809,3 +1809,215 @@ dd {
 .removed__why {
   font-style: italic;
 }
+
+/* ---------- Sakshya-Bench annotation page ---------- */
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.wordmark {
+  text-decoration: none;
+}
+
+.hero--small {
+  padding: 36px 0 18px;
+}
+
+.hero--small h1 {
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
+}
+
+.ann {
+  margin-bottom: 48px;
+}
+
+.ann-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line-strong);
+}
+
+.ann-field {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.ann-field > span,
+.ann-slices legend {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-3);
+}
+
+.ann-field input,
+.ann-field textarea,
+.ann-field select,
+.ann-pages select {
+  font: inherit;
+  font-family: var(--doc);
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.ann-name {
+  margin: 0;
+  min-width: 220px;
+}
+
+.ann-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ann-tabs button {
+  font: inherit;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.ann-tabs button.is-on {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+
+.ann-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 24px;
+  margin-top: 18px;
+}
+
+.ann-slices {
+  border: 0;
+  padding: 0;
+  margin: 0 0 12px;
+  display: grid;
+  gap: 4px;
+}
+
+.ann-slices label {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.ann-pages__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 18px;
+  margin-bottom: 6px;
+}
+
+.ann-text {
+  max-height: 340px;
+  overflow-y: auto;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  font-family: var(--doc);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  user-select: text;
+}
+
+.ann-text::selection,
+.ann-text *::selection {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.ann-span {
+  font-family: var(--doc);
+  color: var(--ink);
+}
+
+.btn-primary {
+  margin-top: 12px;
+  font: inherit;
+  font-weight: 600;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--bg);
+  cursor: pointer;
+}
+
+.ann-list h3 {
+  margin: 0 0 8px;
+  font-family: var(--display);
+  font-size: 1.05rem;
+}
+
+.ann-list ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.ann-list li {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.ann-q {
+  margin: 0;
+  font-family: var(--doc);
+}
+
+.ann-pick {
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  font-family: var(--doc);
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.ann-pick.is-on {
+  font-weight: 600;
+}
+
+.ann-stats {
+  margin-top: 18px;
+}
+
+@media (max-width: 760px) {
+  .ann-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .header-nav .header-note {
+    display: none;
+  }
+}

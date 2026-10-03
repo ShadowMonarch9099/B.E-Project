@@ -13,7 +13,7 @@ from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
 from . import catalog, config
-from .api import conversations, documents, search
+from .api import bench, conversations, documents, search
 from .db import init_db
 from .db.session import status as db_status
 from .detection import analyse, detect as detect_type, get_magika
@@ -52,6 +52,7 @@ app.add_middleware(
 app.include_router(documents.router)
 app.include_router(search.router)
 app.include_router(conversations.router)
+app.include_router(bench.router)
 
 
 @app.get("/api/health")

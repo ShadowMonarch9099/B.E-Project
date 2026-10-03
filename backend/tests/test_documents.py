@@ -163,3 +163,14 @@ def test_a_scanned_image_gets_a_viewer_pdf_and_boxes_on_its_page(client):
         boxes = [b for c in chunks for b in c.bbox]
     assert boxes and all(0 <= x0 < x1 <= rect.width + 1 and 0 <= y0 < y1 <= rect.height + 1
                          for x0, y0, x1, y1 in boxes)
+
+
+def test_control_characters_in_pdf_metadata_are_dropped():
+    # Found in a district collectorate scan: producer "Adobe PSL 1.3e for Canon\x00", which
+    # PostgreSQL refuses to store in text or JSON.
+    from app.inspect_file import Facts
+
+    facts = Facts()
+    facts.add("Created with", "Adobe PSL 1.3e for Canon" + chr(0))
+    facts.add("Title", chr(0))
+    assert facts.items == [("Created with", "Adobe PSL 1.3e for Canon")]

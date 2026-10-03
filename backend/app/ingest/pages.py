@@ -80,6 +80,7 @@ def native_page(page, page_no: int, source: str = "native") -> ExtractedPage:
     paragraphs: list[list[list[dict]]] = []
     last_block = last_line = None
     for x0, y0, x1, y1, text, block, line, _ in page.get_text("words"):
+        text = text.replace("\x00", "")  # PostgreSQL text cannot hold NUL
         if not text.strip():
             continue
         if rotate is not None:  # text coordinates are unrotated; the viewer shows the rotated page

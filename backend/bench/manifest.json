@@ -1,0 +1,1301 @@
+{
+  "name": "Sakshya-Bench",
+  "version": "v1 (documents collected 2026-10-03; questions being annotated)",
+  "documents": [
+    {
+      "id": "mh-gr-01",
+      "title": "प्रतिनियुक्तीच्या सेवा प्रत्यवर्तीत करणेबाबत - श्री महेंद्र हरपाळकर, सह सचिव",
+      "url": "https://gr.maharashtra.gov.in/Site/Upload/Government%20Resolutions/Marathi/202610021249399707.pdf",
+      "source_page": "https://gr.maharashtra.gov.in/1145/Government-Resolutions",
+      "publisher": "Government of Maharashtra (gr.maharashtra.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": true,
+      "department": "सामान्य प्रशासन विभाग (पासुन २४-जून-२०२६)",
+      "date": "02-10-2026",
+      "sha256": "d18e10ccf6445bc204ef22ce75e8c7a21d91bcc4f359bbd83a4a7855cd08013c",
+      "size_bytes": 1419200,
+      "pages": 1,
+      "text_layer": "scanned",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "mh-gr-02",
+      "title": "नियोजन विभागाकडून वर्ग करण्यात आलेल्या पदांचे वित्त विभाग (खुद्द) च्या आस्थापनेवर समावेशन करण्याबाबत.",
+      "url": "https://gr.maharashtra.gov.in/Site/Upload/Government%20Resolutions/Marathi/202610011147080405.pdf",
+      "source_page": "https://gr.maharashtra.gov.in/1145/Government-Resolutions",
+      "publisher": "Government of Maharashtra (gr.maharashtra.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "department": "वित्त विभाग",
+      "date": "01-10-2026",
+      "sha256": "07ca396bb3b1e7d86922c03b3d222b1d519c265f79d96630e39315847cefda99",
+      "size_bytes": 309297,
+      "pages": 2,
+      "text_layer": "native",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "mh-gr-03",
+      "title": "महाराष्ट्र शासनाच्या 25 प्रमुख धोरणांचे विश्लेषण, 26 प्रमुख लोककल्याणकारी योजनांचे समांतर मूल्यांकन करण्यासाठी महाराष्ट्र तांत्रिक सहाय्यता कक्ष (Maharashtra Technical Assistance Cell-MahaTAC) स्थापन करण्यास व त्याद्वारे एक वर्षाच्या मूल्यमापन प्रकल्पास मान्यता देण्याबाबत.",
+      "url": "https://gr.maharashtra.gov.in/Site/Upload/Government%20Resolutions/Marathi/202610011807599305.pdf",
+      "source_page": "https://gr.maharashtra.gov.in/1145/Government-Resolutions",
+      "publisher": "Government of Maharashtra (gr.maharashtra.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "department": "वित्त विभाग",
+      "date": "01-10-2026",
+      "sha256": "79094ac9af3c3418f8d545441618e4a5e0eeff5753de9b745d9d04e23a4cbe09",
+      "size_bytes": 403934,
+      "pages": 8,
+      "text_layer": "native",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "mh-gr-04",
+      "title": "राज्यातील गरीब व गरजू व्यक्तींसाठी राबविण्यात येणाऱ्या शिवभोजन योजने च्या सर्व शासन निर्णय व परिपत्रकांचे एकत्रीकरण करुन सर्वसमावेशक शासन निर्णय.",
+      "url": "https://gr.maharashtra.gov.in/Site/Upload/Government%20Resolutions/Marathi/202610011753230206.pdf",
+      "source_page": "https://gr.maharashtra.gov.in/1145/Government-Resolutions",
+      "publisher": "Government of Maharashtra (gr.maharashtra.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "department": "अन्‍न, नागरी पुरवठा व ग्राहक संरक्षण विभाग",
+      "date": "01-10-2026",
+      "sha256": "c4601c0f287cb5db107cebd3439fe483dc326510dfcbc040ec4d2f11a1e8af71",
+      "size_bytes": 202690,
+      "pages": 8,
+      "text_layer": "native",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "mh-gr-05",
+      "title": "महाराष्ट्रात राज्यात सुरु असलेल्या मतदार याद्यांच्या पुनरिक्षण (SIR-2026) कार्यक्रमाच्या अनुषंगाने Software Engineer (Level-4) या 2 तांत्रिक मनुष्यबळाच्या सेवांना दि.30/09/2026 पर्यंत कार्यरत ठेवण्यास मुदतवाढ देण्याबाबत.",
+      "url": "https://gr.maharashtra.gov.in/Site/Upload/Government%20Resolutions/Marathi/202610011416547307.pdf",
+      "source_page": "https://gr.maharashtra.gov.in/1145/Government-Resolutions",
+      "publisher": "Government of Maharashtra (gr.maharashtra.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "department": "सामान्य प्रशासन विभाग (पासुन २४-जून-२०२६)",
+      "date": "01-10-2026",
+      "sha256": "9087dc99bfcd58bab73d2f4af17b0013f419296492d679e45517319490f9e2b9",
+      "size_bytes": 138874,
+      "pages": 1,
+      "text_layer": "native",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "mh-gr-06",
+      "title": "राज्य सेवा हक्क आयुक्त,कोकण महसुली विभाग या कार्यालयासाठी बाह्ययंत्रणेद्वारे दोन शिपाई पदे भरण्यास प्रशासकीय व वित्तीय मान्यता देण्याबाबत..",
+      "url": "https://gr.maharashtra.gov.in/Site/Upload/Government%20Resolutions/Marathi/202610011522311507.pdf",
+      "source_page": "https://gr.maharashtra.gov.in/1145/Government-Resolutions",
+      "publisher": "Government of Maharashtra (gr.maharashtra.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "department": "सामान्य प्रशासन विभाग (पासुन २४-जून-२०२६)",
+      "date": "01-10-2026",
+      "sha256": "c9eaee34d63d4511fd22ae76f3c581d0132e0355d001faf51985d3e93fdbb717",
+      "size_bytes": 307602,
+      "pages": 2,
+      "text_layer": "native",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "mh-gr-07",
+      "title": "खुल्या प्रवर्गातील आर्थिकदृष्ट्या कमकुवत असलेल्या गुणवंत मुलामुलींना परदेशात उच्च शिक्षणासाठी शिष्यवृत्ती योजनेंतर्गत सन 202६-2७ करीता शिष्यवृत्ती मंजूर करणेबाबत.",
+      "url": "https://gr.maharashtra.gov.in/Site/Upload/Government%20Resolutions/Marathi/202610011745303508.pdf",
+      "source_page": "https://gr.maharashtra.gov.in/1145/Government-Resolutions",
+      "publisher": "Government of Maharashtra (gr.maharashtra.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "department": "उच्च व तंत्र शिक्षण विभाग",
+      "date": "01-10-2026",
+      "sha256": "0867ea7ad282c83b7d32b050ad81a31e7480c19b60ee23910d4d26a5af9afaf5",
+      "size_bytes": 190377,
+      "pages": 7,
+      "text_layer": "native",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "mh-gr-08",
+      "title": "सन 2026-27 अर्थसंकल्पीय अनुदान मागणी क्र. जे-5, मुख्य लेखाशीर्ष 7610, शासकीय कर्मचारी इत्यादींना कर्जे, याखालील उपशीर्ष (202)(00)(01) मोटार वाहन खरेदी अग्रिमे (7610 0481) मोटार वाहन खरेदी अग्रिम वाटप.",
+      "url": "https://gr.maharashtra.gov.in/Site/Upload/Government%20Resolutions/Marathi/202610011735064312.pdf",
+      "source_page": "https://gr.maharashtra.gov.in/1145/Government-Resolutions",
+      "publisher": "Government of Maharashtra (gr.maharashtra.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "department": "विधी व न्याय विभाग",
+      "date": "01-10-2026",
+      "sha256": "e9b71ea0129c4f4e1b7bc4d825e0fcd1b79a26df382a6a5adcce76fb5c3773bf",
+      "size_bytes": 455498,
+      "pages": 6,
+      "text_layer": "native",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "mh-gr-09",
+      "title": "राज्यातील अल्पसंख्याक समुदायातील विद्यार्थ्यांकरिता परदेशात पदव्युत्तर पदवी व पीएचडी अभ्यासक्रमासाठी शिष्यवृत्ती योजना सन 2026-27 साठी विद्यार्थ्यांची निवड करणेबाबत (भाग-3)",
+      "url": "https://gr.maharashtra.gov.in/Site/Upload/Government%20Resolutions/Marathi/202610011739134914.pdf",
+      "source_page": "https://gr.maharashtra.gov.in/1145/Government-Resolutions",
+      "publisher": "Government of Maharashtra (gr.maharashtra.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "department": "अल्पसंख्याक विकास विभाग",
+      "date": "01-10-2026",
+      "sha256": "4f623897f5b97464f4769642e849ebabcbb0f3b3970fa9e445cef8b87d9a15b3",
+      "size_bytes": 245698,
+      "pages": 7,
+      "text_layer": "native",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "mh-gr-10",
+      "title": "राज्यातील अल्पसंख्याक समुदायातील विद्यार्थ्यांकरिता परदेशात पदव्युत्तर पदवी व पीएचडी अभ्यासक्रमासाठी शिष्यवृत्ती योजना सन 2026-27 साठी विद्यार्थ्यांची निवड रद्द करणेबाबत",
+      "url": "https://gr.maharashtra.gov.in/Site/Upload/Government%20Resolutions/Marathi/202610011742111714.pdf",
+      "source_page": "https://gr.maharashtra.gov.in/1145/Government-Resolutions",
+      "publisher": "Government of Maharashtra (gr.maharashtra.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "department": "अल्पसंख्याक विकास विभाग",
+      "date": "01-10-2026",
+      "sha256": "4042b83e012f2546e6c5d29ea383bc77f2fc7af5bf2d5dd07970b75ee1481815",
+      "size_bytes": 222881,
+      "pages": 3,
+      "text_layer": "native",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "kop-laq-01",
+      "title": "List of Lapsed Land Acquisition cases",
+      "url": "https://cdn.s3waas.gov.in/s33d2d8ccb37df977cb6d9da15b76c3f3a/uploads/2021/11/2021112329.pdf",
+      "source_page": "https://kolhapur.gov.in/en/document-category/land-acquisition/",
+      "publisher": "Collector Office, Kolhapur (kolhapur.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "1af4e666b98f85f69c53f62bdd522dc5949c00b0b8e11e30923d5a81233c9b65",
+      "size_bytes": 108868,
+      "pages": 1,
+      "text_layer": "broken",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "kop-laq-02",
+      "title": "List of Land Acquisition cases as per Land Acquisition Act -2013",
+      "url": "https://cdn.s3waas.gov.in/s33d2d8ccb37df977cb6d9da15b76c3f3a/uploads/2021/11/2021112393.pdf",
+      "source_page": "https://kolhapur.gov.in/en/document-category/land-acquisition/",
+      "publisher": "Collector Office, Kolhapur (kolhapur.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "f7e5c034971c2158971e2bfc2ece0916568eeab91e837ec25964e7749137c565",
+      "size_bytes": 199055,
+      "pages": 14,
+      "text_layer": "broken",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "kop-laq-03",
+      "title": "Case List of grant for project demand but yet not received",
+      "url": "https://cdn.s3waas.gov.in/s33d2d8ccb37df977cb6d9da15b76c3f3a/uploads/2021/11/2021112378.pdf",
+      "source_page": "https://kolhapur.gov.in/en/document-category/land-acquisition/",
+      "publisher": "Collector Office, Kolhapur (kolhapur.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "c7e72b270d6dc21ec1059f677db751f0d480d6cfd2737f2aa30270032ac792c9",
+      "size_bytes": 188990,
+      "pages": 26,
+      "text_layer": "broken",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "kop-laq-04",
+      "title": "Case list as per Section -64 of Land Acquisition Act -2013",
+      "url": "https://cdn.s3waas.gov.in/s33d2d8ccb37df977cb6d9da15b76c3f3a/uploads/2021/11/2021112387.pdf",
+      "source_page": "https://kolhapur.gov.in/en/document-category/land-acquisition/",
+      "publisher": "Collector Office, Kolhapur (kolhapur.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "029b55d3a359abbec411773baa03ee0cad542e81d3625382fef61839f9ed25be",
+      "size_bytes": 241380,
+      "pages": 16,
+      "text_layer": "broken",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "kop-laq-05",
+      "title": "Case list of uncompleted private land acquisition",
+      "url": "https://cdn.s3waas.gov.in/s33d2d8ccb37df977cb6d9da15b76c3f3a/uploads/2021/11/2021112320.pdf",
+      "source_page": "https://kolhapur.gov.in/en/document-category/land-acquisition/",
+      "publisher": "Collector Office, Kolhapur (kolhapur.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "104743100e08faded8687ab37dcc8874018252f2ea076a2be46acce57e0d1efb",
+      "size_bytes": 897509,
+      "pages": 9,
+      "text_layer": "broken",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "kop-laq-06",
+      "title": "Case list of Section 28-A",
+      "url": "https://cdn.s3waas.gov.in/s33d2d8ccb37df977cb6d9da15b76c3f3a/uploads/2021/11/2021112390.pdf",
+      "source_page": "https://kolhapur.gov.in/en/document-category/land-acquisition/",
+      "publisher": "Collector Office, Kolhapur (kolhapur.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "3d0871526d5d2cf9296d6f8bdb019937041f9567efdd46ece9b1241cbcc9311b",
+      "size_bytes": 356687,
+      "pages": 46,
+      "text_layer": "broken",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "kop-laq-07",
+      "title": "List of pending Land Reference Cases in District Court",
+      "url": "https://cdn.s3waas.gov.in/s33d2d8ccb37df977cb6d9da15b76c3f3a/uploads/2021/11/2021112333.pdf",
+      "source_page": "https://kolhapur.gov.in/en/document-category/land-acquisition/",
+      "publisher": "Collector Office, Kolhapur (kolhapur.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "d007c02d89df93e86737af3375e56168ecfbd9ec57fb1bc409ae297170d485f3",
+      "size_bytes": 656461,
+      "pages": 70,
+      "text_layer": "broken",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "kop-notice-01",
+      "title": "Regarding the publication of information about Dowry Prohibition Officers, in accordance with the Hon. Supreme Court’s order dated 20/08/2026 (M.A. Nos. 2689-90/2025 in Criminal Appeal Nos. 132-133/2017).",
+      "url": "https://cdn.s3waas.gov.in/s33d2d8ccb37df977cb6d9da15b76c3f3a/uploads/2026/09/17899890892663.pdf",
+      "source_page": "https://kolhapur.gov.in/en/notice_category/announcements/",
+      "publisher": "Collector Office, Kolhapur (kolhapur.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": true,
+      "sha256": "5e04fef15e2b8914eb40b8266954d27a141b16fe5b57c0d0c68096dc88e45e4b",
+      "size_bytes": 1139306,
+      "pages": 3,
+      "text_layer": "scanned",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "kop-notice-02",
+      "title": "Regarding the acquisition—through private negotiations—of private lands required for the ‘Aptal Storage Tank’ project in Radhanagari Taluka.",
+      "url": "https://cdn.s3waas.gov.in/s33d2d8ccb37df977cb6d9da15b76c3f3a/uploads/2026/09/17894750969922.pdf",
+      "source_page": "https://kolhapur.gov.in/en/notice_category/announcements/",
+      "publisher": "Collector Office, Kolhapur (kolhapur.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "4eced860524579f849a01c57f231b99fe4fe34067a315e301ab99ba8b1e309b1",
+      "size_bytes": 2044257,
+      "pages": 2,
+      "text_layer": "native",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "kop-notice-03",
+      "title": "Regarding the direct purchase of land at Mauje Pandivare through the private negotiation method for the Pazar tank project at Pandivare, Taluka Bhudargad, District Kolhapur.",
+      "url": "https://cdn.s3waas.gov.in/s33d2d8ccb37df977cb6d9da15b76c3f3a/uploads/2026/09/17890190349685.pdf",
+      "source_page": "https://kolhapur.gov.in/en/notice_category/announcements/",
+      "publisher": "Collector Office, Kolhapur (kolhapur.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": true,
+      "sha256": "475dfbde18e489a8d43681832e40c24d6dc991685b4df118591265fdeccedec8",
+      "size_bytes": 966912,
+      "pages": 2,
+      "text_layer": "scanned",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "kop-notice-04",
+      "title": "Land acquisition for resrevation no V/18, “Play Ground”, CTS No-20806 ( Gat No.678) in Shahapur Area 1327.74 Sq.m under development plan of ichalakaranji",
+      "url": "https://cdn.s3waas.gov.in/s33d2d8ccb37df977cb6d9da15b76c3f3a/uploads/2026/09/17888531025632.pdf",
+      "source_page": "https://kolhapur.gov.in/en/notice_category/announcements/",
+      "publisher": "Collector Office, Kolhapur (kolhapur.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": true,
+      "sha256": "a97c08eaa35dd1f8268e299938c0530e880cf2f9639b10142609541f5235cfbf",
+      "size_bytes": 838964,
+      "pages": 3,
+      "text_layer": "scanned",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "kop-notice-05",
+      "title": "Circular regarding the implementation of the Mahatma Jyotirao Phule Revenue Lok Adalat Campaign 2026.",
+      "url": "https://cdn.s3waas.gov.in/s33d2d8ccb37df977cb6d9da15b76c3f3a/uploads/2026/09/17884330207075.pdf",
+      "source_page": "https://kolhapur.gov.in/en/notice_category/announcements/",
+      "publisher": "Collector Office, Kolhapur (kolhapur.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": true,
+      "sha256": "46b7421dc2a80cb96e2b8a7441ab177e6a3f69d75942b68476e0bde453f14dc3",
+      "size_bytes": 1900526,
+      "pages": 2,
+      "text_layer": "scanned",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "kop-notice-06",
+      "title": "Special Intensive Revision (SIR) Programme for Electoral Rolls – 2026. Draft electoral roll published on 31/08/2026",
+      "url": "https://cdn.s3waas.gov.in/s33d2d8ccb37df977cb6d9da15b76c3f3a/uploads/2026/08/17881722683265.pdf",
+      "source_page": "https://kolhapur.gov.in/en/notice_category/announcements/",
+      "publisher": "Collector Office, Kolhapur (kolhapur.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "9638bc1b7aee99e82eb37e0597d7b8943f16fd2e6c646f0671e904dab53ebb4c",
+      "size_bytes": 330391,
+      "pages": 1,
+      "text_layer": "native",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "kop-notice-07",
+      "title": "Special Intensive Revision (SIR)- 2026 Kolhapur District Assembly Constituency wise Lists of Absent, Shifted, Duplicate, and Dead (ASDD) voters.",
+      "url": "https://cdn.s3waas.gov.in/s33d2d8ccb37df977cb6d9da15b76c3f3a/uploads/2026/08/17881660944122.pdf",
+      "source_page": "https://kolhapur.gov.in/en/notice_category/announcements/",
+      "publisher": "Collector Office, Kolhapur (kolhapur.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "86ee784ac7b3a6c7f02026e4ee8b94599261898d63b9b7ff2ad6f5a98f57256c",
+      "size_bytes": 270857,
+      "pages": 1,
+      "text_layer": "native",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "kop-notice-08",
+      "title": "Nandwal – Regarding the acquisition of land through private negotiations; regarding the publication of a public notice prior to direct purchase.",
+      "url": "https://cdn.s3waas.gov.in/s33d2d8ccb37df977cb6d9da15b76c3f3a/uploads/2026/08/17859352397725.pdf",
+      "source_page": "https://kolhapur.gov.in/en/notice_category/announcements/",
+      "publisher": "Collector Office, Kolhapur (kolhapur.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": true,
+      "sha256": "31ee10bcff51bb686aaba82d1940d8fdc84804c4beab2816804a33f0e886e000",
+      "size_bytes": 1726078,
+      "pages": 6,
+      "text_layer": "scanned",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "kop-charter-01",
+      "title": "Citizens Charter 2025",
+      "url": "https://cdn.s3waas.gov.in/s33d2d8ccb37df977cb6d9da15b76c3f3a/uploads/2025/08/17546322845539.pdf",
+      "source_page": "https://kolhapur.gov.in/en/document-category/citizen-charter/",
+      "publisher": "Collector Office, Kolhapur (kolhapur.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "4c65142359433148ee8e370d40279566a423d9e8a16997f7d06cc51d495d42ea",
+      "size_bytes": 745722,
+      "pages": 15,
+      "text_layer": "mixed",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "kop-charter-02",
+      "title": "Citizen Charter 2020",
+      "url": "https://cdn.s3waas.gov.in/s33d2d8ccb37df977cb6d9da15b76c3f3a/uploads/2020/09/2020092937.pdf",
+      "source_page": "https://kolhapur.gov.in/en/document-category/citizen-charter/",
+      "publisher": "Collector Office, Kolhapur (kolhapur.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "d0479074d693866c0553323b553fe72979b462f720327db588a87132041fc89f",
+      "size_bytes": 507669,
+      "pages": 11,
+      "text_layer": "native",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "sol-laq-01",
+      "title": "Notification under Section 20A of the Railways (Amendment) Act, 2008, regarding the land acquired in Mohol Taluka for the third and fourth railway lines on the Pune-Solapur-Wadi route.",
+      "url": "https://cdn.s3waas.gov.in/s3acc3e0404646c57502b480dc052c4fe1/uploads/2026/09/17882635937632.pdf",
+      "source_page": "https://solapur.gov.in/en/document-category/land-acquisition/",
+      "publisher": "Collector Office, Solapur (solapur.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "74071970bdb877819e00da2cb76aed7e92929b990f292ef9f2f73485977d5415",
+      "size_bytes": 1938693,
+      "pages": 141,
+      "text_layer": "native",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "sol-laq-02",
+      "title": "Notification under Section 20A of the Railways (Amendment) Act, 2008, regarding the land acquired in North Solapur Taluka for the ongoing special railway project involving the third and fourth lines on the Pune-Solapur-Wadi route",
+      "url": "https://cdn.s3waas.gov.in/s3acc3e0404646c57502b480dc052c4fe1/uploads/2026/09/17882637725747.pdf",
+      "source_page": "https://solapur.gov.in/en/document-category/land-acquisition/",
+      "publisher": "Collector Office, Solapur (solapur.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "d669ecc3c1f95642abc9cef2ef57f0b6717045aa7375ae7b5b7e058cf7f0b134",
+      "size_bytes": 1583325,
+      "pages": 92,
+      "text_layer": "native",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "sol-laq-03",
+      "title": "Section 11 Notification for the villages of Kuranwadi/Chikhali and Konheri",
+      "url": "https://cdn.s3waas.gov.in/s3acc3e0404646c57502b480dc052c4fe1/uploads/2026/08/17861054966478.pdf",
+      "source_page": "https://solapur.gov.in/en/document-category/land-acquisition/",
+      "publisher": "Collector Office, Solapur (solapur.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": true,
+      "sha256": "6fb8134fd655032f8c2db7e279351777cb515ace884629616e780d23dfab9a64",
+      "size_bytes": 1946464,
+      "pages": 5,
+      "text_layer": "scanned",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "sol-laq-04",
+      "title": "Maharashtra Highway Act, 1955 Section 15(2) Notification Maharashtra Shaktipeeth Expressway State Highway (Special) No. 10 Mah. Govt. Gazette General Part 4B- June 9, 2026 Page No. 149 To 172",
+      "url": "https://cdn.s3waas.gov.in/s3acc3e0404646c57502b480dc052c4fe1/uploads/2026/07/17841946751579.pdf",
+      "source_page": "https://solapur.gov.in/en/document-category/land-acquisition/",
+      "publisher": "Collector Office, Solapur (solapur.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "92f69cefa3bb7d0d02d9c2d4cb4d13c2ccac2c5ee95653a612dd9bcf5ca3efee",
+      "size_bytes": 2730457,
+      "pages": 14,
+      "text_layer": "mixed",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "sol-laq-05",
+      "title": "Regarding publishing the final award information on the website for land acquisition for Pazar Talao No. 4 in Mauje Gulavanchi Tal. Uttar Solapur Dist. Solapur",
+      "url": "https://cdn.s3waas.gov.in/s3acc3e0404646c57502b480dc052c4fe1/uploads/2026/06/17804657739437.pdf",
+      "source_page": "https://solapur.gov.in/en/document-category/land-acquisition/",
+      "publisher": "Collector Office, Solapur (solapur.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": true,
+      "sha256": "68cce773d42371084abfbf4c72aab9f2dc291264f0bf783639bb8706ae6d3a45",
+      "size_bytes": 2321056,
+      "pages": 17,
+      "text_layer": "scanned",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "sol-laq-06",
+      "title": "Click here to see the Awards of Hingani Nipani, Bhoyre, Kalaman, Khuneshwar, Padsali, Darfal Gawdi under the K.M.U.C.Y.O. of Tal. Mohol and Uttar Solapur, Dist. Solapur from Ubhusakr.7 Mohol.",
+      "url": "https://cdn.s3waas.gov.in/s3acc3e0404646c57502b480dc052c4fe1/uploads/2026/05/17793572945218.pdf",
+      "source_page": "https://solapur.gov.in/en/document-category/land-acquisition/",
+      "publisher": "Collector Office, Solapur (solapur.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "mr"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "176e264b7f91772510ecde5aeb3fe38c74b9f84e28e5210fb20a1301a0aaf240",
+      "size_bytes": 68153,
+      "pages": 1,
+      "text_layer": "legacy",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "bpl-notice-01",
+      "title": "A public notice under Section 21 has been issued regarding the construction of the West Bhopal Bypass Road, covering two villages—Thuakheda and Ratanpur Sadak—in Kolar Tehsil.",
+      "url": "https://cdn.s3waas.gov.in/s337a749d808e46495a8da1e5352d03cae/uploads/2026/09/17907563449733.pdf",
+      "source_page": "https://bhopal.nic.in/en/documents/",
+      "publisher": "Collector Office, Bhopal (bhopal.nic.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "hi"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "2dad27856a8e4f0cffafdfcf959664078f3f2d7ab73dcbd4fc2087ef9b7a5273",
+      "size_bytes": 1690349,
+      "pages": 24,
+      "text_layer": "broken",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "bpl-notice-02",
+      "title": "Public notice issued under Section 21 for the construction of the West Bhopal Bypass Road in Village Aamla, Tehsil Huzur.",
+      "url": "https://cdn.s3waas.gov.in/s337a749d808e46495a8da1e5352d03cae/uploads/2026/09/17907561185267.pdf",
+      "source_page": "https://bhopal.nic.in/en/documents/",
+      "publisher": "Collector Office, Bhopal (bhopal.nic.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "hi"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "c836d7f6722aeff4702f903b31a174054bb583f03200d371be1b4e5d3d87c9e6",
+      "size_bytes": 857683,
+      "pages": 9,
+      "text_layer": "broken",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "bpl-notice-03",
+      "title": "For the construction of Metro Rail Route Orange Line under Bhopal Metro Rail Project, total 13 Kita, total area 2.1204 hectare, total acquired area 0.2367 hectare of private lands situated in Village Nishatpura, Nazul Sant Hirdaram Nagar (Bairgarh) C",
+      "url": "https://cdn.s3waas.gov.in/s337a749d808e46495a8da1e5352d03cae/uploads/2026/09/17907557022762.pdf",
+      "source_page": "https://bhopal.nic.in/en/documents/",
+      "publisher": "Collector Office, Bhopal (bhopal.nic.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "hi"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "348ee675bb2d6024eb7fad4b40bb676fd31ed398eed8743ddcb720787ba163ef",
+      "size_bytes": 202732,
+      "pages": 6,
+      "text_layer": "native",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "bpl-notice-04",
+      "title": "A public notice under Section 21 has been issued regarding the construction of a retaining wall for the Sukhi Sevania ROB on the Bhopal Bypass Road, specifically concerning the village of Choprakalan in Tehsil Huzur.",
+      "url": "https://cdn.s3waas.gov.in/s337a749d808e46495a8da1e5352d03cae/uploads/2026/09/17907553597604.pdf",
+      "source_page": "https://bhopal.nic.in/en/documents/",
+      "publisher": "Collector Office, Bhopal (bhopal.nic.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "hi"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "9009ea201018c9a97495ad0dd856e55971aa487299473e55be8c30a4ef63eca5",
+      "size_bytes": 390724,
+      "pages": 2,
+      "text_layer": "native",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "bpl-notice-05",
+      "title": "A public notice under Section 21 has been issued for the construction of the West Bhopal Bypass Road, covering four villages in Huzur Tehsil: Samasgarh, Narela, Jatkhedi, and Bhanpur Kekadiya.",
+      "url": "https://cdn.s3waas.gov.in/s337a749d808e46495a8da1e5352d03cae/uploads/2026/09/17900663255318.pdf",
+      "source_page": "https://bhopal.nic.in/en/documents/",
+      "publisher": "Collector Office, Bhopal (bhopal.nic.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "hi"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "a55153147e91dd85a922efa8f2007c47931990735fce4eabd9aeb9d815569b8d",
+      "size_bytes": 3110665,
+      "pages": 22,
+      "text_layer": "broken",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "bpl-notice-06",
+      "title": "A public notice under Section 21 has been issued for the village of Semrikalan in Kolar Tehsil regarding the construction of the West Bhopal Bypass Road.",
+      "url": "https://cdn.s3waas.gov.in/s337a749d808e46495a8da1e5352d03cae/uploads/2026/09/17900661875705.pdf",
+      "source_page": "https://bhopal.nic.in/en/documents/",
+      "publisher": "Collector Office, Bhopal (bhopal.nic.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "hi"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "9be2fd45b5aaf739212e924730fa537af5449896ab6c3784be51b0aa9ed9734a",
+      "size_bytes": 132858,
+      "pages": 6,
+      "text_layer": "broken",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "bpl-notice-07",
+      "title": "A declaration under Section 19 has been issued for four villages—Megra Navin, Bijavan Kalan, Bandikhedi, and Chachakhedi—in Bairasia Tehsil that are affected by the submergence area of ​​the Suthalia Irrigation Project.",
+      "url": "https://cdn.s3waas.gov.in/s337a749d808e46495a8da1e5352d03cae/uploads/2026/09/17897399502613.pdf",
+      "source_page": "https://bhopal.nic.in/en/documents/",
+      "publisher": "Collector Office, Bhopal (bhopal.nic.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "hi"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "2d6ff6b1d59f4dc206d1f39480f4519859a510abbce3c4426690663a08c13470",
+      "size_bytes": 1351199,
+      "pages": 9,
+      "text_layer": "legacy",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "bpl-notice-08",
+      "title": "A public notice under Section 21 has been issued for the construction of the West Bhopal Bypass Road, covering three villages in Kolar Tehsil: Pipliya Berkhedi, Pipliya Kesho, and Guradi Ghat.",
+      "url": "https://cdn.s3waas.gov.in/s337a749d808e46495a8da1e5352d03cae/uploads/2026/09/17897394614474.pdf",
+      "source_page": "https://bhopal.nic.in/en/documents/",
+      "publisher": "Collector Office, Bhopal (bhopal.nic.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "hi"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "0ccf353b4dba9e8b7f3c7b647c5ef64179efdacdbefd52c4da5e1d2fa96b9d4b",
+      "size_bytes": 2499576,
+      "pages": 13,
+      "text_layer": "broken",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "pat-notice-01",
+      "title": "Proceedings of the meeting held on 20.08.2026 under the chairmanship of Sri Kundan Kumar, IAS, District Magistrate, Patna, to review the work undertaken by various departments during the weekly coordination meeting.",
+      "url": "https://cdn.s3waas.gov.in/s3fb7b9ffa5462084c5f4e7e85a093e6d7/uploads/2026/08/17873830166961.pdf",
+      "source_page": "https://patna.nic.in/en/documents/",
+      "publisher": "Collectorate, Patna (patna.nic.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "hi"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": true,
+      "sha256": "8756a60ad73d8ba87384e47f10f35383e25d3dc4e5e038e2b010a8f98bf9e729",
+      "size_bytes": 153933,
+      "pages": 4,
+      "text_layer": "scanned",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "pat-notice-02",
+      "title": "Regarding the development of a ‘Fin tech City’ under an industrial project (GIFT-Goods) on land adjacent to the Multi-Modal Logistics Park (MMLP) project within the Fatuha Circle (Mauza: Jaitiya, Thana No. 79). Letter No. 2937, Dated: 24/06/2026.",
+      "url": "https://cdn.s3waas.gov.in/s3fb7b9ffa5462084c5f4e7e85a093e6d7/uploads/2026/06/17822941311980.pdf",
+      "source_page": "https://patna.nic.in/en/documents/",
+      "publisher": "Collectorate, Patna (patna.nic.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "hi"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": true,
+      "sha256": "22643bcc6df1df45c352a1ccd0271c9b95a04dfa8334523d576e125847c121e0",
+      "size_bytes": 561008,
+      "pages": 1,
+      "text_layer": "scanned",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "pat-notice-03",
+      "title": "District Establishment Office, Collectorate, Patna – Order. Letter No. 1512, Dated 01/06/2026",
+      "url": "https://cdn.s3waas.gov.in/s3fb7b9ffa5462084c5f4e7e85a093e6d7/uploads/2026/06/17803806876402.pdf",
+      "source_page": "https://patna.nic.in/en/documents/",
+      "publisher": "Collectorate, Patna (patna.nic.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "hi"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "45fd16b157fb8c84f4349f244276c33d4b63178235970785b5f5266d52c44dda",
+      "size_bytes": 2841127,
+      "pages": 9,
+      "text_layer": "native",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "pat-notice-04",
+      "title": "District Land Acquisition Office, Collectorate Patna: Letter No. 1070, Dated 11.03.2026 Information",
+      "url": "https://cdn.s3waas.gov.in/s3fb7b9ffa5462084c5f4e7e85a093e6d7/uploads/2026/03/17732134706207.pdf",
+      "source_page": "https://patna.nic.in/en/documents/",
+      "publisher": "Collectorate, Patna (patna.nic.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "hi"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": true,
+      "sha256": "973e3ba507e0e3cd9d2d857205e0d408328d7fc7d132db35668a185b5fd1bd6f",
+      "size_bytes": 2417318,
+      "pages": 3,
+      "text_layer": "scanned",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "pat-notice-05",
+      "title": "District Establishment Office, Collectorate Patna-Order. Memorandum No.-637 Date-05/03/2026",
+      "url": "https://cdn.s3waas.gov.in/s3fb7b9ffa5462084c5f4e7e85a093e6d7/uploads/2026/03/17731244531985.pdf",
+      "source_page": "https://patna.nic.in/en/documents/",
+      "publisher": "Collectorate, Patna (patna.nic.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "hi"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": true,
+      "sha256": "4031d22d54568f3dd170b8cdb94fc84031fe35b69d62ec73d608f01116ac27b6",
+      "size_bytes": 252429,
+      "pages": 2,
+      "text_layer": "scanned",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "pat-notice-06",
+      "title": "District Land Acquisition Office, Collectorate, Patna-Project-Notification related to four lane widening/construction of the road from Bhadraghat to Didarganj (length-7.8 km) under Patna district. Letter No.-246, Date-17/01/2026",
+      "url": "https://cdn.s3waas.gov.in/s3fb7b9ffa5462084c5f4e7e85a093e6d7/uploads/2026/01/17689034809057.pdf",
+      "source_page": "https://patna.nic.in/en/documents/",
+      "publisher": "Collectorate, Patna (patna.nic.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "hi"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": true,
+      "sha256": "45596f1f7bd1f9f3783074b9a17cabb0a4a170b13ca0d50d8b9996c28c797731",
+      "size_bytes": 773161,
+      "pages": 6,
+      "text_layer": "scanned",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "nhm-asha-hi-01",
+      "title": "ASHA Module Book 5 (Hindi)",
+      "url": "https://nhm.gov.in/images/pdf/communitisation/asha/Asha_Module_book%205_Hindi.pdf",
+      "source_page": "https://nhm.gov.in/index1.php?lang=1&level=3&sublinkid=184&lid=257",
+      "publisher": "National Health Mission, MoHFW (nhm.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "hi"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "dff8d319c1ac095402f2679237efe657c648b79c16d9a6f6d9aed5d5ae441e93",
+      "size_bytes": 494979,
+      "pages": 54,
+      "text_layer": "mixed",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "nhm-asha-hi-02",
+      "title": "ASHA Module Book 6 (Hindi)",
+      "url": "https://nhm.gov.in/images/pdf/communitisation/asha/Asha_Module_book_6%20Hindi.pdf",
+      "source_page": "https://nhm.gov.in/index1.php?lang=1&level=3&sublinkid=184&lid=257",
+      "publisher": "National Health Mission, MoHFW (nhm.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "hi"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "3609d2559e90c09b8050d3dce76d183d26d02cb44d906c5e6421062bd61c86c8",
+      "size_bytes": 7902278,
+      "pages": 78,
+      "text_layer": "mixed",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "nhm-asha-hi-03",
+      "title": "ASHA Module Book 7 (Hindi)",
+      "url": "https://nhm.gov.in/images/pdf/communitisation/asha/Asha_Module_book_7%20Hindi.pdf",
+      "source_page": "https://nhm.gov.in/index1.php?lang=1&level=3&sublinkid=184&lid=257",
+      "publisher": "National Health Mission, MoHFW (nhm.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "hi"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "54d1d41ab02c81b02b15152fcb7445e464686b7d3446bde7fa7d83cfaa20b9bb",
+      "size_bytes": 3037226,
+      "pages": 89,
+      "text_layer": "mixed",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "nhm-asha-hi-04",
+      "title": "ASHA Handbook: Mobilizing for Action on Violence against Women (Hindi)",
+      "url": "https://nhm.gov.in/images/pdf/communitisation/asha/ASHA_Handbook-Mobilizing_for_Action_on_Violence_against_Women_Hindi.pdf",
+      "source_page": "https://nhm.gov.in/index1.php?lang=1&level=3&sublinkid=184&lid=257",
+      "publisher": "National Health Mission, MoHFW (nhm.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "hi"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "4c771bfdad8b99e49c335268af44b079596d5322b026a774ca64ef9a470b5de4",
+      "size_bytes": 2664775,
+      "pages": 36,
+      "text_layer": "mixed",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "nhm-asha-en-01",
+      "title": "ASHA Module Book 1 (English)",
+      "url": "https://nhm.gov.in/images/pdf/communitisation/asha/book-no-1.pdf",
+      "source_page": "https://nhm.gov.in/index1.php?lang=1&level=3&sublinkid=184&lid=257",
+      "publisher": "National Health Mission, MoHFW (nhm.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "en"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "d57863e94498a63ef210920482058c03c918d25738f52f2506ec6a5c9be204c1",
+      "size_bytes": 597246,
+      "pages": 101,
+      "text_layer": "native",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "nhm-asha-en-02",
+      "title": "ASHA Module Book 2 (English)",
+      "url": "https://nhm.gov.in/images/pdf/communitisation/asha/book-no-2.pdf",
+      "source_page": "https://nhm.gov.in/index1.php?lang=1&level=3&sublinkid=184&lid=257",
+      "publisher": "National Health Mission, MoHFW (nhm.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "en"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "7a85cc664c2ee0c8bb37135eb111117d20420988e92817b00c13cd284f3a81d9",
+      "size_bytes": 1507955,
+      "pages": 43,
+      "text_layer": "mixed",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "nhm-asha-en-03",
+      "title": "ASHA Module Book 3 (English)",
+      "url": "https://nhm.gov.in/images/pdf/communitisation/asha/book-no-3.pdf",
+      "source_page": "https://nhm.gov.in/index1.php?lang=1&level=3&sublinkid=184&lid=257",
+      "publisher": "National Health Mission, MoHFW (nhm.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "en"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "d58397ca32c0b84a80c04dcdad3d37b5d08532c6972b17e79684db776597af3b",
+      "size_bytes": 987467,
+      "pages": 35,
+      "text_layer": "mixed",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "nhm-asha-en-04",
+      "title": "ASHA Module Book 4 (English)",
+      "url": "https://nhm.gov.in/images/pdf/communitisation/asha/book-no-4.pdf",
+      "source_page": "https://nhm.gov.in/index1.php?lang=1&level=3&sublinkid=184&lid=257",
+      "publisher": "National Health Mission, MoHFW (nhm.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "en"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "eb3c5708b05aa8449e8e623cbc7fe985045cd2f38b1c80abc8e794f39a53a060",
+      "size_bytes": 971280,
+      "pages": 33,
+      "text_layer": "mixed",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "nhm-asha-en-05",
+      "title": "ASHA Module Book 5 (English)",
+      "url": "https://nhm.gov.in/images/pdf/communitisation/asha/book-no-5.pdf",
+      "source_page": "https://nhm.gov.in/index1.php?lang=1&level=3&sublinkid=184&lid=257",
+      "publisher": "National Health Mission, MoHFW (nhm.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "en"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "cf022896ce48b9665ebf64e4c0942aa5eb5fa61fbe8755a64545d0080db3ddae",
+      "size_bytes": 444559,
+      "pages": 58,
+      "text_layer": "mixed",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "nhm-asha-en-06",
+      "title": "ASHA Module Book 6 (English)",
+      "url": "https://nhm.gov.in/images/pdf/communitisation/asha/book-no-6.pdf",
+      "source_page": "https://nhm.gov.in/index1.php?lang=1&level=3&sublinkid=184&lid=257",
+      "publisher": "National Health Mission, MoHFW (nhm.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "en"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "9982c3e3a487d7f57da523ac37abdc721802a7b1cae6ae2a7574e4f12d8d5f21",
+      "size_bytes": 3510633,
+      "pages": 77,
+      "text_layer": "mixed",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "nhm-asha-en-07",
+      "title": "ASHA Module Book 7 (English)",
+      "url": "https://nhm.gov.in/images/pdf/communitisation/asha/book-no-7.pdf",
+      "source_page": "https://nhm.gov.in/index1.php?lang=1&level=3&sublinkid=184&lid=257",
+      "publisher": "National Health Mission, MoHFW (nhm.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "en"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "4ca167e99b6624fcd2b000d2b66eee99fd249d223e8ccf8193e62ebcdb5c6f38",
+      "size_bytes": 2493282,
+      "pages": 88,
+      "text_layer": "mixed",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "nhm-asha-en-08",
+      "title": "Mobilizing for Action on Violence against Women (English)",
+      "url": "https://nhm.gov.in/images/pdf/communitisation/asha/ASHA_Handbook-Mobilizing_for_Action_on_Violence_against_Women_English.pdf",
+      "source_page": "https://nhm.gov.in/index1.php?lang=1&level=3&sublinkid=184&lid=257",
+      "publisher": "National Health Mission, MoHFW (nhm.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "en"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "93e6fb6dbfe4cd5f1eaa1e2f944c0487b8d4091bd2571383bce6556202e8c298",
+      "size_bytes": 1438034,
+      "pages": 36,
+      "text_layer": "mixed",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "nhm-asha-en-09",
+      "title": "Reaching the Unreached (English)",
+      "url": "https://nhm.gov.in/images/pdf/communitisation/asha/Reaching_The_Unreached_Brochure_for_ASHA.pdf",
+      "source_page": "https://nhm.gov.in/index1.php?lang=1&level=3&sublinkid=184&lid=257",
+      "publisher": "National Health Mission, MoHFW (nhm.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "en"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": true,
+      "sha256": "384193683d56e6c22bdc359428b54606a2bdb53f9092c1d8b164fcc4f1552a70",
+      "size_bytes": 738113,
+      "pages": 2,
+      "text_layer": "scanned",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "nhm-asha-en-10",
+      "title": "Induction Training Module for ASHA (English)",
+      "url": "https://nhm.gov.in/images/pdf/communitisation/asha/ASHA_Induction_Module_English.pdf",
+      "source_page": "https://nhm.gov.in/index1.php?lang=1&level=3&sublinkid=184&lid=257",
+      "publisher": "National Health Mission, MoHFW (nhm.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "en"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "563ddb0a4f23c16bed186e14c88d6c60e3f33fadcf7d4810175da41f391a794f",
+      "size_bytes": 2093967,
+      "pages": 152,
+      "text_layer": "mixed",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "nhm-asha-en-11",
+      "title": "ASHA Trainers Part -1 (English)",
+      "url": "https://nhm.gov.in/images/pdf/communitisation/asha/Notes_for_ASHA_Trainers_Part-1_English.pdf",
+      "source_page": "https://nhm.gov.in/index1.php?lang=1&level=3&sublinkid=184&lid=257",
+      "publisher": "National Health Mission, MoHFW (nhm.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "en"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "74659f0878fd7a528a6c5dff4bdf60fb756fb5eea57b7248ada79027abaec3dd",
+      "size_bytes": 1685397,
+      "pages": 155,
+      "text_layer": "mixed",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "nhm-asha-en-12",
+      "title": "ASHA Trainers Part -2 (English)",
+      "url": "https://nhm.gov.in/images/pdf/communitisation/asha/Notes_for_ASHA_Trainers_Part-2_English.pdf",
+      "source_page": "https://nhm.gov.in/index1.php?lang=1&level=3&sublinkid=184&lid=257",
+      "publisher": "National Health Mission, MoHFW (nhm.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "en"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": true,
+      "sha256": "442dc61e7d263cde0f7bb1444bf0dd3635f34c431e3c149eeebbc900a11261c2",
+      "size_bytes": 5442025,
+      "pages": 80,
+      "text_layer": "scanned",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "nhm-asha-en-13",
+      "title": "ASHA Trainers Mobilizing for Action on Violence Against Women (English)",
+      "url": "https://nhm.gov.in/images/pdf/communitisation/asha/Notes_for_ASHA_Trainers-Mobilizing_for_Action_on_Violence_Against_Women_English.pdf",
+      "source_page": "https://nhm.gov.in/index1.php?lang=1&level=3&sublinkid=184&lid=257",
+      "publisher": "National Health Mission, MoHFW (nhm.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "en"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "3f4275eda522a98df73d56784a4dc839304245962cc8639396500dfc32473281",
+      "size_bytes": 1059430,
+      "pages": 32,
+      "text_layer": "mixed",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "nhm-asha-en-14",
+      "title": "Handbook for ASHA Facilitator (English)",
+      "url": "https://nhm.gov.in/images/pdf/communitisation/asha/Handbook_for_ASHA_Facilitators.pdf",
+      "source_page": "https://nhm.gov.in/index1.php?lang=1&level=3&sublinkid=184&lid=257",
+      "publisher": "National Health Mission, MoHFW (nhm.gov.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "en"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "5ba6899d35b268653f577e440dd836eca3ec58cae595ec43b5d37ff3f44159b1",
+      "size_bytes": 598022,
+      "pages": 72,
+      "text_layer": "mixed",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "coi-diglot",
+      "title": "The Constitution of India (Hindi-English diglot edition)",
+      "url": "https://cdnbbsr.s3waas.gov.in/s380537a945c7aaa788ccfcdf1b99b5d8f/uploads/2024/07/20240716890312078.pdf",
+      "source_page": "https://legislative.gov.in/constitution-of-india/",
+      "publisher": "Legislative Department, Ministry of Law and Justice",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "en",
+        "hi"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": false,
+      "sha256": "819ba7adc5e5ae4063f26c82472283ba682ddb662e5a7f864cf26984d99b26ed",
+      "size_bytes": 2413611,
+      "pages": 402,
+      "text_layer": "native",
+      "detected_type": "pdf"
+    },
+    {
+      "id": "sppu-01",
+      "title": "Committee for Prevention of Caste based Discrimination",
+      "url": "https://www.unipune.ac.in/pdf_files/Caste%20Based%20Discrimination%20Committee_05.102018.pdf",
+      "source_page": "https://www.unipune.ac.in/",
+      "publisher": "Savitribai Phule Pune University (unipune.ac.in)",
+      "licence": "Indian government publication; the source site states no open licence, so the file is not redistributed here. Fetch it from the source URL.",
+      "redistribute": false,
+      "languages": [
+        "en"
+      ],
+      "languages_source": "expected from the publisher's listing page",
+      "scanned": true,
+      "sha256": "28fc35a1c22e80d4a77d59af23464650e02084d6be333804e46bff6a580288e4",
+      "size_bytes": 480578,
+      "pages": 1,
+      "text_layer": "scanned",
+      "detected_type": "pdf"
+    }
+  ],
+  "frozen": null
+}
