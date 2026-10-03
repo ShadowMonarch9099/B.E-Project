@@ -106,7 +106,7 @@ export default function DocumentCard({
       )}
 
       <div className="card-actions">
-        {onOpen && doc.has_viewer && doc.status === "indexed" && (
+        {onOpen && doc.status === "indexed" && (doc.has_viewer || doc.anchor === "paragraph") && (
           <button type="button" className="btn-text" onClick={onOpen}>
             Open
           </button>

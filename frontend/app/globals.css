@@ -1408,3 +1408,264 @@ dd {
     padding: 10px 12px;
   }
 }
+
+/* ---------- PDF viewer: the cited page with the passage highlighted ---------- */
+
+.viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.viewer__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.35);
+  animation: fade-in 0.25s both;
+}
+
+.viewer__panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(760px, 60vw);
+  height: 100%;
+  background: var(--bg);
+  border-left: 1px solid var(--line-strong);
+  box-shadow: -24px 0 48px -32px rgba(0, 0, 0, 0.6);
+  outline: none;
+  animation: viewer-in 0.35s var(--ease) both;
+}
+
+.viewer__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.viewer__title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.viewer__stamp {
+  flex: none;
+  padding: 0 8px;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  transform: rotate(-4deg);
+  animation: stamp-press-small 0.5s 0.15s var(--ease) both;
+}
+
+.viewer__file {
+  font-family: var(--doc);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.viewer__actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.viewer__close,
+.viewer__btn {
+  display: grid;
+  place-items: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 6px;
+  font: inherit;
+  font-size: 1.15rem;
+  line-height: 1;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.viewer__close:hover,
+.viewer__btn:hover:not(:disabled),
+.viewer__close:focus-visible,
+.viewer__btn:focus-visible {
+  border-color: var(--line-strong);
+}
+
+.viewer__btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.viewer__check {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin: 0;
+  padding: 10px 16px;
+  font-size: 0.88rem;
+  color: var(--ink-2);
+  border-bottom: 1px dashed var(--line);
+}
+
+.viewer__check .check-badge {
+  margin-left: 0;
+}
+
+.viewer__quote {
+  margin: 0;
+  padding: 10px 16px 10px 14px;
+  border-left: 3px solid var(--line-strong);
+  font-family: var(--doc);
+  font-size: 0.95rem;
+  color: var(--ink-2);
+  max-height: 6.5em;
+  overflow-y: auto;
+}
+
+.viewer__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.viewer__tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 0.78rem;
+}
+
+.viewer__pageno,
+.viewer__zoom {
+  min-width: 70px;
+  text-align: center;
+  color: var(--ink-2);
+}
+
+.viewer__zoom {
+  min-width: 44px;
+}
+
+.viewer__sep {
+  width: 1px;
+  height: 20px;
+  margin: 0 4px;
+  background: var(--line);
+}
+
+.viewer__back {
+  margin-left: auto;
+}
+
+.viewer__scroll {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 12px;
+  background: var(--surface-2);
+  outline: none;
+}
+
+.viewer__scroll:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--line-strong);
+}
+
+.viewer__page {
+  position: relative;
+  margin: 0 auto;
+  background: #fff;
+  box-shadow: 0 10px 30px -18px rgba(0, 0, 0, 0.55);
+}
+
+.viewer__canvas {
+  display: block;
+  transition: opacity 0.2s;
+}
+
+.viewer__canvas--loading {
+  opacity: 0.4;
+}
+
+.viewer__loading {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 12px;
+}
+
+.viewer__marks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* The highlighted evidence: a dark band under each cited line (the page is always white). */
+.viewer__mark {
+  position: absolute;
+  border-radius: 3px;
+  background: rgba(10, 10, 10, 0.14);
+  box-shadow: inset 0 -2px 0 rgba(10, 10, 10, 0.85);
+  mix-blend-mode: multiply;
+  animation: mark-in 0.5s var(--ease) both;
+}
+
+.viewer__paras {
+  padding: 16px 20px;
+  background: var(--surface);
+}
+
+.para {
+  margin: 0 0 12px;
+  font-family: var(--doc);
+  line-height: 1.7;
+}
+
+.para__no {
+  margin-right: 8px;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--ink-3);
+}
+
+.para--mark {
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: var(--surface-2);
+  box-shadow: inset 3px 0 0 var(--line-strong);
+}
+
+@keyframes viewer-in {
+  from { transform: translateX(40px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+@keyframes mark-in {
+  from { opacity: 0; transform: scaleX(0.6); transform-origin: left; }
+  to { opacity: 1; transform: none; }
+}
+
+/* Phones: the viewer takes the whole screen. */
+@media (max-width: 760px) {
+  .viewer__panel {
+    width: 100%;
+    border-left: 0;
+  }
+}

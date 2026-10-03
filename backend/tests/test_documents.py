@@ -142,3 +142,24 @@ def test_delete_removes_rows_and_files(client):
     assert not folder.exists()
     with session_scope() as s:
         assert s.query(Page).filter_by(doc_id=doc_id).count() == 0
+
+
+@pytest.mark.skipif(not engine_status()["available"], reason="Tesseract with eng/hin/mar is not installed")
+def test_a_scanned_image_gets_a_viewer_pdf_and_boxes_on_its_page(client):
+    import pymupdf
+
+    from app.db import Chunk
+    from tests.helpers import png_bytes, scan_image
+
+    r = upload(client, "notice.png", png_bytes(scan_image()), "image/png")
+    d = client.get(f"/api/documents/{r.json()['document']['id']}").json()
+    assert d["status"] == "indexed" and d["kind"] == "image" and d["has_viewer"] is True
+    pdf = client.get(f"/api/documents/{d['id']}/file")
+    assert pdf.headers["content-type"] == "application/pdf"
+    with pymupdf.open(stream=pdf.content, filetype="pdf") as doc:
+        rect = doc[0].rect
+    with session_scope() as s:
+        chunks = s.query(Chunk).filter_by(doc_id=d["id"]).all()
+        boxes = [b for c in chunks for b in c.bbox]
+    assert boxes and all(0 <= x0 < x1 <= rect.width + 1 and 0 <= y0 < y1 <= rect.height + 1
+                         for x0, y0, x1, y1 in boxes)

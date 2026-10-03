@@ -7,6 +7,7 @@ import { createLimiter } from "@/lib/limit";
 import type { Citation, DocSummary, Health, UploadItem } from "@/lib/types";
 import Chat from "./Chat";
 import DocumentCard from "./DocumentCard";
+import PdfViewer, { type ViewerTarget } from "./PdfViewer";
 import ResultCard from "./ResultCard";
 
 const DEFAULT_LIMITS = { max_file_mb: 200, max_files: 20 };
@@ -131,11 +132,24 @@ export default function Workspace() {
     handleFiles(e.dataTransfer.files);
   };
 
-  // Opens the cited page of the original document. (The in-app viewer with the passage
-  // highlighted replaces this in phase 5.)
+  // A citation chip or a nearest page opens the original page with the passage highlighted.
+  const [viewer, setViewer] = useState<ViewerTarget | null>(null);
   const openCitation = useCallback((c: Citation) => {
-    window.open(`/api/documents/${c.doc_id}/file#page=${c.page_no}`, "_blank", "noopener");
+    setViewer({
+      docId: c.doc_id,
+      filename: c.filename,
+      page: c.page_no,
+      anchor: c.anchor,
+      boxes: c.bbox ?? [],
+      label: c.anchor === "paragraph" ? `¶ ${c.para_idx + 1}` : `p. ${c.page_no}`,
+      paraIdx: c.para_idx,
+      citedText: c.cited_text,
+      checkPage: c.check_page,
+      ocrConf: c.ocr_conf,
+    });
   }, []);
+  const openDocument = (d: DocSummary) =>
+    setViewer({ docId: d.id, filename: d.filename, page: 1, anchor: d.anchor, boxes: [], label: "p. 1" });
 
   const indexed = (docs ?? []).filter((d) => d.status === "indexed");
   const askable = indexed.map((d) => ({ id: d.id, name: d.filename }));
@@ -231,7 +245,13 @@ export default function Workspace() {
             ))}
             {(docs ?? []).map((d, i) => (
               <li key={d.id} className="card" style={{ "--i": Math.min(i + uploads.length, 8) } as React.CSSProperties}>
-                <DocumentCard doc={d} busy={busy.has(d.id)} onDelete={() => remove(d)} onReindex={() => reindex(d)} />
+                <DocumentCard
+                  doc={d}
+                  busy={busy.has(d.id)}
+                  onDelete={() => remove(d)}
+                  onReindex={() => reindex(d)}
+                  onOpen={() => openDocument(d)}
+                />
               </li>
             ))}
           </ol>
@@ -239,6 +259,7 @@ export default function Workspace() {
       )}
 
       {askable.length > 0 && <Chat docs={askable} llm={health?.llm} onOpen={openCitation} />}
+      {viewer && <PdfViewer target={viewer} onClose={() => setViewer(null)} />}
     </>
   );
 }

@@ -24,7 +24,7 @@ A citation-grounded Retrieval-Augmented Generation system for private English, H
 | `docs/prebuilt_models.md` | Prebuilt models for detection and extraction, mapped to the plan's stages |
 | `docs/sakshya.html` | Review of the plan and the "Sakshya" counter-proposal (open in a browser) |
 
-## The app (Sakshya v0.4)
+## The app (Sakshya v0.5)
 
 What works now, by plan section:
 
@@ -48,6 +48,8 @@ Pick an indexed document in the ask bar at the bottom of the page and ask in Eng
 2. **Rerank** with the pretrained multilingual cross-encoder [`cross-encoder/mmarco-mMiniLMv2-L12-H384-v1`](https://huggingface.co/cross-encoder/mmarco-mMiniLMv2-L12-H384-v1) (used as-is) and keep the top 6.
 3. **Evidence gate** (§6.7 step 1, N4): if the best reranker score is below **τ = 0.07** (`SAKSHYA_GATE_TAU`), Sakshya **abstains without calling the answer model** and shows the nearest pages.
 4. **Answer** with the Claude API (`claude-opus-5-5`, effort `medium`): each of the 6 passages is sent as its own document block with the API's citations feature, so every cited sentence carries a stamp-style chip ("p. 4"), with a dashed *check* mark when the page was a low-confidence scan. Answers stream to the browser over Server-Sent Events. Follow-up questions see the earlier turns (and their passages), which are replayed append-only so the API's prompt cache reuses them. Server-side refusal fallbacks are switched on (`fallbacks: "default"`), so if the model's safeguards decline a question, the API retries it on the model Anthropic recommends; a refusal that survives is shown as a polite "cannot answer", and an answer that hits the token limit is marked as cut short.
+
+**Opening the evidence** (phase 5, §6.8): a citation chip, a nearest page in an abstention, or a document's *Open* button opens the original page in a side panel (full screen on phones) with the cited passage highlighted. The page is drawn with [pdf.js](https://mozilla.github.io/pdf.js/) (`pdfjs-dist`), and the highlight boxes are the chunk's line boxes in PDF points (from PyMuPDF words on native pages, from Tesseract word boxes on scanned, legacy-font and broken-text pages, and from the converted PDF for DOCX and images). A DOCX that could not be converted shows its paragraphs with the cited one marked. Keyboard: `Esc` closes, `←`/`→` change page, `+`/`−` zoom; focus moves into the panel and back to the chip on close. Pages from low-confidence scans carry a "Check the page" note.
 
 Every question is written to the `query_logs` table: the question and its normalized form, features, route, the candidate lists with each source's rank and score, reranker scores, the gate decision, whether the model was called, the model's usage, and the latency of each stage. These rows are the training data for the future router and the raw material for the evaluation.
 
