@@ -1,4 +1,4 @@
-// Mirrors the JSON returned by the FastAPI backend (backend/app/detection.py).
+// Mirrors the JSON returned by the FastAPI backend (backend/app).
 
 export type IngestionStatus = "in_scope" | "out_of_scope" | "blocked";
 
@@ -26,10 +26,17 @@ export interface DetectionResult {
     expected_kind: string | null;
   };
   facts: { label: string; value: string }[];
-  scripts: { devanagari: number; latin: number; other: number; devanagari_digits: boolean } | null;
-  pdf_text_layer: "native" | "scanned" | "mixed" | "legacy" | null;
+  scripts: ScriptMix | null;
+  pdf_text_layer: "native" | "scanned" | "mixed" | "legacy" | "broken" | null;
   ingestion: { status: IngestionStatus; route: string; needs_ocr: boolean };
   note: string | null;
+}
+
+export interface ScriptMix {
+  devanagari: number;
+  latin: number;
+  other: number;
+  devanagari_digits: boolean;
 }
 
 export interface Health {
@@ -43,45 +50,74 @@ export interface Health {
     missing: string[];
     error: string | null;
   };
+  database: { available: boolean; dialect: string; error: string | null };
+  docx_converter: { name: string; available: boolean };
   limits: { max_file_mb: number; max_files: number };
 }
 
-export interface OcrPage {
-  page: number;
-  source: "ocr" | "text_layer";
-  text: string;
-  confidence: number | null;
-  check_page: boolean;
-  check_reason: "low_confidence" | "no_text" | null;
-  ocr_reason: "no_text_layer" | "legacy_font" | null;
-  word_count: number;
+export type DocStatus = "queued" | "processing" | "indexed" | "failed";
+
+export interface DocStats {
+  pages?: number;
+  pages_by_source?: Record<string, number>;
+  ocr_share?: number;
+  mean_ocr_conf?: number | null;
+  check_pages?: number;
+  words?: number;
+  scripts?: ScriptMix | null;
 }
 
-export interface OcrResult {
+export interface DocSummary {
+  id: string;
   filename: string;
-  engine: { name: string; version: string; languages: string[] };
-  summary: {
-    pages_total: number;
-    pages_read: number;
-    pages_ocr: number;
-    truncated: boolean;
-    max_pages: number;
-    mean_confidence: number | null;
-    check_pages: number[];
-    legacy_font_pages: number[];
-    low_confidence_threshold: number;
-  };
-  pages: OcrPage[];
+  size_bytes: number;
+  label: string;
+  stamp: string;
+  kind: string | null;
+  status: DocStatus;
+  stage: string | null;
+  progress: { done: number; total: number };
+  page_count: number | null;
+  anchor: "page" | "paragraph";
+  has_viewer: boolean;
+  error: string | null;
+  notes: string[];
+  stats: DocStats;
+  chunks: number | null;
+  created_at: string | null;
+  indexed_at: string | null;
 }
 
-export type OcrState =
-  | { state: "running" }
-  | { state: "done"; data: OcrResult }
-  | { state: "error"; message: string };
+export interface PageInfo {
+  page_no: number;
+  source: "native" | "ocr" | "docx";
+  ocr_conf: number | null;
+  ocr_reason: "no_text_layer" | "legacy_font" | "broken_text" | null;
+  check_reason: "low_confidence" | "no_text" | "ocr_unavailable" | null;
+  word_count: number;
+  width?: number | null;
+  height?: number | null;
+  lang: string | null;
+  script: string | null;
+}
 
-export type Item =
+export interface PageText extends PageInfo {
+  text: string;
+}
+
+export interface DocDetail extends DocSummary {
+  detection: DetectionResult | null;
+  pages: PageInfo[];
+}
+
+export type UploadResult =
+  | { kind: "stored"; duplicate: boolean; document: DocSummary; detection: DetectionResult | null }
+  | { kind: "rejected"; detail: string; detection: DetectionResult };
+
+// A file on its way to the server, or one the server looked at but did not store.
+export type UploadItem =
   | { id: string; name: string; size: number; state: "queued" }
   | { id: string; name: string; size: number; state: "uploading"; progress: number }
   | { id: string; name: string; size: number; state: "analysing" }
-  | { id: string; name: string; size: number; state: "done"; result: DetectionResult; ocr?: OcrState }
+  | { id: string; name: string; size: number; state: "rejected"; detail: string; detection: DetectionResult }
   | { id: string; name: string; size: number; state: "error"; message: string };

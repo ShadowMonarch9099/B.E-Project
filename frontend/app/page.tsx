@@ -1,4 +1,4 @@
-import Detector from "@/components/Detector";
+import Workspace from "@/components/Workspace";
 
 export default function Home() {
   return (
@@ -15,18 +15,17 @@ export default function Home() {
 
       <main>
         <section className="hero">
-          <p className="eyebrow">Ingestion steps 1–2 · type detection and OCR</p>
+          <p className="eyebrow">English · हिंदी · मराठी · native PDF, DOCX and scans</p>
           <h1>
-            What kind of document <span className="nowrap">is this?</span>
+            Ask your documents. <span className="nowrap">Check the page.</span>
           </h1>
           <p className="lede">
-            Upload any file. Sakshya reads its content, not just its name, to tell you what it is
-            and how it enters the pipeline. Scanned PDFs and images are read with OCR in English,
-            Hindi and Marathi.
+            Add your files. Sakshya reads every page, including old scans, in English, Hindi and Marathi, and
+            keeps each page so that answers can point to the evidence behind them.
           </p>
         </section>
 
-        <Detector />
+        <Workspace />
       </main>
 
       <footer className="site-footer">

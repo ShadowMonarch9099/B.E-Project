@@ -11,6 +11,8 @@ This note lists prebuilt, open models that fit the stages of the Review 2 plan (
 
 Everything else in the current app is a plain parser, not a model: PyMuPDF (PDF pages and text-layer check), python-docx, Pillow and `zipfile`.
 
+**Finding (text-layer check):** the team's two "native" sample GRs have a Unicode Devanagari text layer whose conjuncts are stored as stray Latin Extended-B / IPA characters ("राष्ट्रीय" → "राʊȄीय", "प्रकल्प" → "ɓकȧप"); 7–50% of the Devanagari words on each page were affected. PDFs that PyMuPDF itself writes in Lohit Devanagari show the same defect. Such pages are now classed as *broken* and OCR'd, which read them at 87% and 93% mean word confidence.
+
 ## Next stages, from the plan
 
 | Plan stage | Model named in the plan | Link |

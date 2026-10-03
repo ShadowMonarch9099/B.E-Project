@@ -24,58 +24,83 @@ A citation-grounded Retrieval-Augmented Generation system for private English, H
 | `docs/prebuilt_models.md` | Prebuilt models for detection and extraction, mapped to the plan's stages |
 | `docs/sakshya.html` | Review of the plan and the "Sakshya" counter-proposal (open in a browser) |
 
-## The app (Sakshya v0.2: type detection and OCR)
+## The app (Sakshya v0.3)
 
-The first slices of the ingestion pipeline (plan §6.1 steps 1-2):
+What works now, by plan section:
 
-- **Type detection:** upload any file and see what type of document it is, detected from its content rather than its name, plus how Sakshya v1 would ingest it (parse, OCR, or detect only).
-- **OCR:** scanned PDFs and images are read automatically with Tesseract (Marathi, Hindi, English). Each page shows its text, its mean word confidence, and a "Check the page" badge when the scan is hard to read. PDF pages that already have a text layer are read directly.
-- **Ask bar (first step of the chatbot):** once a document is analysed, a question box stays fixed at the bottom of the window, with a picker when several documents are loaded. Answering is not connected yet; retrieval, the evidence gate and cited answers (plan §6.3–6.7) come next.
-- **Legacy fonts:** Devanagari typed in pre-Unicode fonts (Kruti Dev, DVB-TT Surekh, Shivaji, ...) has a text layer that is nonsense ("भारत" stored as "Hkkjr"). Sakshya detects it and OCRs those pages instead; Word files in such fonts get a warning.
+- **Type detection** (§6.1 step 1): any file is identified from its content (Google Magika), not its name.
+- **Stored documents** (§6.2, §6.8): PDF, DOCX and scans (PNG, JPEG, TIFF) are stored under `data/uploads/<document id>/` (gitignored), keyed by their SHA-256 so a second upload of the same file is recognised. Documents, pages and their text live in PostgreSQL 16 + pgvector and survive a restart of both servers.
+- **Background ingestion** (§6.2 steps 1–3): every page is read, from the text layer when it is usable and with OCR otherwise. Status moves *queued → processing → indexed* (or *failed*), and each card shows "Indexing… page 12 of 40". Unfinished documents are picked up again when the backend restarts.
+- **OCR** (§6.2 step 2): Tesseract (Marathi, Hindi, English) at 300 DPI on every page, with per-word confidence and boxes converted to PDF points. Low-confidence pages get a "Check the page" badge.
+- **Text layers that cannot be trusted** go to OCR instead: Devanagari typed in legacy fonts (Kruti Dev, DVB-TT Surekh, Shivaji, …: "भारत" stored as "Hkkjr"), and Unicode Devanagari whose conjuncts were written as stray characters ("राष्ट्रीय" stored as "राʊȄीय"). The second kind was found in the team's sample GRs.
+- **DOCX** (§6.2 step 3) is converted to PDF with LibreOffice headless so citations point to real pages. Without LibreOffice, a DOCX is read paragraph by paragraph and its card says so.
 
 No ML is trained here: type detection uses the prebuilt [Google Magika](https://github.com/google/magika) model and OCR uses [Tesseract](https://github.com/tesseract-ocr/tesseract). See `docs/prebuilt_models.md`.
 
 | Folder | What it is |
 | --- | --- |
-| `backend/` | FastAPI service: `POST /api/detect` (multipart `files`), `POST /api/ocr` (multipart `file`), `GET /api/health`. Files are read in memory and never stored |
-| `frontend/` | Next.js + TypeScript site: drag-and-drop upload, per-file results, monochrome theme |
+| `backend/` | FastAPI service (endpoints below); Alembic migrations in `backend/migrations` |
+| `frontend/` | Next.js + TypeScript site: upload, document cards with ingestion progress, extracted pages |
+| `data/` | Uploaded originals (created at runtime, gitignored) |
+
+| Endpoint | What it does |
+| --- | --- |
+| `GET /api/health` | Detector, OCR, database and DOCX-converter status |
+| `POST /api/detect` | Detect file types (multipart `files`); nothing is stored |
+| `POST /api/ocr` | OCR one PDF or image (multipart `file`, first 10 pages); nothing is stored |
+| `POST /api/documents` | Store a PDF, DOCX or image (multipart `file`) and start ingesting it: `201` new, `200` duplicate, `422` detected but not ingestible |
+| `GET /api/documents` | All documents with status and progress |
+| `GET /api/documents/{id}` | One document: status, facts, page list |
+| `GET /api/documents/{id}/pages` | Every page's text, source and OCR confidence |
+| `GET /api/documents/{id}/file` | The PDF the viewer opens (`?original=true` for the uploaded file) |
+| `POST /api/documents/{id}/reindex` | Detect and ingest the stored file again |
+| `DELETE /api/documents/{id}` | Delete the document, its pages and its files |
 
 ### Run it locally
 
-**Install Tesseract first** (needed for OCR; type detection works without it):
+You need **Python 3.11+**, **Node 20+**, **Docker** (for the database) and **Tesseract**.
+
+**1. Tesseract** (OCR; type detection works without it):
 
 - Windows: run the [UB Mannheim installer](https://github.com/UB-Mannheim/tesseract/wiki). On the components page, under *Additional language data*, tick **Hindi** and **Marathi**. The backend finds the default install path (`C:\Program Files\Tesseract-OCR\tesseract.exe`) by itself; for another location set `SAKSHYA_TESSERACT_CMD` to the full path of `tesseract.exe`.
 - Ubuntu/Debian: `sudo apt install tesseract-ocr tesseract-ocr-hin tesseract-ocr-mar`
 - macOS: `brew install tesseract tesseract-lang`
 
-The status line above the upload box says whether OCR is ready.
+**2. LibreOffice** (optional, for DOCX page citations): Windows `winget install -e --id TheDocumentFoundation.LibreOffice`, Ubuntu `sudo apt install libreoffice-writer`, macOS `brew install --cask libreoffice`.
+
+**3. The database** (PostgreSQL 16 + pgvector, on port **5433** so it does not clash with a PostgreSQL you may already run on 5432):
 
 ```bash
-# 1. Backend (Python 3.11+)
+docker compose up -d db
+```
+
+**4. Backend and frontend:**
+
+```bash
+# Backend (Python 3.11+)
 cd backend
 python -m venv .venv
 .venv/bin/pip install -r requirements-dev.txt      # Windows: .venv\Scripts\pip
-.venv/bin/uvicorn app.main:app --port 8000
+cp .env.example .env                               # optional: settings (see the file)
+.venv/bin/uvicorn app.main:app --port 8000         # Windows: .venv\Scripts\uvicorn
 
-# 2. Frontend (Node 20+), in a second terminal
+# Frontend (Node 20+), in a second terminal
 cd frontend
 npm install
 npm run dev                                         # open http://localhost:3000
 ```
 
-The frontend forwards `/api/*` to `BACKEND_URL` (default `http://localhost:8000`). Or run both with `docker compose up --build`.
+The backend creates and upgrades its tables on startup. If the database is not running, the site still detects and OCRs files, and says that documents cannot be stored. The frontend forwards `/api/*` to `BACKEND_URL` (default `http://localhost:8000`). Or run everything with `docker compose up --build`.
 
-OCR settings (environment variables for the backend): `SAKSHYA_OCR_LANGS` (default `mar+hin+eng`), `SAKSHYA_OCR_MAX_PAGES` (default `10` pages per file), `SAKSHYA_TESSERACT_CMD` (path to the Tesseract binary).
+Settings are environment variables, listed with their defaults in `backend/.env.example`. The main ones: `SAKSHYA_DATABASE_URL`, `SAKSHYA_DATA_DIR`, `SAKSHYA_MAX_FILE_MB`, `SAKSHYA_OCR_LANGS` (default `mar+hin+eng`), `SAKSHYA_TESSERACT_CMD`, `SAKSHYA_LIBREOFFICE_CMD`.
 
-Tests: `cd backend && .venv/bin/python -m pytest`.
+**Tests:** `cd backend && .venv/bin/python -m pytest -q`. They use a throwaway SQLite database, so they need no server. To run them against PostgreSQL, create an empty database whose name ends in `_test` and set `SAKSHYA_TEST_DATABASE_URL`, e.g. `postgresql+psycopg://sakshya:sakshya@localhost:5433/sakshya_test`.
 
-**Upload limit:** 200 MB per file by default (20 files per batch; the site uploads two at a time). To change it, set `SAKSHYA_MAX_FILE_MB` in **both** terminals before starting the backend and the frontend, because the frontend's forwarding limit uses the same value:
+**Upload limit:** 200 MB per file by default. To change it, set `SAKSHYA_MAX_FILE_MB` in **both** terminals before starting the backend and the frontend, because the frontend's forwarding limit uses the same value:
 
 ```powershell
 $env:SAKSHYA_MAX_FILE_MB=500     # Windows PowerShell; on macOS/Linux: export SAKSHYA_MAX_FILE_MB=500
 ```
-
-The backend and the frontend's forwarding each hold a copy of the file while it is read, so very large limits need enough RAM: a 164 MB PDF added about 340 MB in total while it was being checked.
 
 **Testing with a PDF over the limit:** cut a few pages out first:
 

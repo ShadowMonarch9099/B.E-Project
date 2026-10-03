@@ -12,7 +12,7 @@ import re
 import zipfile
 from dataclasses import dataclass, field
 
-from .legacy_fonts import is_legacy_font, legacy_spans, looks_legacy
+from .legacy_fonts import is_legacy_font, legacy_spans, looks_broken, looks_legacy
 
 MAX_PDF_PAGES_CHECKED = 60
 MAX_TEXT_CHARS = 400_000
@@ -82,10 +82,11 @@ def page_has_text_layer(text: str) -> bool:
 
 
 def classify_page(page) -> tuple[str, str, set[str]]:
-    """(kind, text, legacy font names) for a PyMuPDF page; kind is "text", "legacy" or "none".
+    """(kind, text, legacy font names) for a PyMuPDF page; kind is "text", "legacy", "broken" or "none".
 
-    "legacy" means the page has a text layer, but it is Devanagari in a pre-Unicode font,
-    so the text cannot be used and the page must be OCR'd.
+    "legacy" means the page has a text layer, but it is Devanagari in a pre-Unicode font.
+    "broken" means it is Unicode Devanagari with conjuncts stored as stray characters
+    ("राष्ट्रीय" as "राʊȄीय"). Either way the text cannot be used and the page must be OCR'd.
     """
     text = page.get_text()
     if not page_has_text_layer(text):
@@ -93,6 +94,8 @@ def classify_page(page) -> tuple[str, str, set[str]]:
     legacy_chars, total, fonts = legacy_spans(page)
     if (total and legacy_chars / total >= LEGACY_SPAN_SHARE) or looks_legacy(text):
         return "legacy", text, fonts
+    if looks_broken(text):
+        return "broken", text, set()
     return "text", text, set()
 
 
@@ -109,7 +112,7 @@ def _pdf(data: bytes, facts: Facts) -> None:
         pages = doc.page_count
         facts.add("Pages", pages)
         checked = min(pages, MAX_PDF_PAGES_CHECKED)
-        counts = {"text": 0, "legacy": 0, "none": 0}
+        counts = {"text": 0, "legacy": 0, "broken": 0, "none": 0}
         legacy_fonts: set[str] = set()
         texts: list[str] = []  # only usable (Unicode) text feeds the script mix
         for i in range(checked):
@@ -121,12 +124,15 @@ def _pdf(data: bytes, facts: Facts) -> None:
         if checked:
             facts.pdf_text_layer = ("native" if counts["text"] == checked
                                     else "scanned" if counts["none"] == checked
-                                    else "legacy" if counts["legacy"] == checked else "mixed")
+                                    else "legacy" if counts["legacy"] == checked
+                                    else "broken" if counts["broken"] == checked else "mixed")
             suffix = "" if checked == pages else f" (first {checked} checked)"
             facts.add("Pages with a usable text layer", f"{counts['text']} of {checked}{suffix}")
             if counts["legacy"]:
                 facts.add("Pages in a legacy Devanagari font", f"{counts['legacy']} of {checked}{suffix}")
                 facts.add("Legacy fonts", ", ".join(sorted(legacy_fonts)) or "not named; found from the text")
+            if counts["broken"]:
+                facts.add("Pages with broken Devanagari text", f"{counts['broken']} of {checked}{suffix}")
         meta = doc.metadata or {}
         facts.add("Title", (meta.get("title") or "").strip())
         facts.add("Author", (meta.get("author") or "").strip())

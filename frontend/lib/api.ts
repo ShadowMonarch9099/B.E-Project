@@ -1,53 +1,80 @@
-import type { DetectionResult, Health, OcrResult } from "./types";
+import type { DocDetail, DocSummary, Health, PageText, UploadResult } from "./types";
 
-export async function getHealth(): Promise<Health> {
-  const res = await fetch("/api/health", { cache: "no-store" });
-  if (!res.ok) throw new Error(`Health check failed (${res.status})`);
+async function readError(res: Response, fallback: string): Promise<Error> {
+  const body = await res.json().catch(() => ({}));
+  const detail = typeof body.detail === "string" ? body.detail : null;
+  return new Error(detail ?? `${fallback} (${res.status}).`);
+}
+
+async function getJson<T>(url: string, what: string): Promise<T> {
+  let res: Response;
+  try {
+    res = await fetch(url, { cache: "no-store" });
+  } catch {
+    throw new Error("Could not reach the backend. Is it running on port 8000?");
+  }
+  if (!res.ok) throw await readError(res, `Could not load ${what}`);
+  return res.json();
+}
+
+export function getHealth(): Promise<Health> {
+  return getJson("/api/health", "the status");
+}
+
+export async function listDocuments(): Promise<DocSummary[]> {
+  return (await getJson<{ documents: DocSummary[] }>("/api/documents", "your documents")).documents;
+}
+
+export function getDocument(id: string): Promise<DocDetail> {
+  return getJson(`/api/documents/${id}`, "the document");
+}
+
+export async function getPages(id: string): Promise<PageText[]> {
+  return (await getJson<{ pages: PageText[] }>(`/api/documents/${id}/pages`, "the pages")).pages;
+}
+
+export function fileUrl(id: string): string {
+  return `/api/documents/${id}/file`;
+}
+
+export async function deleteDocument(id: string): Promise<void> {
+  const res = await fetch(`/api/documents/${id}`, { method: "DELETE" });
+  if (!res.ok && res.status !== 404) throw await readError(res, "Could not delete the document");
+}
+
+export async function reindexDocument(id: string): Promise<DocSummary> {
+  const res = await fetch(`/api/documents/${id}/reindex`, { method: "POST" });
+  if (!res.ok) throw await readError(res, "Could not re-index the document");
   return res.json();
 }
 
 // XMLHttpRequest rather than fetch, because fetch cannot report upload progress.
-export function detectFile(
-  file: File,
-  onProgress: (fraction: number) => void,
-): Promise<DetectionResult> {
+export function uploadDocument(file: File, onProgress: (fraction: number) => void): Promise<UploadResult> {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     const form = new FormData();
-    form.append("files", file, file.name);
+    form.append("file", file, file.name);
 
     xhr.upload.onprogress = (e) => {
       if (e.lengthComputable) onProgress(e.loaded / e.total);
     };
-    xhr.onerror = () => reject(new Error("Could not reach the detector. Is the backend running?"));
+    xhr.onerror = () => reject(new Error("Could not reach the backend. Is it running on port 8000?"));
     xhr.onload = () => {
-      let body: { results?: (DetectionResult | { error: string })[]; detail?: string } = {};
+      let body: Record<string, unknown> = {};
       try {
         body = JSON.parse(xhr.responseText);
       } catch {
-        return reject(new Error(`The detector returned an unreadable response (${xhr.status}).`));
+        return reject(new Error(`The server returned an unreadable response (${xhr.status}).`));
       }
-      if (xhr.status >= 400) return reject(new Error(body.detail ?? `Upload failed (${xhr.status}).`));
-      const first = body.results?.[0];
-      if (!first) return reject(new Error("The detector returned no result."));
-      if ("error" in first) return reject(new Error(first.error));
-      resolve(first);
+      if (xhr.status === 422 && body.detection) {
+        return resolve({ kind: "rejected", detail: String(body.detail), detection: body.detection as never });
+      }
+      if (xhr.status >= 400) {
+        return reject(new Error(typeof body.detail === "string" ? body.detail : `Upload failed (${xhr.status}).`));
+      }
+      resolve({ kind: "stored", ...(body as Omit<Extract<UploadResult, { kind: "stored" }>, "kind">) });
     };
-    xhr.open("POST", "/api/detect");
+    xhr.open("POST", "/api/documents");
     xhr.send(form);
   });
-}
-
-export async function runOcr(file: File): Promise<OcrResult> {
-  const form = new FormData();
-  form.append("file", file, file.name);
-  let res: Response;
-  try {
-    res = await fetch("/api/ocr", { method: "POST", body: form });
-  } catch {
-    throw new Error("Could not reach the OCR service. Is the backend running?");
-  }
-  const body = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(body.detail ?? `OCR failed (${res.status}).`);
-  return body as OcrResult;
 }

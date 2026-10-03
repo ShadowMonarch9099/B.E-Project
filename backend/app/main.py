@@ -1,8 +1,10 @@
-"""Sakshya API: document type detection and OCR (plan section 6.1, steps 1-2).
+"""Sakshya API.
 
-Files are analysed in memory and never stored.
+- /api/detect and /api/ocr analyse a file in memory and store nothing (plan section 6.1 steps 1-2).
+- /api/documents stores documents and ingests them in the background (sections 6.2 and 6.8).
 """
 
+import logging
 import os
 from contextlib import asynccontextmanager
 
@@ -10,28 +12,40 @@ import magika
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
-from . import catalog
+from . import catalog, config
+from .api import documents
+from .db import init_db
+from .db.session import status as db_status
 from .detection import analyse, detect as detect_type, get_magika
+from .ingest import docx_convert
+from .ingest.pipeline import resume_pending
 from .ocr import OcrUnavailable, engine_status, run_ocr
 
-MAX_FILE_MB = int(os.environ.get("SAKSHYA_MAX_FILE_MB", "200"))
-MAX_FILES = int(os.environ.get("SAKSHYA_MAX_FILES", "20"))
-MAX_FILE_BYTES = MAX_FILE_MB * 1024 * 1024
+logging.basicConfig(level=os.environ.get("SAKSHYA_LOG_LEVEL", "INFO"),
+                    format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+logging.getLogger("alembic").setLevel(logging.WARNING)
+
+MAX_FILE_MB = config.MAX_FILE_MB
+MAX_FILES = config.MAX_FILES
+MAX_FILE_BYTES = config.MAX_FILE_BYTES
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     get_magika()  # load the model once at startup, not on the first upload
+    if init_db():
+        resume_pending()
     yield
 
 
-app = FastAPI(title="Sakshya API", version="0.2.0", lifespan=lifespan)
+app = FastAPI(title="Sakshya API", version="0.3.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=os.environ.get("SAKSHYA_CORS_ORIGINS", "http://localhost:3000").split(","),
-    allow_methods=["GET", "POST"],
+    allow_methods=["GET", "POST", "DELETE"],
     allow_headers=["*"],
 )
+app.include_router(documents.router)
 
 
 @app.get("/api/health")
@@ -40,6 +54,8 @@ def health() -> dict:
         "status": "ok",
         "detector": {"name": "Magika", "version": magika.__version__, "model": get_magika().get_model_name()},
         "ocr": engine_status(),
+        "database": db_status(),
+        "docx_converter": {"name": "LibreOffice", **docx_convert.status()},
         "limits": {"max_file_mb": MAX_FILE_MB, "max_files": MAX_FILES},
     }
 

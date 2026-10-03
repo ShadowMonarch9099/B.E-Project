@@ -17,8 +17,8 @@ const body = Hind({
 const mono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
-  title: "Sakshya · Document type detection",
-  description: "Upload any file and see what type of document it is, detected from its content.",
+  title: "Sakshya · Ask your documents",
+  description: "Citation-grounded answers over English, Hindi and Marathi documents, including scans.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -1,8 +1,14 @@
 fastapi>=0.115
 uvicorn[standard]>=0.30
 python-multipart>=0.0.9
+python-dotenv>=1.0
 magika>=1.0,<2
 pymupdf>=1.24
 python-docx>=1.1
 pillow>=10
 pytesseract>=0.3.10
+# Storage: PostgreSQL 16 + pgvector (plan section 6.2)
+sqlalchemy>=2.0
+psycopg[binary]>=3.2
+alembic>=1.13
+pgvector>=0.3

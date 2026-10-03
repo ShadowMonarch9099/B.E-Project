@@ -22,3 +22,6 @@ node_modules/
 *.safetensors
 *.gguf
 data/raw/
+
+# Sakshya runtime data: uploaded originals, model caches, indexes (never commit)
+/data/

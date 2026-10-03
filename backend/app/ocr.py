@@ -38,6 +38,10 @@ MIN_LONG_SIDE_PX = 1500  # smaller images are upscaled; Tesseract reads small te
 WINDOWS_DEFAULT = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 
+# Why a PDF page is OCR'd, by its classify_page() kind.
+OCR_REASON = {"none": "no_text_layer", "legacy": "legacy_font", "broken": "broken_text"}
+
+
 class OcrUnavailable(RuntimeError):
     pass
 
@@ -81,7 +85,10 @@ class PageResult:
     width: int | None = None
     height: int | None = None
     has_ink: bool = False
-    ocr_reason: str | None = None  # "no_text_layer" or "legacy_font" for OCR'd PDF pages
+    ocr_reason: str | None = None  # "no_text_layer", "legacy_font" or "broken_text" for OCR'd PDF pages
+    # Words with Tesseract's block / paragraph / line numbers, for page-anchored ingestion.
+    # Not part of the /api/ocr response.
+    layout_words: list[dict] = field(default_factory=list)
 
     def check_reason(self) -> str | None:
         """Why a reader should check this page against the original, if at all."""
@@ -130,7 +137,7 @@ def ocr_image(image: Image.Image, page: int) -> PageResult:
     has_ink = sum(dark) / (gray.width * gray.height) > INK_SHARE
     data = pytesseract.image_to_data(image, lang=OCR_LANGS, output_type=pytesseract.Output.DICT,
                                      timeout=PAGE_TIMEOUT_S)
-    words, confs = [], []
+    words, confs, layout_words = [], [], []
     lines: dict[tuple, list[str]] = {}
     for i, raw in enumerate(data["text"]):
         text = raw.strip()
@@ -141,6 +148,7 @@ def ocr_image(image: Image.Image, page: int) -> PageResult:
         words.append({"text": text, "conf": round(conf, 1), "bbox": [x, y, x + w, y + h]})
         confs.append(conf)
         key = (data["block_num"][i], data["par_num"][i], data["line_num"][i])
+        layout_words.append({"text": text, "conf": round(conf, 1), "bbox": [x, y, x + w, y + h], "key": key})
         lines.setdefault(key, []).append(text)
 
     paragraphs: list[str] = []
@@ -153,7 +161,8 @@ def ocr_image(image: Image.Image, page: int) -> PageResult:
         else:
             paragraphs[-1] += "\n" + line
     mean = sum(confs) / len(confs) if confs else None  # a blank page has no words to score
-    return PageResult(page, "ocr", "\n\n".join(paragraphs), mean, words, image.width, image.height, has_ink)
+    return PageResult(page, "ocr", "\n\n".join(paragraphs), mean, words, image.width, image.height, has_ink,
+                      layout_words=layout_words)
 
 
 def _pdf_pages(data: bytes) -> tuple[list[tuple[int, object, str | None]], int]:
@@ -173,7 +182,7 @@ def _pdf_pages(data: bytes) -> tuple[list[tuple[int, object, str | None]], int]:
                 items.append((i + 1, text.strip(), None))
             else:
                 pix = page.get_pixmap(dpi=PDF_DPI, colorspace=pymupdf.csGRAY)
-                reason = "legacy_font" if kind == "legacy" else "no_text_layer"
+                reason = OCR_REASON[kind]
                 items.append((i + 1, Image.open(io.BytesIO(pix.tobytes("png"))), reason))
     return items, total
 
@@ -218,6 +227,7 @@ def run_ocr(data: bytes, label: str) -> dict:
             "mean_confidence": round(sum(confs) / len(confs), 1) if confs else None,
             "check_pages": [p.page for p in ocr_pages if p.check_reason()],
             "legacy_font_pages": [p.page for p in ocr_pages if p.ocr_reason == "legacy_font"],
+            "broken_text_pages": [p.page for p in ocr_pages if p.ocr_reason == "broken_text"],
             "low_confidence_threshold": LOW_CONFIDENCE,
         },
         "pages": [p.as_dict() for p in pages],

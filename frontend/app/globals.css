@@ -512,6 +512,65 @@ h2 {
   border-style: dashed;
 }
 
+/* Document status: filled = indexed, outlined = in progress, dashed = failed */
+.pill--indexed {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.pill--queued,
+.pill--processing {
+  color: var(--ink-2);
+  border-color: var(--ink-3);
+}
+
+.pill--failed {
+  border-style: dashed;
+}
+
+.doc-progress {
+  margin-top: 14px;
+}
+
+.doc-scripts {
+  margin-top: 14px;
+}
+
+.card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--line);
+}
+
+.btn-text:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.btn-text--danger:hover:not(:disabled),
+.btn-text--danger:focus-visible {
+  text-decoration: line-through;
+}
+
+.notice--warn {
+  padding: 10px 14px;
+  border: 1.5px dashed var(--line-strong);
+  border-radius: 8px;
+  color: var(--ink);
+}
+
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  padding: 1px 5px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface-2);
+}
+
 /* ---------- bars ---------- */
 
 .bar {

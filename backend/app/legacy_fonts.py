@@ -52,6 +52,23 @@ def looks_legacy(text: str) -> bool:
     return hits >= MIN_KRUTI_HITS and hits / len(words) >= KRUTI_SHARE
 
 
+# Unicode Devanagari whose conjuncts were written with the wrong code points. Some PDF
+# writers map each shaped conjunct glyph to a stray character from Latin Extended-B, IPA
+# Extensions or Spacing Modifier Letters, so "राष्ट्रीय" is stored as "राʊȄीय" and "प्रकल्प" as
+# "ɓकȧप". Found in the team's sample GRs (and in PDFs PyMuPDF writes in Lohit Devanagari).
+_STRAY = re.compile(r"[ƀ-ͯḀ-ỿ]")
+_DEVA = re.compile(r"[ऀ-ॿ]")
+BROKEN_SHARE = 0.05  # share of Devanagari words with a stray character
+MIN_BROKEN_WORDS = 5
+
+
+def looks_broken(text: str) -> bool:
+    """True when Unicode Devanagari words are mixed with stray glyph-mapped characters."""
+    words = [w for w in text.split() if _DEVA.search(w)]
+    broken = sum(1 for w in words if _STRAY.search(w))
+    return broken >= MIN_BROKEN_WORDS and broken / len(words) >= BROKEN_SHARE
+
+
 def is_legacy_font(name: str) -> bool:
     # Drop the "ABCDEF+" subset prefix that PDF writers add to embedded font names.
     return bool(LEGACY_FONT_NAME.search(name.split("+", 1)[-1]))

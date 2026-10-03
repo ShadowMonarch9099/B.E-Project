@@ -108,3 +108,37 @@ def test_word_file_in_kruti_dev_is_flagged():
     r = analyse(buf.getvalue(), "circular.docx")
     assert {"label": "Legacy Devanagari font", "value": "Kruti Dev 010"} in r["facts"]
     assert "legacy" in r["note"] and r["scripts"] is None
+
+
+# The first lines of a sample GR's text layer: Unicode Devanagari, but the conjuncts are
+# stray Latin Extended / IPA characters ("राष्ट्रीय" -> "राʊȄीय", "प्रकल्प" -> "ɓकȧप").
+BROKEN = ("राʊȄीय उɧतर शʺȈा अभʺयान (RUSA) या योजनेअंतȁगत राȑय ɓकȧप संचालनालयास निधी उपलȡध "
+          "कʕन देȘयाबाबत. महाराʊȄ शासन उɧ व तंɑ शʺȈण विभाग शासन निȁणय Ɍमांक: ʖसायो २०२३")
+
+
+def test_broken_conjuncts_are_recognised():
+    from app.legacy_fonts import looks_broken
+
+    assert looks_broken(BROKEN)
+    assert not looks_legacy(BROKEN)  # a different failure from a legacy font
+
+
+@pytest.mark.parametrize("text", [
+    "महाराष्ट्र शासन उच्च व तंत्र शिक्षण विभाग राष्ट्रीय उच्चतर शिक्षा अभियान प्रकल्प संचालनालय",
+    "Phonetics: the vowel ə and the glide ʊ appear in English words such as about and foot. " * 2,
+    "भारत का संविधान THE CONSTITUTION OF INDIA ə ʊ",  # too few Devanagari words to judge
+])
+def test_clean_text_is_not_broken(text):
+    from app.legacy_fonts import looks_broken
+
+    assert not looks_broken(text)
+
+
+def test_pdf_with_broken_devanagari_goes_to_ocr():
+    from tests.helpers import html_pdf
+
+    # PyMuPDF's HTML writer with Lohit Devanagari produces exactly this kind of text layer.
+    text = "<p>महाराष्ट्र शासन उच्च व तंत्र शिक्षण विभाग. राष्ट्रीय उच्चतर शिक्षा अभियान प्रकल्प संचालनालय.</p>" * 6
+    r = analyse(html_pdf([text]), "gr.pdf")
+    assert r["pdf_text_layer"] == "broken" and r["ingestion"]["needs_ocr"] is True
+    assert {"label": "Pages with broken Devanagari text", "value": "1 of 1"} in r["facts"]
