@@ -20,7 +20,7 @@ from .detection import analyse, detect as detect_type, get_magika
 from .ingest import docx_convert
 from .ingest.pipeline import backfill, resume_pending
 from .llm import get_provider
-from .ml import embedder, langid, reranker, translate, warmup
+from .ml import embedder, langid, nli, reranker, translate, warmup
 from .ocr import OcrUnavailable, engine_status, run_ocr
 
 logging.basicConfig(level=os.environ.get("SAKSHYA_LOG_LEVEL", "INFO"),
@@ -66,6 +66,7 @@ def health() -> dict:
         "reranker": reranker.status(),
         "langid": langid.status(),
         "translator": translate.status(),
+        "nli": nli.status(),
         "models": warmup.status(),
         "llm": get_provider().status(),
         "limits": {"max_file_mb": MAX_FILE_MB, "max_files": MAX_FILES},

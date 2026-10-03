@@ -1,4 +1,6 @@
-"""Roman -> Devanagari transliteration with AI4Bharat IndicXlit (plan section 6.3, N2).
+"""Transliteration with AI4Bharat IndicXlit (plan sections 6.3 and 6.7): roman -> Devanagari
+for romanized questions and the answer's "Show in Devanagari" view, Devanagari -> roman to
+repair an answer written in the wrong script.
 
 IndicXlit's official weights (ai4bharat/IndicXlit on Hugging Face, MIT licence) are a fairseq
 checkpoint, and fairseq does not install on Python 3.11 / Windows. This module runs the same
@@ -10,7 +12,8 @@ sinusoidal positions, GELU), trained with `translation_multi_simple_epoch` and
 - dictionaries: fairseq's <s>=0, <pad>=1, </s>=2, <unk>=3, then dict.<lang>.txt in file
   order, then the language tokens __en__, __as__, ... in lang_list.txt order;
 - source: "__mr__ g h a r k u l </s>" (the official pre-processing: lower case, one token
-  per character, the target language token first);
+  per character, the target language token first; for Devanagari -> roman, the word is
+  IndicNLP-normalised and the token is the source language);
 - decoding: beam search (beam 5, length penalty 1, the checkpoint's generation settings),
   starting from </s>, top hypothesis only. The official engine can also rescore candidates
   with word-frequency tables (850 MB); that step is not used here.
@@ -27,12 +30,13 @@ from .loading import load_once
 log = logging.getLogger("sakshya.xlit")
 
 REPO = "ai4bharat/IndicXlit"
-PREFIX = "indicxlit-en-indic-v1.0"
+PREFIXES = {"en-indic": "indicxlit-en-indic-v1.0", "indic-en": "indicxlit-indic-en-v1.0"}
 LANG_LIST = ["en", "as", "bn", "brx", "gom", "gu", "hi", "kn", "ks", "mai", "ml", "mni", "mr", "ne", "or",
              "pa", "sa", "sd", "si", "ta", "te", "ur"]  # models/en2indic/lang_list.txt
 BEAM = 5
 MAX_LEN = 60
 _WORD = re.compile(r"[A-Za-z]+")
+_DEVA_WORD = re.compile(r"[\u0900-\u0963\u0970-\u097F]+")
 
 
 def _load_dict(path: str) -> list[str]:
@@ -120,19 +124,24 @@ class _Transformer:
 
 
 class IndicXlit:
-    name = "ai4bharat/IndicXlit (en-indic v1.0)"
+    """One direction of IndicXlit: "en-indic" (roman -> Devanagari) or "indic-en"."""
 
-    def __init__(self) -> None:
+    def __init__(self, direction: str = "en-indic") -> None:
         import torch
         from huggingface_hub import hf_hub_download
 
+        prefix = PREFIXES[direction]
+
         def get(path: str) -> str:
-            return hf_hub_download(REPO, f"{PREFIX}/{path}")
+            return hf_hub_download(REPO, f"{prefix}/{path}")
 
         ck = torch.load(get("transformer/indicxlit.pt"), map_location="cpu", weights_only=False)
         model_cfg = ck["cfg"]["model"]
-        self.src_symbols = _load_dict(get("corpus-bin/dict.en.txt"))
-        self.tgt_symbols = _load_dict(get("corpus-bin/dict.mr.txt"))  # one joint Indic dictionary
+        roman, indic = _load_dict(get("corpus-bin/dict.en.txt")), _load_dict(get("corpus-bin/dict.mr.txt"))
+        # one joint Indic dictionary (dict.mr.txt == dict.hi.txt == ...)
+        self.src_symbols, self.tgt_symbols = (roman, indic) if direction == "en-indic" else (indic, roman)
+        self.direction = direction
+        self.name = f"ai4bharat/IndicXlit ({prefix})"
         self.src_index = {s: i for i, s in enumerate(self.src_symbols)}
         assert len(self.src_symbols) == ck["model"]["encoder.embed_tokens.weight"].shape[0]
         assert len(self.tgt_symbols) == ck["model"]["decoder.embed_tokens.weight"].shape[0]
@@ -144,7 +153,13 @@ class IndicXlit:
 
     def _word(self, word: str, lang: str) -> str:
         t = self._torch
-        ids = [self.src_index[f"__{lang}__"]] + [self.src_index.get(ch, 3) for ch in word.lower()] + [2]
+        if self.direction == "en-indic":
+            chars = list(word.lower())
+        else:
+            from indicnlp.normalize.indic_normalize import IndicNormalizerFactory
+
+            chars = list(IndicNormalizerFactory().get_normalizer(lang).normalize(word))
+        ids = [self.src_index[f"__{lang}__"]] + [self.src_index.get(ch, 3) for ch in chars] + [2]
         enc = self.net.encode(t.tensor([ids]))
         beams = [([2], 0.0)]  # (tokens starting with </s>, summed log-prob)
         finished: list[tuple[list[int], float]] = []
@@ -174,8 +189,9 @@ class IndicXlit:
         return "".join(self.tgt_symbols[i] for i in best[1:-1] if i > 3 and not self.tgt_symbols[i].startswith("__"))
 
     def transliterate(self, word: str, lang: str = "mr") -> str:
-        """One romanized word to Devanagari (lang "mr" or "hi")."""
-        if not _WORD.fullmatch(word):
+        """One word: roman -> Devanagari (en-indic) or Devanagari -> roman (indic-en); lang "mr"/"hi"."""
+        pattern = _WORD if self.direction == "en-indic" else _DEVA_WORD
+        if not pattern.fullmatch(word):
             return word
         with self._lock, self._torch.inference_mode():
             return self._word(word, lang)
@@ -183,9 +199,34 @@ class IndicXlit:
 
 @load_once
 def get_xlit() -> IndicXlit:
-    return IndicXlit()
+    return IndicXlit("en-indic")
+
+
+@load_once
+def get_romanizer() -> IndicXlit:
+    return IndicXlit("indic-en")
 
 
 @lru_cache(maxsize=4096)
 def transliterate_word(word: str, lang: str) -> str:
     return get_xlit().transliterate(word, lang)
+
+
+@lru_cache(maxsize=4096)
+def romanize_word(word: str, lang: str) -> str:
+    return get_romanizer().transliterate(word, lang)
+
+
+_TOKENS = re.compile(r"[A-Za-z]+|[\u0900-\u0963\u0970-\u097F]+|[^A-Za-z\u0900-\u0963\u0970-\u097F]+")
+
+
+def to_devanagari(text: str, lang: str) -> str:
+    """Romanized text -> Devanagari, word by word; acronyms, digits and punctuation kept."""
+    return "".join(transliterate_word(t.lower(), lang) if t.isascii() and t.isalpha() and not
+                   (len(t) >= 2 and t.isupper()) else t for t in _TOKENS.findall(text))
+
+
+def to_roman(text: str, lang: str) -> str:
+    """Devanagari text -> roman, word by word; dandas become full stops; everything else kept."""
+    out = "".join(romanize_word(t, lang) if _DEVA_WORD.fullmatch(t) else t for t in _TOKENS.findall(text))
+    return out.replace("॥", ".").replace("।", ".")

@@ -183,10 +183,31 @@ export interface Routing {
   numbers: string[];
 }
 
+export interface AnswerSentence {
+  text: string;
+  original: string | null; // the model's text before a language/script repair
+  devanagari: string | null; // the "Show in Devanagari" view of a romanized answer
+  entailment: number | null;
+  citations: Citation[];
+}
+
+export interface Fidelity {
+  expected: { lang?: string; script?: string; romanized?: boolean };
+  found: { lang?: string | null; script?: string | null };
+  lang_match: boolean | null;
+  script_match: boolean | null;
+  repair: string | null;
+  repair_model: string | null;
+  has_devanagari_view?: boolean;
+}
+
 export interface AnswerPayload {
   routing?: Routing | null;
   kind: "answer";
-  segments: { text: string; citations: Citation[] }[];
+  sentences?: AnswerSentence[];
+  removed?: { text: string; reason: string | null }[];
+  fidelity?: Fidelity;
+  segments?: { text: string; citations: Citation[] }[]; // answers stored before phase 9
   status: "complete" | "cut_short" | "refused";
   model: string;
   fallback_used: boolean;
@@ -199,6 +220,8 @@ export interface AnswerPayload {
 export interface AbstainPayload {
   routing?: Routing | null;
   kind: "abstain";
+  unsupported?: boolean; // the model answered, but its sentences were not supported by citations
+  removed?: { text: string; reason: string | null }[];
   reason: string;
   gate: Gate;
   nearest: NearestPage[];

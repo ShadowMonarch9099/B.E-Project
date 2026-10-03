@@ -1778,3 +1778,34 @@ dd {
     grid-template-columns: 1fr;
   }
 }
+
+/* ---------- verified answers (phase 9) ---------- */
+
+.answer-toggle {
+  margin-top: 6px;
+}
+
+.removed {
+  margin-top: 8px;
+  font-family: var(--body);
+  font-size: 0.82rem;
+  color: var(--ink-3);
+}
+
+.removed summary {
+  cursor: pointer;
+}
+
+.removed ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+
+.removed s {
+  font-family: var(--doc);
+  text-decoration-color: var(--ink-3);
+}
+
+.removed__why {
+  font-style: italic;
+}

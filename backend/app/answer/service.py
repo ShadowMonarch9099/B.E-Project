@@ -23,7 +23,9 @@ from ..db import Conversation, Message, QueryLog, session_scope
 from ..ingest.normalize import script_of
 from ..llm import get_provider
 from ..llm.base import AnswerRequest, AnswerResult, Passage, ProviderError, Turn
-from ..retrieval.chunks import ChunkInfo
+from ..retrieval.chunks import ChunkInfo, load_chunks
+from .fidelity import check_and_repair
+from .verify import Verification, verify
 from ..retrieval.hybrid import GATE_TAU, TOP_K, TOP_N, WEIGHTS, Retrieval, retrieve
 
 log = logging.getLogger("sakshya.answer")
@@ -31,6 +33,8 @@ log = logging.getLogger("sakshya.answer")
 MAX_HISTORY_TURNS = 6
 ABSTAIN_TEXT = "The documents do not seem to answer this. These are the nearest pages Sakshya found."
 REFUSED_TEXT = "Sorry, Sakshya cannot answer this question."
+UNSUPPORTED_TEXT = ("The answer could not be supported by the cited passages, so Sakshya does not show it. "
+                    "These are the nearest pages it found.")
 
 
 class NotFound(Exception):
@@ -132,14 +136,25 @@ def routing_view(r: Retrieval) -> dict | None:
             "views": a.views() if a else {}, "numbers": a.numbers if a else []}
 
 
-def _answer_payload(result: AnswerResult, r: Retrieval) -> dict:
-    segments = []
-    for seg in result.segments:
-        cits = [citation_view(r.chunks[c.chunk_id], c.cited_text) for c in seg.citations if c.chunk_id in r.chunks]
-        segments.append({"text": seg.text, "citations": cits})
-    return {"kind": "answer", "segments": segments, "status": result.status, "model": result.model,
-            "fallback_used": result.fallback_used, "refusal_category": result.refusal_category,
-            "route": r.route, "gate": r.gate.as_dict(), "routing": routing_view(r)}
+def _answer_payload(result: AnswerResult, r: Retrieval, v: Verification, fid, chunks: dict) -> dict:
+    """The verified answer: kept sentences (after any language/script repair) with citations."""
+    sentences = []
+    for i, sent in enumerate(v.kept):
+        cits, seen = [], set()
+        for c in sent.citations:
+            if c.chunk_id in chunks and c.chunk_id not in seen:
+                seen.add(c.chunk_id)
+                cits.append(citation_view(chunks[c.chunk_id], c.cited_text))
+        sentences.append({"text": fid.texts[i], "original": sent.text if fid.repair else None,
+                          "devanagari": fid.devanagari[i] if fid.devanagari else None,
+                          "entailment": sent.entailment, "citations": cits})
+    return {"kind": "answer", "sentences": sentences,
+            "removed": [{"text": x.text, "reason": x.reason} for x in v.removed],
+            "fidelity": fid.as_log(), "verification": {"nli": v.nli, "kept": len(v.kept),
+                                                        "removed": len(v.removed)},
+            "status": result.status, "model": result.model, "fallback_used": result.fallback_used,
+            "refusal_category": result.refusal_category, "route": r.route, "gate": r.gate.as_dict(),
+            "routing": routing_view(r)}
 
 
 def _retrieval_view(r: Retrieval) -> dict:
@@ -212,18 +227,48 @@ async def ask(conversation_id: str, question: str, route: str | None = None) -> 
         return
 
     assert result is not None
-    latency = {**r.latency_ms, "llm_first_token": round(first_token or 0, 1),
-               "llm_total": round((time.perf_counter() - t_llm) * 1000, 1),
+    llm_ms = round((time.perf_counter() - t_llm) * 1000, 1)
+    llm_log = {**provider.status(), "served_by": result.model, "stop_reason": result.stop_reason,
+               "fallback_used": result.fallback_used, "refusal_category": result.refusal_category,
+               "usage": result.usage}
+    verification_log, fidelity_log = {}, {}
+    if result.status == "refused":
+        payload = {"kind": "answer", "sentences": [], "removed": [], "status": "refused", "model": result.model,
+                   "fallback_used": result.fallback_used, "refusal_category": result.refusal_category,
+                   "route": r.route, "gate": r.gate.as_dict(), "routing": routing_view(r)}
+        content, status = REFUSED_TEXT, "refused"
+    else:
+        # Verify every sentence against its citations (N4), then the language and script (N5).
+        t_v = time.perf_counter()
+        texts = {p.chunk_id: p.text for t in history for p in t.passages}
+        texts.update({p.chunk_id: p.text for p in passages})
+        v = await to_thread.run_sync(lambda: verify(result.segments, texts))
+        verification_log = v.as_log()
+        latency_verify = (time.perf_counter() - t_v) * 1000
+        if v.abstain:
+            payload = {"kind": "abstain", "reason": v.reason, "unsupported": True, "gate": r.gate.as_dict(),
+                       "nearest": r.nearest_pages(), "route": r.route, "routing": routing_view(r),
+                       "removed": [{"text": x.text, "reason": x.reason} for x in v.removed]}
+            content, status = UNSUPPORTED_TEXT, "abstained"
+            fid = None
+        else:
+            t_f = time.perf_counter()
+            fid = await to_thread.run_sync(lambda: check_and_repair([x.text for x in v.kept], r.analysis))
+            fidelity_log = fid.as_log()
+            cited = {c.chunk_id for x in v.kept for c in x.citations}
+            chunks = {**r.chunks, **load_chunks([cid for cid in cited if cid not in r.chunks])}
+            payload = _answer_payload(result, r, v, fid, chunks)
+            content, status = " ".join(fid.texts), result.status
+            latency_fidelity = (time.perf_counter() - t_f) * 1000
+    latency = {**r.latency_ms, "llm_first_token": round(first_token or 0, 1), "llm_total": llm_ms,
                "total": round((time.perf_counter() - t0) * 1000, 1)}
-    payload = _answer_payload(result, r)
-    content = REFUSED_TEXT if result.status == "refused" else result.text
-    status = "refused" if result.status == "refused" else result.status
+    if verification_log:
+        latency["verify"] = round(latency_verify, 1)
+    if fidelity_log:
+        latency["fidelity"] = round(latency_fidelity, 1)
     log_id = await to_thread.run_sync(lambda: _write_log(
-        **base_log, abstained=False, llm_called=True,
-        llm={**provider.status(), "served_by": result.model, "stop_reason": result.stop_reason,
-             "fallback_used": result.fallback_used, "refusal_category": result.refusal_category,
-             "usage": result.usage},
-        latency_ms=latency))
+        **base_log, abstained=status == "abstained", llm_called=True, llm=llm_log,
+        verification=verification_log, fidelity=fidelity_log, latency_ms=latency))
     msg = await to_thread.run_sync(_add_message, conversation_id, "assistant", content, status,
                                    {**payload, "query_log_id": log_id}, log_id)
     yield "answer", msg

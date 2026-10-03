@@ -1,6 +1,7 @@
 "use client";
 
-import { percent } from "@/lib/format";
+import { useState } from "react";
+import { LANG_NAME, percent } from "@/lib/format";
 import type { AbstainPayload, AnswerPayload, ChatMessage, Citation, ErrorPayload, NearestPage } from "@/lib/types";
 import WhyRoute from "./WhyRoute";
 
@@ -70,19 +71,59 @@ function NearestList({ pages, onOpen }: { pages: NearestPage[]; onOpen: OpenCita
   );
 }
 
+const SCRIPT_NAME: Record<string, string> = { latin: "Latin letters", devanagari: "Devanagari" };
+
+function fidelityNote(payload: AnswerPayload): string | null {
+  const f = payload.fidelity;
+  if (!f || !f.repair) return null;
+  const lang = LANG_NAME[f.expected.lang ?? ""] ?? f.expected.lang;
+  const script = SCRIPT_NAME[f.expected.script ?? ""] ?? f.expected.script;
+  if (f.repair === "transliterated") return `The model answered in the wrong script; Sakshya wrote it in ${script} (IndicXlit).`;
+  return `The model answered in ${LANG_NAME[f.found.lang ?? ""] ?? "another language"}; Sakshya translated it to ${lang}` +
+    `${f.repair.includes("transliterated") ? `, in ${script}` : ""} (${f.repair_model ?? "machine translation"}).`;
+}
+
 function Answer({ payload, onOpen }: { payload: AnswerPayload; onOpen: OpenCitation }) {
+  const [devanagari, setDevanagari] = useState(false);
+  // Answers stored before verification existed have segments instead of sentences.
+  const parts = payload.sentences ?? (payload.segments ?? []).map((g) => ({ ...g, devanagari: null, original: null }));
+  const hasDeva = parts.some((x) => x.devanagari);
+  const note = fidelityNote(payload);
+  const removed = payload.removed ?? [];
   return (
     <>
       <p className="answer-text">
-        {payload.segments.map((s, i) => (
-          <span key={i} className="answer-seg">
-            {s.text}
-            {s.citations.length > 0 && <CiteChips citations={s.citations} onOpen={onOpen} />}
+        {parts.map((x, i) => (
+          <span key={i} className="answer-seg" title={x.original ? `As the model wrote it: ${x.original}` : undefined}>
+            {devanagari && x.devanagari ? x.devanagari : x.text}
+            {x.citations.length > 0 && <CiteChips citations={x.citations} onOpen={onOpen} />}
+            {payload.sentences && i < parts.length - 1 ? " " : ""}
           </span>
         ))}
       </p>
+      {hasDeva && (
+        <button type="button" className="btn-text answer-toggle" aria-pressed={devanagari} onClick={() => setDevanagari((d) => !d)}>
+          {devanagari ? "Show as typed (Latin)" : "Show in Devanagari"}
+        </button>
+      )}
+      {note && <p className="msg-note">{note}</p>}
       {payload.status === "cut_short" && <p className="msg-note">The answer was cut short before it finished.</p>}
       {payload.fallback_used && <p className="msg-note">Answered by a fallback model after the first model declined.</p>}
+      {removed.length > 0 && (
+        <details className="removed">
+          <summary>
+            {removed.length} {removed.length === 1 ? "sentence" : "sentences"} removed: no supporting citation
+          </summary>
+          <ul>
+            {removed.map((r, i) => (
+              <li key={i}>
+                <s>{r.text}</s>
+                {r.reason === "not_entailed" && <span className="removed__why"> (not entailed by its passage)</span>}
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
     </>
   );
 }
@@ -97,7 +138,9 @@ function AssistantMessage({ m, onOpen, onRetry }: { m: ChatMessage; onOpen: Open
         </span>
         <p className="answer-text">{m.content}</p>
         <p className="msg-note">
-          Sakshya did not call the answer model: {p.reason}.
+          {p.unsupported
+            ? `The answer model replied, but its answer was withheld: ${p.reason}`
+            : `Sakshya did not call the answer model: ${p.reason}.`}
         </p>
         <NearestList pages={p.nearest} onOpen={onOpen} />
         {p.routing && <WhyRoute routing={p.routing} />}

@@ -27,7 +27,7 @@ log = logging.getLogger("sakshya.translate")
 
 NLLB_MODEL = "facebook/nllb-200-distilled-600M"
 NLLB_DIR = config.MODEL_DIR / "nllb-200-distilled-600M-ct2"
-NLLB_TAGS = {"mr": "mar_Deva", "hi": "hin_Deva"}
+NLLB_TAGS = {"mr": "mar_Deva", "hi": "hin_Deva", "en": "eng_Latn"}
 INDICTRANS2_MODEL = os.environ.get("SAKSHYA_INDICTRANS2_MODEL", "ai4bharat/indictrans2-indic-en-dist-200M")
 INDICTRANS2_TAGS = {"mr": "mar_Deva", "hi": "hin_Deva"}
 BEAM = int(os.environ.get("SAKSHYA_TRANSLATE_BEAM", "4"))
@@ -79,11 +79,12 @@ class NllbTranslator:
                                                  intra_threads=max(1, min(8, os.cpu_count() or 4)))
         self._lock = threading.Lock()
 
-    def _run(self, sentences: list[str], lang: str) -> list[str]:
+    def _run(self, sentences: list[str], lang: str, target: str = "en") -> list[str]:
         tok = self.tokenizer
         tok.src_lang = NLLB_TAGS.get(lang, "hin_Deva")
+        tgt = NLLB_TAGS[target]
         sources = [tok.convert_ids_to_tokens(tok.encode(s, truncation=True, max_length=MAX_LENGTH)) for s in sentences]
-        results = self.translator.translate_batch(sources, target_prefix=[["eng_Latn"]] * len(sources),
+        results = self.translator.translate_batch(sources, target_prefix=[[tgt]] * len(sources),
                                                   beam_size=BEAM, max_decoding_length=MAX_LENGTH,
                                                   max_batch_size=BATCH)
         return [tok.decode(tok.convert_tokens_to_ids(r.hypotheses[0][1:]), skip_special_tokens=True)
@@ -92,6 +93,11 @@ class NllbTranslator:
     def to_english(self, texts: list[str], lang: str) -> list[str]:
         with self._lock:
             return _by_sentence(texts, lambda sents: self._run(sents, lang))
+
+    def translate(self, texts: list[str], source: str, target: str) -> list[str]:
+        """Any direction between en, hi and mr (used to repair an answer in the wrong language)."""
+        with self._lock:
+            return _by_sentence(texts, lambda sents: self._run(sents, source, target))
 
     def label(self, lang: str) -> str:
         return f"{NLLB_MODEL} (CTranslate2 int8)"
@@ -172,6 +178,12 @@ def get_translator():
                 raise
             log.warning("IndicTrans2 could not be loaded (%s); using NLLB-200. Accept the model's terms on "
                         "Hugging Face for the account whose HF_TOKEN is set.", type(exc).__name__)
+    return get_nllb()
+
+
+@load_once
+def get_nllb() -> NllbTranslator:
+    """NLLB-200 also translates out of English (IndicTrans2's model here is Indic -> English only)."""
     return NllbTranslator()
 
 

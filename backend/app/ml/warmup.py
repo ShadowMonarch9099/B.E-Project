@@ -22,6 +22,10 @@ def _load_all() -> None:
     if MODELS_ON:
         steps += [("langid", "app.ml.langid", "get_langid"), ("xlit", "app.ml.xlit", "get_xlit"),
                   ("translator", "app.ml.translate", "get_translator")]
+    from .nli import NLI_ON
+
+    if NLI_ON:
+        steps.append(("nli", "app.ml.nli", "get_nli"))
     import importlib
 
     for name, module, fn in steps:

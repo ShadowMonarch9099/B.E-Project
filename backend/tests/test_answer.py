@@ -191,7 +191,7 @@ def test_answer_streams_with_page_citations_and_is_logged(client, doc_id, fake):
     assert names[0] == "status" and "retrieval" in names and "delta" in names and names[-1] == "done"
     answer = dict(events)["answer"]
     assert answer["status"] == "complete" and answer["payload"]["kind"] == "answer"
-    cit = answer["payload"]["segments"][0]["citations"][0]
+    cit = answer["payload"]["sentences"][0]["citations"][0]
     assert cit["page_no"] == 2 and cit["label"] == "p. 2" and cit["filename"] == "gharkul.pdf" and cit["bbox"]
     # only the top passages were sent, never the whole document
     assert 0 < len(fake.requests[-1].passages) <= 6
