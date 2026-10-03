@@ -43,6 +43,9 @@ class AnswerRequest:
     question: str
     passages: list[Passage]
     history: list[Turn] = field(default_factory=list)
+    # e.g. "Answer in English." Stated with every question: gpt-oss answered an English question
+    # about Marathi passages in Marathi when the language rule was only in the system prompt.
+    answer_language: str | None = None
 
 
 @dataclass
@@ -99,3 +102,7 @@ class AnswerProvider(Protocol):
 
     def stream(self, request: AnswerRequest) -> AsyncIterator[AnswerEvent]:
         """Text deltas as they arrive, then one "result" event. Raises ProviderError."""
+
+    async def rewrite(self, sentences: list[str], instruction: str) -> tuple[list[str], str] | None:
+        """The sentences rewritten as instructed (e.g. into English), one for one, and the model
+        that did it; None if this provider cannot. Used to repair an answer in the wrong language."""

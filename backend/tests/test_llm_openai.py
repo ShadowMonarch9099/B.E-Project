@@ -8,6 +8,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from app import config  # noqa: F401  (loads backend/.env, so the live test sees the keys)
 from app.answer.verify import verify
 from app.llm import get_provider
 from app.llm import openai_compat as oc
@@ -180,3 +181,11 @@ def test_live_answer_cites_its_passage():
     assert result.status == "complete"
     assert any(c.chunk_id == 12 for s in result.segments for c in s.citations)
     assert "three lakh" in result.text.lower() or "3" in result.text
+
+
+def test_answer_language_and_rewrite_parsing():
+    req = AnswerRequest("What is the limit?", [P2], answer_language="Answer in English.")
+    messages, _ = oc.build_messages(req)
+    assert messages[-1]["content"].endswith("Question: What is the limit?\n\nAnswer in English.")
+    assert oc.parse_numbered("Here you go:\n1. First.\n2) Second.", 2) == ["First.", "Second."]
+    assert oc.parse_numbered("1. Only one.", 2) is None

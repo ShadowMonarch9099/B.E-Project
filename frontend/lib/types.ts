@@ -198,6 +198,7 @@ export interface Fidelity {
   script_match: boolean | null;
   repair: string | null;
   repair_model: string | null;
+  note?: string | null;
   has_devanagari_view?: boolean;
 }
 
@@ -211,6 +212,7 @@ export interface AnswerPayload {
   status: "complete" | "cut_short" | "refused";
   model: string;
   fallback_used: boolean;
+  verification?: { nli: boolean; kept: number; removed: number; numbers_fixed?: [string, string][] };
   refusal_category: string | null;
   route: string;
   gate: Gate;

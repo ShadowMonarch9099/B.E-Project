@@ -37,7 +37,10 @@ log = logging.getLogger("sakshya.llm")
 MAX_TOKENS = int(os.environ.get("SAKSHYA_LLM_MAX_TOKENS", "4096"))  # reasoning tokens count too
 TEMPERATURE = float(os.environ.get("SAKSHYA_LLM_TEMPERATURE", "0.2"))
 REASONING_EFFORT = os.environ.get("SAKSHYA_LLM_REASONING_EFFORT") or None  # e.g. "low" for gpt-oss
-TIMEOUT_S = float(os.environ.get("SAKSHYA_LLM_TIMEOUT", "90"))
+# One attempt per provider: the chain is the retry. A provider that hangs (seen on NVIDIA NIM for
+# models it lists but does not serve) then delays the next one by TIMEOUT_S, not twice that.
+TIMEOUT_S = float(os.environ.get("SAKSHYA_LLM_TIMEOUT", "45"))
+RETRIES = int(os.environ.get("SAKSHYA_LLM_RETRIES", "0"))
 
 
 @dataclass(frozen=True)
@@ -57,7 +60,7 @@ PRESETS = {p.name: p for p in [
     Preset("openrouter", "OpenRouter", "https://openrouter.ai/api/v1", "OPENROUTER_API_KEY",
            "SAKSHYA_OPENROUTER_MODEL", "openai/gpt-oss-120b", (("X-Title", "Sakshya"),)),
     Preset("nvidia", "NVIDIA NIM", "https://integrate.api.nvidia.com/v1", "NVIDIA_API_KEY",
-           "SAKSHYA_NVIDIA_MODEL", "openai/gpt-oss-120b"),
+           "SAKSHYA_NVIDIA_MODEL", "openai/gpt-oss-20b"),  # NIM does not serve gpt-oss-120b (2026-10-04)
 ]}
 DEFAULT_ORDER = "groq,openrouter,nvidia"
 
@@ -96,7 +99,10 @@ def build_messages(request: AnswerRequest) -> tuple[list[dict], dict[int, int]]:
     for turn in request.history:
         messages.append(user_turn(turn.question, turn.passages))
         messages.append({"role": "assistant", "content": turn.answer})
-    messages.append(user_turn(request.question, request.passages))
+    last = user_turn(request.question, request.passages)
+    if request.answer_language:
+        last["content"] += "\n\n" + request.answer_language
+    messages.append(last)
     return messages, numbers
 
 
@@ -155,6 +161,22 @@ def parse_cited(text: str, numbers: dict[int, int], passages: dict[int, Passage]
     return segments
 
 
+REWRITE_PROMPT = ("You rewrite sentences as instructed. Keep every number, name, date and ID exactly as "
+                  "written. Add nothing and leave nothing out. Reply with exactly one numbered line per "
+                  "sentence, in the same order (1. ..., 2. ...), and nothing else.")
+_NUMBERED = re.compile(r"^\s*(\d+)[.)]\s*(.*\S)\s*$")
+
+
+def parse_numbered(text: str, n: int) -> list[str] | None:
+    """Lines "1. ..." to "n. ..." of a reply, in order; None unless all n are there."""
+    lines: dict[int, str] = {}
+    for line in strip_reasoning(text).splitlines():
+        m = _NUMBERED.match(line)
+        if m:
+            lines.setdefault(int(m.group(1)), m.group(2))
+    return [lines[i] for i in range(1, n + 1)] if all(i in lines for i in range(1, n + 1)) else None
+
+
 class OpenAICompatProvider:
     def __init__(self, preset: Preset, model: str | None = None) -> None:
         self.preset = preset
@@ -171,7 +193,7 @@ class OpenAICompatProvider:
     def client(self) -> openai.AsyncOpenAI:
         if self._client is None:
             self._client = openai.AsyncOpenAI(api_key=os.environ.get(self.preset.key_env), base_url=self.preset.base_url,
-                                              timeout=TIMEOUT_S, max_retries=1,
+                                              timeout=TIMEOUT_S, max_retries=RETRIES,
                                               default_headers=dict(self.preset.headers) or None)
         return self._client
 
@@ -196,6 +218,9 @@ class OpenAICompatProvider:
         if isinstance(exc, openai.APIConnectionError):
             return ProviderError("connection", f"Could not reach {self.preset.label}. Check the internet connection.")
         return ProviderError("api_error", f"{who} failed: {type(exc).__name__}")
+
+    async def rewrite(self, sentences: list[str], instruction: str) -> tuple[list[str], str] | None:
+        return await _rewrite(self, sentences, instruction) if self.configured() else None
 
     async def _create(self, messages: list[dict], with_usage: bool):
         kwargs = dict(model=self.model, messages=messages, stream=True, max_tokens=MAX_TOKENS,
@@ -256,6 +281,21 @@ class OpenAICompatProvider:
         yield AnswerEvent("result", result=result)
 
 
+async def _rewrite(provider: "OpenAICompatProvider", sentences: list[str],
+                   instruction: str) -> tuple[list[str], str] | None:
+    body = "\n".join(f"{i}. {s}" for i, s in enumerate(sentences, start=1))
+    try:
+        r = await provider.client().chat.completions.create(
+            model=provider.model, max_tokens=MAX_TOKENS, temperature=0.0,
+            messages=[{"role": "system", "content": REWRITE_PROMPT},
+                      {"role": "user", "content": f"{instruction}\n\n{body}"}])
+    except openai.OpenAIError as exc:
+        log.warning("%s rewrite failed: %s", provider.preset.label, type(exc).__name__)
+        return None
+    out = parse_numbered(r.choices[0].message.content or "", len(sentences)) if r.choices else None
+    return (out, f"{r.model or provider.model} via {provider.preset.label}") if out else None
+
+
 FALLBACK_CODES = {"rate_limited", "busy", "connection", "api_error", "not_found", "payment", "auth", "permission"}
 
 
@@ -281,6 +321,13 @@ class ChainProvider:
         return {"provider": first.preset.label if first else None, "configured": bool(ready),
                 "model": first.model if first else None,
                 "chain": [p.status() for p in self.providers]}
+
+    async def rewrite(self, sentences: list[str], instruction: str) -> tuple[list[str], str] | None:
+        for provider in self.configured():
+            out = await provider.rewrite(sentences, instruction)
+            if out:
+                return out
+        return None
 
     async def stream(self, request: AnswerRequest) -> AsyncIterator[AnswerEvent]:
         ready = self.configured()

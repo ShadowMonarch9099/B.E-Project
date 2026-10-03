@@ -2,7 +2,20 @@
 
 The artifact (`docs/sakshya.html`) walks through four users. Its documents and numbers are illustrative; here each scenario runs on a **real public document from Sakshya-Bench** (`backend/bench/manifest.json`), with a question written by us whose answer we checked by reading the page. The questions are demo questions, not benchmark items.
 
-Recorded on 2026-10-03 (commit `7dd17c2`) on the team laptop, with the router choosing the route (`GET /api/search/route?q=…&doc_id=…&route=auto`). No answer-model key was set, so the ask bar showed the setup hint and the nearest pages. With a key in `backend/.env`, the same retrieval feeds the answer model and the verifier. The latencies at the end were measured while the English shadow index was being translated in the background, so they are upper bounds, not results.
+Recorded on 2026-10-03 (commit `7dd17c2`) on the team laptop, with the router choosing the route (`GET /api/search/route?q=…&doc_id=…&route=auto`). The retrieval details below were recorded before the API keys were added (the answers are in the table above). The latencies at the end were measured while the English shadow index was being translated in the background, so they are upper bounds, not results.
+
+## Answers with the API keys (2026-10-04)
+
+The same four questions, each in a fresh conversation, answered by `openai/gpt-oss-120b` on Groq after the keys were added (and after the fixes in the decision log entry of 2026-10-04):
+
+| Scenario | Answer (as shown, after verification) | Cited pages | Tokens in / out | Question → verified answer |
+| --- | --- | --- | --- | --- |
+| 1. Romanized Marathi over an OCR'd GR | "21 umedvaranchi nivad zali." (asked again in the browser: "2026-27 sathi 21 umedvaranchi nivad zali.", which "Show in Devanagari" displays as "2026-27 साठी 21 उमेदवारांची निवड झाली.") | p. 2 | 2,871 / 189 | 9.5 s |
+| 2. Hinglish over an English module | "Ghar pe delivery hone par ASHA ko newborn ke liye turant (pehle 24 ghante ke andar) aur din 2 ko visit karna chahiye; uske baad din 3, din 7, din 14, din 21 aur din 28 ko visit karna chahiye." | pp. 39, 45 | 1,911 / 542 | 20.3 s |
+| 3. English over a Marathi scan | "The area of C.T.S. No. 20806 at Shahapur to be acquired for the playground is 1327.74 sq m." (the model wrote 1,327.74; the number check rewrote it as the page has it) | pp. 1, 3 | 2,506 / 426 | 3.7 s |
+| 4. Hindi, not in the file | Abstained (best passage 0.0075 < τ); the answer model was not called | – | – | 10.5 s |
+
+Each answer is correct against the page we read, in the question's language and script, with every sentence cited. The times were measured while the English shadow index was still being built in the background; the answer model itself took 1.4–2.0 s. Before the fixes, the same English question once came back in Marathi and was machine-translated into an invented English sentence, and once had its figure written as "13,27.74"; see the decision log.
 
 ## 1. Gram Panchayat clerk: romanized Marathi, a GR read with OCR
 

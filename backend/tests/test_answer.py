@@ -195,6 +195,7 @@ def test_answer_streams_with_page_citations_and_is_logged(client, doc_id, fake):
     assert cit["page_no"] == 2 and cit["label"] == "p. 2" and cit["filename"] == "gharkul.pdf" and cit["bbox"]
     # only the top passages were sent, never the whole document
     assert 0 < len(fake.requests[-1].passages) <= 6
+    assert fake.requests[-1].answer_language == "Answer in English."  # stated with every question
     with session_scope() as s:
         row = s.get(QueryLog, dict(events)["done"]["query_log_id"])
         assert row.llm_called and not row.abstained and row.gate["passed"]

@@ -166,3 +166,15 @@ def test_spaces_drawn_in_another_font_still_separate_words():
     lines = [" ".join(w["t"] for w in line) for para in page.paragraphs for line in para]
     assert lines[0] == "वसतिगृह परिपत्रक"
     assert "विद्यार्थी बारा हजार रुपये आहे." in lines
+
+
+def test_dotted_abbreviations_do_not_end_a_sentence():
+    # An answer was cut at "C.T.S." and its first half dropped as uncited (2026-10-04).
+    from app.ingest.chunking import sentence_spans
+
+    text = "The acquisition is for 1327.74 sq m of C.T.S. No. 20806 at Shahapur. Notices go to the owner."
+    assert [text[s:e] for s, e in sentence_spans(text)] == [
+        "The acquisition is for 1327.74 sq m of C.T.S. No. 20806 at Shahapur.", "Notices go to the owner."]
+    mr = "मौजे शहापूर सि.स.नं. २०८०६ पै. ही जमीन आरक्षित आहे. पुढील सूचना."
+    assert len(sentence_spans(mr)) == 2
+    assert len(sentence_spans("The rate is 1.5. The next rule applies.")) == 2  # numbers still end sentences

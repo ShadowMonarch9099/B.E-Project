@@ -26,9 +26,15 @@ ABBREVIATIONS = {
     "art", "arts", "cl", "cls", "sec", "secs", "govt", "dept", "rs", "fig", "figs", "vol", "pp", "co", "ltd",
     "inc", "hon", "shri", "smt", "ref", "dt", "viz", "approx", "ch", "para", "sl", "dist", "tal", "est",
     "क्र", "क्रं", "सं", "दि", "डॉ", "श्री", "श्रीमती", "प्रा", "मा", "ता", "जि", "नं", "रु", "इ", "वि", "कि",
-    "मि", "ग्रा", "कं", "पृ", "शा", "नि", "उ", "सौ", "कु", "ले", "प्र", "मु", "पो",
+    "मि", "ग्रा", "कं", "पृ", "शा", "नि", "उ", "सौ", "कु", "ले", "प्र", "मु", "पो", "पै",  # पै. = पैकी (out of)
 }
 _BOUNDARY = re.compile(r"[.?!।॥]+[\"'”’)\]]*(?=\s)")
+
+
+def _dotted(word: str) -> bool:
+    """A dotted abbreviation: "C.T.S", "B.E", "सि.स.नं", "प्र.क्र" (short parts, each with a letter)."""
+    parts = word.split(".")
+    return len(parts) >= 2 and all(1 <= len(p) <= 3 and any(ch.isalpha() for ch in p) for p in parts)
 _TOKEN_BEFORE = re.compile(r"([^\s(\[\"'“‘]+)$")
 
 
@@ -44,6 +50,7 @@ def sentence_spans(text: str, offset: int = 0) -> list[tuple[int, int]]:
             line_start = text.rfind("\n", 0, m.start()) + 1
             if (word.lower() in ABBREVIATIONS or word in ABBREVIATIONS
                     or (len(word) == 1 and word.isalpha())  # an initial: "R. K. Rao", "क. ख."
+                    or _dotted(word)  # "C.T.S. No. 20806", "सि.स.नं. २०८०६"
                     or (word.isdigit() and len(word) <= 2 and before.start(1) == line_start)):  # "1. Scope"
                 continue
             nxt = text[m.end():m.end() + 2].strip()[:1]

@@ -55,7 +55,7 @@ def test_nli_removes_sentences_their_passage_does_not_entail(monkeypatch):
 
     monkeypatch.setattr(nli_mod, "get_nli", lambda: FakeNli())
     passages = {7: "The annual income must not exceed three lakh rupees.", 8: "The office opens at ten."}
-    v = verify([seg("The limit is three lakh rupees.", 7), seg(" The scheme ends in 2030.", 8)], passages,
+    v = verify([seg("The limit is three lakh rupees.", 7), seg(" The scheme ends next year.", 8)], passages,
                use_nli=True)
     assert [s.text for s in v.kept] == ["The limit is three lakh rupees."]
     assert v.removed[0].reason == "not_entailed" and v.removed[0].entailment == 0.1
@@ -143,4 +143,38 @@ def test_real_script_and_language_repairs(monkeypatch):
     assert f.after["script"] == "latin" and f.devanagari and "घरकुल" in f.devanagari[0]
     mr_q = QueryAnalysis("घरकुल योजनेसाठी उत्पन्नाची मर्यादा किती आहे?", "", "devanagari", "mr")
     g = fid_mod.check_and_repair(["The income limit for the Gharkul scheme is three lakh rupees."], mr_q)
-    assert g.lang_match is False and g.repair == "translated" and g.after["lang"] == "mr"
+    assert g.lang_match is False and g.needs_rewrite and g.repair is None  # no machine translation
+    g = fid_mod.apply_rewrite(g, (["घरकुल योजनेसाठी उत्पन्नाची मर्यादा तीन लाख रुपये आहे."], "model"), mr_q)
+    assert g.repair == "rewritten" and g.after["lang"] == "mr"
+
+
+def test_a_rewrite_that_changes_a_figure_is_refused():
+    en_q = QueryAnalysis("What area is acquired?", "What area is acquired?", "latin", "en")
+    f = fid_mod.Fidelity({"lang": "en", "script": "latin"}, {"lang": "mr", "script": "devanagari"}, False, False,
+                         texts=["सि.स.नं. २०८०६ मधील १३२७.७४ चौ.मी. क्षेत्र संपादित होणार आहे."], needs_rewrite=True)
+    bad = fid_mod.apply_rewrite(f, (["An area of 1,327 sq m of C.T.S. 20806 is acquired."], "m"), en_q)
+    assert bad.repair is None and "changed a figure" in bad.note and bad.texts[0].startswith("सि.स.नं.")
+    none = fid_mod.apply_rewrite(f, None, en_q)
+    assert none.repair is None and "shown as written" in none.note
+    assert fid_mod.language_instruction(en_q) == "Answer in English."
+    rom = QueryAnalysis("kiti jaga aahet?", "", "latin", "mr", romanized=True)
+    assert "Latin letters" in fid_mod.language_instruction(rom)
+
+
+def test_numbers_must_come_from_the_cited_passage():
+    from app.answer.verify import verify
+    from app.llm.base import Citation, Segment
+
+    passage = {7: "सि.स.नं. २०८०६ पै. (गट नं. ६७८ पैकी) १३२७.७४ चौ.मी. क्षेत्र. सन २०२६-२७ करीता २१ उमेदवार."}
+    seg = lambda text: Segment(text, [Citation(7, "")])  # noqa: E731
+    # the live answer of 2026-10-04: right value, wrong grouping -> rewritten as the page has it
+    v = verify([seg("The acquisition is for 13,27.74 sq m of C.T.S. No. 20806 at Shahapur.")], passage, use_nli=False)
+    assert v.kept[0].text == "The acquisition is for 1327.74 sq m of C.T.S. No. 20806 at Shahapur."
+    assert v.kept[0].numbers_fixed == [("13,27.74", "1327.74")]
+    # a figure the passage does not have -> removed
+    v = verify([seg("21 candidates were selected. "), seg("19 places are vacant.")], passage, use_nli=False)
+    assert [s.text for s in v.kept] == ["21 candidates were selected."]
+    assert v.removed[0].reason == "number_not_in_passage"
+    # Devanagari digits stay Devanagari; part of "2026-27" counts; single digits are not checked
+    v = verify([seg("२०२६ साठी २१ उमेदवारांची निवड झाली, 3 जागा राखीव.")], passage, use_nli=False)
+    assert v.kept and v.kept[0].text.startswith("२०२६ साठी २१")

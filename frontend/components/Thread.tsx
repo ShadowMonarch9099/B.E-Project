@@ -75,10 +75,13 @@ const SCRIPT_NAME: Record<string, string> = { latin: "Latin letters", devanagari
 
 function fidelityNote(payload: AnswerPayload): string | null {
   const f = payload.fidelity;
+  if (f && !f.repair && f.note) return f.note;
   if (!f || !f.repair) return null;
   const lang = LANG_NAME[f.expected.lang ?? ""] ?? f.expected.lang;
   const script = SCRIPT_NAME[f.expected.script ?? ""] ?? f.expected.script;
   if (f.repair === "transliterated") return `The model answered in the wrong script; Sakshya wrote it in ${script} (IndicXlit).`;
+  if (f.repair === "rewritten")
+    return `The model answered in ${LANG_NAME[f.found.lang ?? ""] ?? "another language"}; it rewrote its answer in ${lang} (${f.repair_model ?? "the answer model"}), keeping every figure.`;
   return `The model answered in ${LANG_NAME[f.found.lang ?? ""] ?? "another language"}; Sakshya translated it to ${lang}` +
     `${f.repair.includes("transliterated") ? `, in ${script}` : ""} (${f.repair_model ?? "machine translation"}).`;
 }
@@ -108,19 +111,25 @@ function Answer({ payload, onOpen }: { payload: AnswerPayload; onOpen: OpenCitat
       )}
       {note && <p className="msg-note">{note}</p>}
       {payload.status === "cut_short" && <p className="msg-note">The answer was cut short before it finished.</p>}
+      {(payload.verification?.numbers_fixed?.length ?? 0) > 0 && (
+        <p className="msg-note">
+          {payload.verification!.numbers_fixed!.map(([was, now]) => `“${was}” → “${now}”`).join(", ")}: figures rewritten exactly as
+          the cited page has them.
+        </p>
+      )}
       {payload.fallback_used && (
         <p className="msg-note">Answered by {payload.model ?? "a fallback model"} because the first answer model could not answer.</p>
       )}
       {removed.length > 0 && (
         <details className="removed">
           <summary>
-            {removed.length} {removed.length === 1 ? "sentence" : "sentences"} removed: no supporting citation
+            {removed.length} {removed.length === 1 ? "sentence" : "sentences"} removed: not supported by a cited passage
           </summary>
           <ul>
             {removed.map((r, i) => (
               <li key={i}>
                 <s>{r.text}</s>
-                {r.reason === "not_entailed" && <span className="removed__why"> (not entailed by its passage)</span>}
+                <span className="removed__why"> ({REMOVED_WHY[r.reason ?? ""] ?? "no supporting citation"})</span>
               </li>
             ))}
           </ul>
@@ -182,6 +191,12 @@ function AssistantMessage({ m, onOpen, onRetry }: { m: ChatMessage; onOpen: Open
     </div>
   );
 }
+
+const REMOVED_WHY: Record<string, string> = {
+  no_citation: "no supporting citation",
+  number_not_in_passage: "a number that is not in the cited passage",
+  not_entailed: "not entailed by its passage",
+};
 
 export default function Thread({
   messages,

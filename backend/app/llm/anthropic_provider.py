@@ -68,8 +68,10 @@ def build_messages(request: AnswerRequest) -> tuple[list[dict], list[int]]:
                                                      {"type": "text", "text": turn.question}]})
         order.extend(p.chunk_id for p in turn.passages)
         messages.append({"role": "assistant", "content": [{"type": "text", "text": turn.answer}]})
-    messages.append({"role": "user", "content": [*(document_block(p) for p in request.passages),
-                                                 {"type": "text", "text": request.question}]})
+    last = [*(document_block(p) for p in request.passages), {"type": "text", "text": request.question}]
+    if request.answer_language:
+        last.append({"type": "text", "text": request.answer_language})
+    messages.append({"role": "user", "content": last})
     order.extend(p.chunk_id for p in request.passages)
     return messages, order
 
@@ -144,6 +146,9 @@ class AnthropicProvider:
         if self._client is None:
             self._client = anthropic.AsyncAnthropic(timeout=TIMEOUT_S, max_retries=2)
         return self._client
+
+    async def rewrite(self, sentences: list[str], instruction: str) -> tuple[list[str], str] | None:
+        return None  # not implemented for Claude: a wrong-language answer is shown as written, with a note
 
     async def stream(self, request: AnswerRequest) -> AsyncIterator[AnswerEvent]:
         if not key_configured():

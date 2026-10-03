@@ -24,7 +24,7 @@ from ..ingest.normalize import script_of
 from ..llm import get_provider
 from ..llm.base import AnswerRequest, AnswerResult, Passage, ProviderError, Turn
 from ..retrieval.chunks import ChunkInfo, load_chunks
-from .fidelity import check_and_repair
+from .fidelity import apply_rewrite, check_and_repair, language_instruction
 from .verify import Verification, verify
 from ..retrieval.hybrid import GATE_TAU, TOP_K, TOP_N, WEIGHTS, Retrieval, retrieve
 
@@ -151,7 +151,9 @@ def _answer_payload(result: AnswerResult, r: Retrieval, v: Verification, fid, ch
     return {"kind": "answer", "sentences": sentences,
             "removed": [{"text": x.text, "reason": x.reason} for x in v.removed],
             "fidelity": fid.as_log(), "verification": {"nli": v.nli, "kept": len(v.kept),
-                                                        "removed": len(v.removed)},
+                                                        "removed": len(v.removed),
+                                                        "numbers_fixed": [list(f) for x in v.kept
+                                                                          for f in x.numbers_fixed]},
             "status": result.status, "model": result.model, "fallback_used": result.fallback_used,
             "refusal_category": result.refusal_category, "route": r.route, "gate": r.gate.as_dict(),
             "routing": routing_view(r)}
@@ -201,7 +203,7 @@ async def ask(conversation_id: str, question: str, route: str | None = None) -> 
     passages = [passage_for(r.chunks[c.chunk_id]) for c in r.top]
     await to_thread.run_sync(_set_payload, user["id"], {"passages": [p.as_dict() for p in passages]})
     yield "status", {"stage": "answering"}
-    request = AnswerRequest(question, passages, history)
+    request = AnswerRequest(question, passages, history, answer_language=language_instruction(r.analysis))
     t_llm = time.perf_counter()
     first_token = None
     result: AnswerResult | None = None
@@ -254,6 +256,14 @@ async def ask(conversation_id: str, question: str, route: str | None = None) -> 
         else:
             t_f = time.perf_counter()
             fid = await to_thread.run_sync(lambda: check_and_repair([x.text for x in v.kept], r.analysis))
+            if fid.needs_rewrite:
+                instruction = language_instruction(r.analysis) or "Rewrite in the language of the question."
+                try:
+                    rewritten = await provider.rewrite(fid.texts, "Rewrite each sentence. " + instruction)
+                except Exception as exc:  # a failed repair keeps the answer as written
+                    log.warning("Rewrite failed: %s", exc)
+                    rewritten = None
+                fid = await to_thread.run_sync(lambda: apply_rewrite(fid, rewritten, r.analysis))
             fidelity_log = fid.as_log()
             cited = {c.chunk_id for x in v.kept for c in x.citations}
             chunks = {**r.chunks, **load_chunks([cid for cid in cited if cid not in r.chunks])}

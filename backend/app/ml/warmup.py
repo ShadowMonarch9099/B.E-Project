@@ -37,6 +37,15 @@ def _load_all() -> None:
         except Exception as exc:  # a model that cannot load is reported in /api/health
             _state["failed"][name] = f"{type(exc).__name__}: {str(exc)[:200]}"
             log.warning("Could not load %s: %s", name, exc)
+    t = time.perf_counter()
+    try:  # the BM25 indexes over every chunk; built here so the first question does not wait 10-50 s
+        from ..index.lexical import get_lexical_index
+
+        get_lexical_index().current()
+        _state["loaded"].append("lexical")
+        log.info("Built the lexical index in %.1fs", time.perf_counter() - t)
+    except Exception as exc:
+        _state["failed"]["lexical"] = f"{type(exc).__name__}: {str(exc)[:200]}"
     _state["done"] = True
 
 

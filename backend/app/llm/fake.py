@@ -16,9 +16,16 @@ class FakeProvider:
     def __init__(self) -> None:
         self.script: list = []
         self.requests: list[AnswerRequest] = []
+        self.rewrites: list = []  # each: the list[str] to return, or None
 
     def status(self) -> dict:
         return {"provider": "fake (tests)", "configured": True, "model": "fake", "effort": None}
+
+    async def rewrite(self, sentences: list[str], instruction: str) -> tuple[list[str], str] | None:
+        if not self.rewrites:
+            return None
+        out = self.rewrites.pop(0)
+        return (out, "fake") if out else None
 
     async def stream(self, request: AnswerRequest) -> AsyncIterator[AnswerEvent]:
         self.requests.append(request)

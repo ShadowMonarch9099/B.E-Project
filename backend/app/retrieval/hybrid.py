@@ -261,10 +261,18 @@ def route_lists(lists: dict, route: str, timings: dict | None = None) -> dict:
     return chosen
 
 
-def retrieve(question: str, doc_ids: list[str] | None, route: str | None = "hybrid", k: int = TOP_K,
-             n: int = TOP_N, tau: float = GATE_TAU, weights: dict[str, float] | None = None,
-             analysis: QueryAnalysis | None = None, options: AnalysisOptions | None = None,
-             probe: bool = True, ocr_aware: bool | None = None, use_reranker: bool = True) -> Retrieval:
+def retrieve(question: str, doc_ids: list[str] | None, route: str | None = "hybrid", **kwargs) -> Retrieval:
+    """See _retrieve. While it runs, background translation (the shadow index) pauses."""
+    from .. import busy
+
+    with busy.serving():
+        return _retrieve(question, doc_ids, route, **kwargs)
+
+
+def _retrieve(question: str, doc_ids: list[str] | None, route: str | None = "hybrid", k: int = TOP_K,
+              n: int = TOP_N, tau: float = GATE_TAU, weights: dict[str, float] | None = None,
+              analysis: QueryAnalysis | None = None, options: AnalysisOptions | None = None,
+              probe: bool = True, ocr_aware: bool | None = None, use_reranker: bool = True) -> Retrieval:
     """Retrieve for one question. route=None lets the router choose; probe=False skips the
     per-route probe (cheaper; used by evaluations of a fixed route). use_reranker=False keeps
     the fused order and scores only the top n with the cross-encoder, for the gate (the

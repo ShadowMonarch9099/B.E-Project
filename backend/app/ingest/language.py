@@ -27,7 +27,7 @@ from ..retrieval.query import MODELS_ON
 log = logging.getLogger("sakshya.language")
 
 SHADOW_ON = os.environ.get("SAKSHYA_SHADOW_INDEX", "on") != "off"
-TRANSLATE_BATCH = 8  # chunks per translation call (each is split into sentences)
+TRANSLATE_BATCH = 2  # chunks per translation call; small, so a question never waits long (app/busy.py)
 
 
 def _script_only(script: str | None) -> tuple[str | None, dict]:
@@ -96,7 +96,10 @@ def build_shadow(doc_id: str, on_progress: Callable[[int, int], None] | None = N
     translator = get_translator() if indic else None
     done, total = 0, len(indic)
     translated: dict[int, tuple[str, str]] = {cid: (text, "source") for cid, text in english}
+    from .. import busy
+
     for i in range(0, len(indic), TRANSLATE_BATCH):
+        busy.wait_until_idle()  # questions first
         batch = indic[i:i + TRANSLATE_BATCH]
         by_lang: dict[str, list] = {}
         for item in batch:
