@@ -31,10 +31,14 @@ def search(q: str = Query(..., min_length=1, max_length=1000), doc_id: list[str]
 
 @router.get("/route", dependencies=[Depends(require_db)])
 def search_route(q: str = Query(..., min_length=1, max_length=1000), doc_id: list[str] | None = Query(None),
-                 route: str = Query("hybrid", pattern="^(direct|translate|hybrid)$")) -> dict:
-    """One route end to end (views, first stage, reranking, gate), without answering."""
-    r = retrieve(q, doc_id, route=route)
-    return {"route": route, "routes": list(ROUTES), "analysis": r.analysis.as_log() if r.analysis else None,
+                 route: str = Query("hybrid", pattern="^(auto|direct|translate|hybrid)$")) -> dict:
+    """One route end to end (views, first stage, reranking, gate), without answering.
+    route=auto lets the rule-based router choose, and returns its decision ("why this route")."""
+    from ..answer.service import routing_view
+
+    r = retrieve(q, doc_id, route=None if route == "auto" else route)
+    return {"route": r.route, "routes": list(ROUTES), "routing": routing_view(r),
+            "analysis": r.analysis.as_log() if r.analysis else None,
             "gate": r.gate.as_dict(), "latency_ms": r.latency_ms,
             "lists": {name: len(hits) for name, hits in r.lists.items()},
             "top": [{"rerank": round(c.rerank or 0, 4), "ranks": c.ranks, **r.chunks[c.chunk_id].as_dict()}

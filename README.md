@@ -136,7 +136,7 @@ Results go to `backend/eval/results/` (gitignored); reports quoted in the projec
 | `POST /api/documents/{id}/reindex` | Detect and ingest the stored file again |
 | `DELETE /api/documents/{id}` | Delete the document, its pages and its files |
 | `GET /api/search?q=…&doc_id=…&k=10` | Top hits from each index (BM25 words, BM25 character n-grams, E5 dense), for checking retrieval |
-| `GET /api/search/route?q=…&doc_id=…&route=…` | One route (`direct`, `translate` or `hybrid`) end to end without answering: views, candidates, reranking, gate |
+| `GET /api/search/route?q=…&doc_id=…&route=…` | One route (`direct`, `translate`, `hybrid`, or `auto` for the router's choice and its reason) end to end without answering: views, candidates, reranking, gate |
 | `POST /api/conversations` | Start a conversation about a document (`{"doc_id": …}`) |
 | `GET /api/conversations?doc_id=…` · `GET /api/conversations/{id}` | List conversations; one conversation with its messages |
 | `POST /api/conversations/{id}/messages` | Ask (`{"question": …}`, optionally `"route"`); the answer streams back as Server-Sent Events (`status`, `retrieval`, `delta`, `answer`, `done`) |

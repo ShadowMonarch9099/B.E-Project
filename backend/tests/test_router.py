@@ -96,3 +96,19 @@ def test_the_decision_reaches_the_log_and_the_answer_payload(doc_id):
         assert row.route == "hybrid" and row.route_reason.startswith("[numbers]")
         assert set(row.route_scores) == {"direct", "translate", "hybrid"}
         assert row.features["question_type"] and "scanned_share" in row.features
+
+
+def test_route_endpoint_can_show_the_routers_choice():
+    from fastapi.testclient import TestClient
+
+    from app.main import app
+    from tests.helpers import native_pdf
+
+    with TestClient(app) as c:
+        r = c.post("/api/documents", files={"file": ("router_demo.pdf", native_pdf(
+            ["The hostel fee is rupees twelve thousand per student for the year. " * 4]), "application/pdf")})
+        doc_id = r.json()["document"]["id"]
+        out = c.get("/api/search/route", params={"q": "What is the hostel fee?", "doc_id": doc_id, "route": "auto"}).json()
+        assert out["route"] in ("direct", "translate", "hybrid") and out["routing"]["rule"] and out["routing"]["reason"]
+        forced = c.get("/api/search/route", params={"q": "What is the hostel fee?", "doc_id": doc_id}).json()
+        assert forced["route"] == "hybrid" and forced["routing"]["rule"] == "forced"
