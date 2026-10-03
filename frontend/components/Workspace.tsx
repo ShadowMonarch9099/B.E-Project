@@ -1,14 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef, useState } from "react";
-import { deleteDocument, getHealth, listDocuments, reindexDocument, uploadDocument } from "@/lib/api";
-import { formatBytes, isPending, percent } from "@/lib/format";
+import Link from "next/link";
+import { useCallback, useEffect, useState } from "react";
+import { clearAllDocuments, deleteDocument, getHealth, listDocuments, reindexDocument, uploadDocument } from "@/lib/api";
+import { useDetails, useMedia } from "@/lib/details";
+import { isPending } from "@/lib/format";
 import { createLimiter } from "@/lib/limit";
 import type { Citation, DocSummary, Health, UploadItem } from "@/lib/types";
 import Chat from "./Chat";
-import DocumentCard from "./DocumentCard";
+import DocDetails from "./DocDetails";
+import Library, { Dropzone } from "./Library";
 import PdfViewer, { type ViewerTarget } from "./PdfViewer";
-import ResultCard from "./ResultCard";
 
 const DEFAULT_LIMITS = { max_file_mb: 200, max_files: 20 };
 const POLL_MS = 1500;
@@ -16,17 +18,21 @@ const POLL_MS = 1500;
 // Large files are held in memory while the backend reads them, so upload two at a time.
 const uploadSlot = createLimiter(2);
 
+// The app: documents on the left, the conversation in the middle, the cited page on the
+// right (on narrower screens the page opens over the conversation).
 export default function Workspace() {
+  const { on: details, toggle: toggleDetails } = useDetails();
+  const wide = useMedia("(min-width: 1180px)");
   const [health, setHealth] = useState<Health | null>(null);
   const [offline, setOffline] = useState(false);
   const [docs, setDocs] = useState<DocSummary[] | null>(null);
   const [listError, setListError] = useState<string | null>(null);
   const [uploads, setUploads] = useState<UploadItem[]>([]);
   const [busy, setBusy] = useState<Set<string>>(new Set());
-  const [dragging, setDragging] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
-  const inputId = useId();
-  const dragDepth = useRef(0);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [viewer, setViewer] = useState<ViewerTarget | null>(null);
+  const [detailsDoc, setDetailsDoc] = useState<DocSummary | null>(null);
 
   const refresh = useCallback(async () => {
     try {
@@ -44,8 +50,8 @@ export default function Workspace() {
     refresh();
   }, [refresh]);
 
-  // Poll while any document is still being ingested.
-  const anyPending = docs?.some((d) => isPending(d) || d.stats.shadow?.state === "building" || d.stats.shadow?.state === "pending" || d.stats.shadow?.state === "queued") ?? false;
+  // Poll while any document is still being read.
+  const anyPending = docs?.some((d) => isPending(d)) ?? false;
   useEffect(() => {
     if (!anyPending) return;
     const t = setTimeout(refresh, POLL_MS);
@@ -64,7 +70,7 @@ export default function Workspace() {
       let picked = Array.from(list);
       setNotice(null);
       if (picked.length > limits.max_files) {
-        setNotice(`Only the first ${limits.max_files} files were taken. Upload the rest in another batch.`);
+        setNotice(`Only the first ${limits.max_files} files were taken. Add the rest in another batch.`);
         picked = picked.slice(0, limits.max_files);
       }
       const batch: UploadItem[] = picked.map((f) => ({ id: crypto.randomUUID(), name: f.name, size: f.size, state: "queued" }));
@@ -114,26 +120,34 @@ export default function Workspace() {
 
   const remove = (doc: DocSummary) =>
     withBusy(doc.id, async () => {
-      if (!window.confirm(`Delete “${doc.filename}” and everything indexed from it?`)) return;
+      if (!window.confirm(`Delete “${doc.filename}” and its conversations?`)) return;
       await deleteDocument(doc.id);
       setDocs((prev) => (prev ?? []).filter((d) => d.id !== doc.id));
+      if (viewer?.docId === doc.id) setViewer(null);
     });
 
   const reindex = (doc: DocSummary) =>
     withBusy(doc.id, async () => {
       const next = await reindexDocument(doc.id);
       setDocs((prev) => (prev ?? []).map((d) => (d.id === doc.id ? next : d)));
+      setDetailsDoc(null);
     });
 
-  const onDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    dragDepth.current = 0;
-    setDragging(false);
-    handleFiles(e.dataTransfer.files);
+  const clearAll = async () => {
+    const n = docs?.length ?? 0;
+    if (!n || !window.confirm(`Delete all ${n} documents and their conversations? This cannot be undone.`)) return;
+    try {
+      await clearAllDocuments();
+      setDocs([]);
+      setSelectedId(null);
+      setViewer(null);
+      setNotice(null);
+    } catch (e) {
+      setNotice((e as Error).message);
+    }
   };
 
-  // A citation chip or a nearest page opens the original page with the passage highlighted.
-  const [viewer, setViewer] = useState<ViewerTarget | null>(null);
+  // A page chip, a nearest page or "View document" opens the page with the passage highlighted.
   const openCitation = useCallback((c: Citation) => {
     setViewer({
       docId: c.doc_id,
@@ -151,156 +165,134 @@ export default function Workspace() {
   const openDocument = (d: DocSummary) =>
     setViewer({ docId: d.id, filename: d.filename, page: 1, anchor: d.anchor, boxes: [], label: "p. 1" });
 
-  const indexed = (docs ?? []).filter((d) => d.status === "indexed");
-  const askable = indexed.map((d) => ({ id: d.id, name: d.filename }));
-  const count = (docs?.length ?? 0) + uploads.length;
+  const all = docs ?? [];
+  const indexed = all.filter((d) => d.status === "indexed");
+  const selected = indexed.find((d) => d.id === selectedId) ?? indexed[0] ?? null;
+  const empty = docs !== null && all.length === 0 && uploads.length === 0;
   const dbDown = health ? !health.database.available : false;
 
-  return (
-    <>
-      <div className="status-line" role="status">
-        <span className={`dot ${offline ? "dot--off" : health ? "dot--on" : ""}`} aria-hidden />
-        {offline
-          ? "Backend offline: start it on port 8000"
-          : health
-            ? [
-                `Detector ready · ${health.detector.name} ${health.detector.version}`,
-                health.ocr.available
-                  ? `OCR: ${health.ocr.engine} ${health.ocr.version} (${health.ocr.languages.join("+")})`
-                  : "OCR unavailable",
-                health.database.available ? "Database connected" : "Database offline",
-              ].join(" · ")
-            : "Connecting…"}
-      </div>
+  const status = offline
+    ? { text: "Offline", tone: "off", title: "The backend is not reachable on port 8000." }
+    : !health
+      ? { text: "Connecting…", tone: "", title: "" }
+      : dbDown
+        ? { text: "Database offline", tone: "off", title: "Start it with: docker compose up -d db" }
+        : {
+            text: "Ready",
+            tone: "on",
+            title: [
+              `${health.detector.name} ${health.detector.version}`,
+              health.ocr.available ? `OCR: ${health.ocr.engine} ${health.ocr.version} (${health.ocr.languages.join("+")})` : "OCR unavailable",
+              "Database connected",
+            ].join(" · "),
+          };
 
-      {dbDown && (
-        <p className="notice notice--warn">
-          Documents cannot be stored because the database is not reachable. Start it with{" "}
-          <code>docker compose up -d db</code> and restart the backend.
-        </p>
+  return (
+    <div className="app">
+      <header className="app__header">
+        <div className="brand">
+          <span className="wordmark">Sakshya</span>
+          <span className="stamp stamp--brand" lang="hi" aria-label="साक्ष्य, evidence">
+            साक्ष्य
+          </span>
+        </div>
+        <nav className="app__nav">
+          <span className={`status status--${status.tone}`} title={status.title} role="status">
+            <span className={`dot ${status.tone === "on" ? "dot--on" : status.tone === "off" ? "dot--off" : ""}`} aria-hidden />
+            {status.text}
+            {details && health && status.tone === "on" && <span className="status__more"> · {status.title}</span>}
+          </span>
+          <label className="switch" title="Show how documents were read and how each answer was found">
+            <input type="checkbox" checked={details} onChange={toggleDetails} />
+            <span className="switch__track" aria-hidden />
+            Technical details
+          </label>
+          <Link className="btn-text" href="/annotate">
+            Sakshya-Bench
+          </Link>
+        </nav>
+      </header>
+
+      {(notice || (listError && !dbDown) || dbDown) && (
+        <div className="app__notices">
+          {dbDown && (
+            <p className="notice notice--warn">
+              Documents cannot be stored because the database is not reachable. Start it with{" "}
+              <code>docker compose up -d db</code> and restart the backend.
+            </p>
+          )}
+          {listError && !dbDown && <p className="notice notice--warn">{listError}</p>}
+          {notice && (
+            <p className="notice">
+              {notice}
+              <button type="button" className="btn-text notice__close" onClick={() => setNotice(null)} aria-label="Dismiss">
+                ×
+              </button>
+            </p>
+          )}
+        </div>
       )}
 
-      <label
-        htmlFor={inputId}
-        className={`dropzone${dragging ? " dropzone--active" : ""}`}
-        onDragEnter={(e) => {
-          e.preventDefault();
-          dragDepth.current += 1;
-          setDragging(true);
-        }}
-        onDragOver={(e) => e.preventDefault()}
-        onDragLeave={() => {
-          dragDepth.current -= 1;
-          if (dragDepth.current <= 0) setDragging(false);
-        }}
-        onDrop={onDrop}
-      >
-        <input
-          id={inputId}
-          type="file"
-          multiple
-          className="visually-hidden"
-          onChange={(e) => {
-            handleFiles(e.target.files);
-            e.target.value = "";
-          }}
-        />
-        <span className="dropzone__icon" aria-hidden>
-          <svg viewBox="0 0 64 64" width="56" height="56" fill="none" stroke="currentColor" strokeWidth="2">
-            <path className="sheet sheet--back" d="M20 10h20l10 10v30H20z" />
-            <path className="sheet sheet--front" d="M14 16h20l10 10v30H14z" fill="var(--surface)" />
-            <path className="sheet sheet--front" d="M34 16v10h10" />
-            <path className="sheet sheet--front" d="M21 36h16M21 42h16M21 48h10" strokeLinecap="round" />
-          </svg>
-        </span>
-        <span className="dropzone__title">{dragging ? "Release to add" : "Drop documents here"}</span>
-        <span className="dropzone__sub">
-          or <span className="link-like">browse your computer</span>
-        </span>
-        <span className="dropzone__hint">
-          PDF, DOCX and scans (PNG, JPEG, TIFF) · up to {limits.max_file_mb} MB each · stored on this machine so
-          answers can open the cited page
-        </span>
-      </label>
-
-      {notice && <p className="notice">{notice}</p>}
-      {listError && !dbDown && <p className="notice notice--warn">{listError}</p>}
-
-      {count > 0 && (
-        <section className="results" aria-live="polite">
-          <div className="results__head">
-            <h2>
-              Documents <span className="count">{docs?.length ?? 0}</span>
-            </h2>
-          </div>
-          <ol className="cards">
-            {uploads.map((u, i) => (
-              <li key={u.id} className="card" style={{ "--i": Math.min(i, 8) } as React.CSSProperties}>
-                {u.state === "rejected" ? (
-                  <ResultCard result={u.detection} onDismiss={() => setUpload(u.id, null)} />
-                ) : (
-                  <Pending item={u} onDismiss={() => setUpload(u.id, null)} />
-                )}
-              </li>
-            ))}
-            {(docs ?? []).map((d, i) => (
-              <li key={d.id} className="card" style={{ "--i": Math.min(i + uploads.length, 8) } as React.CSSProperties}>
-                <DocumentCard
-                  doc={d}
-                  busy={busy.has(d.id)}
-                  onDelete={() => remove(d)}
-                  onReindex={() => reindex(d)}
-                  onOpen={() => openDocument(d)}
-                />
-              </li>
-            ))}
-          </ol>
-        </section>
+      {empty ? (
+        <main className="welcome">
+          <p className="eyebrow">English · हिंदी · मराठी · PDF, Word and scans</p>
+          <h1>
+            Ask your documents. <span className="nowrap">Check the page.</span>
+          </h1>
+          <p className="lede">
+            Add your files. Sakshya reads every page, including old scans, and every answer points to the page it
+            comes from.
+          </p>
+          <Dropzone compact={false} maxFileMb={limits.max_file_mb} onFiles={handleFiles} />
+        </main>
+      ) : (
+        <main className={`shell${wide ? " shell--wide" : ""}`}>
+          <Library
+            docs={all}
+            loading={docs === null}
+            uploads={uploads}
+            selectedId={selected?.id ?? null}
+            busy={busy}
+            maxFileMb={limits.max_file_mb}
+            onFiles={handleFiles}
+            onSelect={(d) => setSelectedId(d.id)}
+            onOpen={openDocument}
+            onDelete={remove}
+            onDetails={setDetailsDoc}
+            onDismissUpload={(id) => setUpload(id, null)}
+            onClearAll={clearAll}
+          />
+          {selected ? (
+            <Chat key={selected.id} doc={selected} llm={health?.llm} onOpen={openCitation}
+                  onOpenDocument={() => openDocument(selected)} />
+          ) : (
+            <section className="conversation conversation--waiting">
+              <div className="conversation__empty">
+                <p className="conversation__lead">Reading your documents…</p>
+                <p>You can ask questions as soon as a document is ready. Scanned pages take longer.</p>
+              </div>
+            </section>
+          )}
+          {wide && (
+            <aside className="evidence" aria-label="Cited page">
+              {viewer ? (
+                <PdfViewer target={viewer} onClose={() => setViewer(null)} inline />
+              ) : (
+                <div className="evidence__empty">
+                  <span className="stamp evidence__stamp" aria-hidden>
+                    p. 4
+                  </span>
+                  <p className="evidence__title">The cited page opens here</p>
+                  <p>Click a page chip in an answer to see the original page with the passage highlighted.</p>
+                </div>
+              )}
+            </aside>
+          )}
+        </main>
       )}
 
-      {askable.length > 0 && <Chat docs={askable} llm={health?.llm} onOpen={openCitation} />}
-      {viewer && <PdfViewer target={viewer} onClose={() => setViewer(null)} />}
-    </>
-  );
-}
-
-function Pending({ item, onDismiss }: { item: UploadItem; onDismiss: () => void }) {
-  return (
-    <div className="pending">
-      <div className="stamp stamp--ghost" aria-hidden>
-        {item.state === "error" ? "!" : "···"}
-      </div>
-      <div className="pending__body">
-        <p className="filename" title={item.name}>
-          {item.name}
-        </p>
-        <p className="meta">{formatBytes(item.size)}</p>
-        {item.state === "queued" && <p className="meta">Waiting to upload…</p>}
-        {item.state === "uploading" && (
-          <>
-            <div className="bar bar--progress" aria-label={`Uploading ${percent(item.progress)}`}>
-              <span style={{ width: percent(item.progress) }} />
-            </div>
-            <p className="meta">Uploading {percent(item.progress)}</p>
-          </>
-        )}
-        {item.state === "analysing" && (
-          <>
-            <div className="bar bar--indeterminate" aria-label="Analysing">
-              <span />
-            </div>
-            <p className="meta">Checking the file type…</p>
-          </>
-        )}
-        {item.state === "error" && (
-          <>
-            <p className="error">{item.message}</p>
-            <button type="button" className="btn-text" onClick={onDismiss}>
-              Dismiss
-            </button>
-          </>
-        )}
-      </div>
+      {viewer && !wide && <PdfViewer target={viewer} onClose={() => setViewer(null)} />}
+      {detailsDoc && <DocDetails doc={detailsDoc} onClose={() => setDetailsDoc(null)} onReindex={() => reindex(detailsDoc)} />}
     </div>
   );
 }

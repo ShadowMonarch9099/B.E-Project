@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Hind, IBM_Plex_Mono, Mukta } from "next/font/google";
 import "./globals.css";
+import "./shell.css";
 
 // The Sakshya artifact's typefaces: Mukta (display) and Hind (body) both cover
 // Devanagari; IBM Plex Mono for data.

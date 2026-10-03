@@ -42,6 +42,12 @@ export async function deleteDocument(id: string): Promise<void> {
   if (!res.ok && res.status !== 404) throw await readError(res, "Could not delete the document");
 }
 
+export async function clearAllDocuments(): Promise<number> {
+  const res = await fetch("/api/documents", { method: "DELETE" });
+  if (!res.ok) throw await readError(res, "Could not clear the documents");
+  return (await res.json()).deleted;
+}
+
 export async function reindexDocument(id: string): Promise<DocSummary> {
   const res = await fetch(`/api/documents/${id}/reindex`, { method: "POST" });
   if (!res.ok) throw await readError(res, "Could not re-index the document");

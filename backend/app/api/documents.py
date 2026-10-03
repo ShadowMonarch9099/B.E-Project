@@ -165,6 +165,20 @@ def reindex(doc_id: str, background: BackgroundTasks, s: Session = Depends(get_s
     return summary(doc)
 
 
+@router.delete("", dependencies=[Depends(require_db)])
+def delete_all_documents(s: Session = Depends(get_session)) -> dict:
+    """Clear all: delete every document with its pages, passages, conversations and files.
+    Documents still queued for ingestion are skipped by the worker once their row is gone."""
+    docs = s.scalars(select(Document)).all()
+    ids = [d.id for d in docs]
+    for doc in docs:
+        s.delete(doc)
+    s.commit()
+    for doc_id in ids:
+        storage.remove(doc_id)
+    return {"deleted": len(ids)}
+
+
 @router.delete("/{doc_id}", status_code=204, dependencies=[Depends(require_db)])
 def delete_document(doc_id: str, s: Session = Depends(get_session)) -> None:
     doc = _get(s, doc_id)

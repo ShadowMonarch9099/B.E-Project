@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { fileUrl, getPages } from "@/lib/api";
+import { useDetails } from "@/lib/details";
 import { percent } from "@/lib/format";
 import type { PDFDocumentProxy, RenderTask } from "pdfjs-dist";
 
@@ -226,16 +227,28 @@ function ParagraphView({ target }: { target: ViewerTarget }) {
   );
 }
 
-export default function PdfViewer({ target, onClose }: { target: ViewerTarget; onClose: () => void }) {
+// The page with the passage highlighted. `inline`: inside the evidence pane of the wide
+// layout; otherwise a dialog over the page (narrow screens), with focus kept inside it.
+export default function PdfViewer({ target, onClose, inline = false }: { target: ViewerTarget; onClose: () => void; inline?: boolean }) {
   const panelRef = useRef<HTMLDivElement>(null);
   const returnFocus = useRef<Element | null>(null);
 
   // Move focus into the dialog, and back to what opened it on close.
   useEffect(() => {
+    if (inline) return;
     returnFocus.current = document.activeElement;
     panelRef.current?.focus();
     return () => (returnFocus.current as HTMLElement | null)?.focus?.();
-  }, []);
+  }, [inline]);
+
+  if (inline) {
+    return (
+      <section className="viewer__panel viewer__panel--inline" aria-label={`${target.filename}, ${target.label}`}
+               onKeyDown={(e) => e.key === "Escape" && onClose()}>
+        <ViewerBody target={target} onClose={onClose} />
+      </section>
+    );
+  }
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Escape") {
@@ -270,6 +283,16 @@ export default function PdfViewer({ target, onClose }: { target: ViewerTarget; o
         aria-label={`${target.filename}, ${target.label}`}
         tabIndex={-1}
       >
+        <ViewerBody target={target} onClose={onClose} />
+      </div>
+    </div>
+  );
+}
+
+function ViewerBody({ target, onClose }: { target: ViewerTarget; onClose: () => void }) {
+  const { on: details } = useDetails();
+  return (
+    <>
         <header className="viewer__head">
           <div className="viewer__title">
             <span className="stamp viewer__stamp" aria-hidden>
@@ -294,7 +317,7 @@ export default function PdfViewer({ target, onClose }: { target: ViewerTarget; o
           <p className="viewer__check">
             <span className="check-badge">Check the page</span>
             This page was read from a scan
-            {target.ocrConf != null && ` (OCR confidence ${percent(target.ocrConf)})`}: compare names and figures with
+            {details && target.ocrConf != null && ` (OCR confidence ${percent(target.ocrConf)})`}: compare names and figures with
             the image.
           </p>
         )}
@@ -308,7 +331,6 @@ export default function PdfViewer({ target, onClose }: { target: ViewerTarget; o
         ) : (
           <PdfPage target={target} />
         )}
-      </div>
-    </div>
+    </>
   );
 }

@@ -53,6 +53,11 @@ WEIGHTS = {"dense": 1.0, "word": 1.0, "char": 0.6, "exact": 0.8, "translate": 1.
 # 0.171-1.000, unanswerable 0.002-0.401. tau = 0.15 answers 14/14 and abstains on 9/10.
 # A small sample; to be re-chosen from the risk-coverage curve on the Sakshya-Bench dev split.
 GATE_TAU = float(os.environ.get("SAKSHYA_GATE_TAU", "0.15"))
+# A document small enough that all of it goes to the answer model (at most TOP_N passages) is
+# not gated: the reranker scores broad questions low ("are there any technical skills in this
+# resume?" scored 0.012 against the passage listing them), and with the whole document in view
+# the model can say it does not cover the question; the citation check still applies.
+SMALL_DOC_CHUNKS = int(os.environ.get("SAKSHYA_SMALL_DOC_CHUNKS", str(TOP_N)))
 NEAREST_PAGES = 3
 
 
@@ -245,6 +250,15 @@ def _ocr_of(ids: list[int]) -> dict[int, float | None]:
         return dict(s.execute(select(Chunk.id, Chunk.ocr_conf).where(Chunk.id.in_(ids))).all())
 
 
+def _chunk_count(doc_ids: list[str]) -> int:
+    from sqlalchemy import func, select
+
+    from ..db import Chunk, session_scope
+
+    with session_scope() as s:
+        return s.scalar(select(func.count(Chunk.id)).where(Chunk.doc_id.in_(doc_ids))) or 0
+
+
 def all_lists(analysis: QueryAnalysis, doc_ids: list[str] | None, k: int, timings: dict) -> dict:
     """Every first-stage list, computed once: dense, word, char, exact, translate."""
     lists = first_stage(analysis, doc_ids, "hybrid", k, timings)
@@ -329,6 +343,9 @@ def _retrieve(question: str, doc_ids: list[str] | None, route: str | None = "hyb
     timings["rerank"] = (time.perf_counter() - t) * 1000
     top = candidates[:n]
     gate = evidence_gate(top, tau)
+    if not gate.passed and top and doc_ids and _chunk_count(doc_ids) <= min(n, SMALL_DOC_CHUNKS):
+        gate = GateDecision(True, gate.score, tau, f"the whole document ({len(top)} passages) goes to the answer "
+                                                   "model, which says if it does not cover the question")
     timings["retrieval_total"] = (time.perf_counter() - t0) * 1000
     r = Retrieval(question, analysis.normalized, route, lists, candidates, top, gate, chunks,
                   {key: round(v, 1) for key, v in timings.items()}, analysis)

@@ -2,26 +2,31 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { askQuestion, createConversation, latestConversation } from "@/lib/api";
-import type { ChatMessage, Conversation, LlmStatus } from "@/lib/types";
-import AskBar, { type AskableDoc } from "./AskBar";
+import type { ChatMessage, Conversation, DocSummary, LlmStatus } from "@/lib/types";
+import AskBar from "./AskBar";
 import Thread, { type OpenCitation, type PendingAnswer } from "./Thread";
 
-// The conversation about one document: the thread between the analysis and the fixed ask
-// bar. Picking another document in the ask bar opens that document's latest conversation.
-export default function Chat({ docs, llm, onOpen }: { docs: AskableDoc[]; llm?: LlmStatus; onOpen: OpenCitation }) {
-  const [picked, setPicked] = useState<string | null>(null);
+// The conversation about the selected document: its latest thread, then the ask bar.
+export default function Chat({
+  doc,
+  llm,
+  onOpen,
+  onOpenDocument,
+}: {
+  doc: DocSummary;
+  llm?: LlmStatus;
+  onOpen: OpenCitation;
+  onOpenDocument: () => void;
+}) {
   const [conv, setConv] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [pending, setPending] = useState<PendingAnswer | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const endRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
-
-  const doc = docs.find((d) => d.id === picked) ?? docs[0];
-  const docId = doc?.id;
+  const docId = doc.id;
 
   useEffect(() => {
-    if (!docId) return;
     let live = true;
     setConv(null);
     setMessages([]);
@@ -38,13 +43,15 @@ export default function Chat({ docs, llm, onOpen }: { docs: AskableDoc[]; llm?: 
     };
   }, [docId]);
 
+  // Keep the newest message in view.
   useEffect(() => {
-    if (pending || messages.length) endRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    const el = scrollRef.current;
+    if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
   }, [messages.length, pending?.text.length, pending]);
 
   const ask = useCallback(
     async (question: string) => {
-      if (!docId || pending) return false;
+      if (pending) return false;
       setError(null);
       setPending({ question, stage: "retrieving", text: "", showQuestion: true });
       try {
@@ -90,32 +97,53 @@ export default function Chat({ docs, llm, onOpen }: { docs: AskableDoc[]; llm?: 
     setError(null);
   };
 
-  if (!doc) return null;
+  const pages = doc.anchor === "paragraph" ? "Word document" : doc.page_count ? `${doc.page_count} pages` : "";
   return (
-    <>
-      <section className="chat" aria-label="Conversation">
-        <div className="results__head">
-          <h2>
-            Questions <span className="count">{doc.name}</span>
-          </h2>
+    <section className="conversation" aria-label="Conversation">
+      <header className="conversation__head">
+        <div className="conversation__title">
+          <span className="stamp docrow__stamp" aria-hidden>
+            {doc.stamp}
+          </span>
+          <div>
+            <h2 className="conversation__name" title={doc.filename}>
+              {doc.filename}
+            </h2>
+            {pages && <p className="conversation__meta">{pages}</p>}
+          </div>
+        </div>
+        <div className="conversation__actions">
+          {(doc.has_viewer || doc.anchor === "paragraph") && (
+            <button type="button" className="btn-text" onClick={onOpenDocument}>
+              View document
+            </button>
+          )}
           {messages.length > 0 && !pending && (
             <button type="button" className="btn-text" onClick={newConversation}>
               New conversation
             </button>
           )}
         </div>
+      </header>
+
+      <div className="conversation__scroll" ref={scrollRef}>
         {messages.length === 0 && !pending && !error ? (
-          <p className="chat__empty">
-            Ask about this document in English, हिंदी, मराठी or romanized. Every sentence of an answer cites
-            the page it comes from; when the document does not say, Sakshya abstains and shows the nearest
-            pages.
-          </p>
+          <div className="conversation__empty">
+            <p className="conversation__lead">Ask anything about this document.</p>
+            <p>
+              Every sentence of the answer links to the page it comes from. If the document does not say,
+              Sakshya tells you so and shows the closest pages.
+            </p>
+            <p className="conversation__try">
+              Specific questions work best: amounts, dates, names, survey or GR numbers, eligibility, who must do what.
+            </p>
+          </div>
         ) : (
           <Thread messages={messages} pending={pending} error={error} onOpen={onOpen} onRetry={ask} />
         )}
-        <div ref={endRef} className="chat__end" />
-      </section>
-      <AskBar docs={docs} selectedId={doc.id} onSelect={setPicked} onAsk={ask} busy={pending !== null} llm={llm} />
-    </>
+      </div>
+
+      <AskBar onAsk={ask} busy={pending !== null} llm={llm} />
+    </section>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useDetails } from "@/lib/details";
 import { LANG_NAME, percent } from "@/lib/format";
 import type { AbstainPayload, AnswerPayload, ChatMessage, Citation, ErrorPayload, NearestPage } from "@/lib/types";
 import WhyRoute from "./WhyRoute";
@@ -25,6 +26,7 @@ function chipLabel(c: Citation): string {
 // Stamp-style chips after a cited sentence; a dashed "check" mark when the page's OCR
 // confidence is low (plan N3).
 export function CiteChips({ citations, onOpen }: { citations: Citation[]; onOpen: OpenCitation }) {
+  const { on: details } = useDetails();
   const seen = new Set<string>();
   const unique = citations.filter((c) => {
     const k = chipKey(c);
@@ -40,7 +42,11 @@ export function CiteChips({ citations, onOpen }: { citations: Citation[]; onOpen
           type="button"
           className={`cite-chip${c.check_page ? " cite-chip--check" : ""}`}
           title={`${c.filename} · ${chipLabel(c)}${
-            c.check_page ? ` · scanned page, OCR confidence ${c.ocr_conf !== null ? percent(c.ocr_conf) : "low"}: check the page` : ""
+            c.check_page
+              ? details
+                ? ` · scanned page, OCR confidence ${c.ocr_conf !== null ? percent(c.ocr_conf) : "low"}: check the page`
+                : " · scanned page: check the figures on it"
+              : ""
           }${c.cited_text ? `\n“${c.cited_text.slice(0, 160)}”` : ""}`}
           onClick={() => onOpen(c)}
         >
@@ -91,6 +97,7 @@ function Answer({ payload, onOpen }: { payload: AnswerPayload; onOpen: OpenCitat
   // Answers stored before verification existed have segments instead of sentences.
   const parts = payload.sentences ?? (payload.segments ?? []).map((g) => ({ ...g, devanagari: null, original: null }));
   const hasDeva = parts.some((x) => x.devanagari);
+  const { on: details } = useDetails();
   const note = fidelityNote(payload);
   const removed = payload.removed ?? [];
   return (
@@ -109,18 +116,18 @@ function Answer({ payload, onOpen }: { payload: AnswerPayload; onOpen: OpenCitat
           {devanagari ? "Show as typed (Latin)" : "Show in Devanagari"}
         </button>
       )}
-      {note && <p className="msg-note">{note}</p>}
+      {details && note && <p className="msg-note">{note}</p>}
       {payload.status === "cut_short" && <p className="msg-note">The answer was cut short before it finished.</p>}
-      {(payload.verification?.numbers_fixed?.length ?? 0) > 0 && (
+      {details && (payload.verification?.numbers_fixed?.length ?? 0) > 0 && (
         <p className="msg-note">
           {payload.verification!.numbers_fixed!.map(([was, now]) => `“${was}” → “${now}”`).join(", ")}: figures rewritten exactly as
           the cited page has them.
         </p>
       )}
-      {payload.fallback_used && (
+      {details && payload.fallback_used && (
         <p className="msg-note">Answered by {payload.model ?? "a fallback model"} because the first answer model could not answer.</p>
       )}
-      {removed.length > 0 && (
+      {details && removed.length > 0 && (
         <details className="removed">
           <summary>
             {removed.length} {removed.length === 1 ? "sentence" : "sentences"} removed: not supported by a cited passage
@@ -140,6 +147,7 @@ function Answer({ payload, onOpen }: { payload: AnswerPayload; onOpen: OpenCitat
 }
 
 function AssistantMessage({ m, onOpen, onRetry }: { m: ChatMessage; onOpen: OpenCitation; onRetry?: () => void }) {
+  const { on: details } = useDetails();
   const p = m.payload as AnswerPayload | AbstainPayload | ErrorPayload;
   if (m.status === "abstained" && p.kind === "abstain") {
     return (
@@ -147,14 +155,20 @@ function AssistantMessage({ m, onOpen, onRetry }: { m: ChatMessage; onOpen: Open
         <span className="stamp stamp--abstain" aria-hidden>
           Not found
         </span>
-        <p className="answer-text">{m.content}</p>
-        <p className="msg-note">
+        <p className="answer-text">
           {p.unsupported
-            ? `The answer model replied, but its answer was withheld: ${p.reason}`
-            : `Sakshya did not call the answer model: ${p.reason}.`}
+            ? "The answer could not be backed by the pages, so it is not shown. These pages came closest:"
+            : "This document does not seem to answer that. These pages came closest:"}
         </p>
+        {details && (
+          <p className="msg-note">
+            {p.unsupported
+              ? `The answer model replied, but its answer was withheld: ${p.reason}`
+              : `Sakshya did not call the answer model: ${p.reason}.`}
+          </p>
+        )}
         <NearestList pages={p.nearest} onOpen={onOpen} />
-        {p.routing && <WhyRoute routing={p.routing} />}
+        {details && p.routing && <WhyRoute routing={p.routing} />}
       </div>
     );
   }
@@ -173,7 +187,7 @@ function AssistantMessage({ m, onOpen, onRetry }: { m: ChatMessage; onOpen: Open
             <NearestList pages={p.nearest} onOpen={onOpen} />
           </>
         )}
-        {p.routing && <WhyRoute routing={p.routing} />}
+        {details && p.routing && <WhyRoute routing={p.routing} />}
       </div>
     );
   }
@@ -187,7 +201,7 @@ function AssistantMessage({ m, onOpen, onRetry }: { m: ChatMessage; onOpen: Open
   return (
     <div className="msg msg--assistant">
       {p.kind === "answer" ? <Answer payload={p} onOpen={onOpen} /> : <p className="answer-text">{m.content}</p>}
-      {p.kind === "answer" && p.routing && <WhyRoute routing={p.routing} />}
+      {details && p.kind === "answer" && p.routing && <WhyRoute routing={p.routing} />}
     </div>
   );
 }

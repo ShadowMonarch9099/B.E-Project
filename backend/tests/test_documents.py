@@ -211,3 +211,19 @@ def test_the_english_index_waits_until_ingestion_is_idle(monkeypatch):
     assert not built.is_set()  # ingestion first
     busy.unfinished_tasks = 0
     assert built.wait(5)
+
+
+def test_clear_all_deletes_every_document():
+    from fastapi.testclient import TestClient
+
+    from app.main import app
+    from tests.helpers import native_pdf
+
+    with TestClient(app) as c:
+        for i in range(2):
+            pdf = native_pdf([f"Circular number {i} about the hostel fee. " * 5])
+            assert c.post("/api/documents", files={"file": (f"clear_{i}.pdf", pdf, "application/pdf")}).status_code in (200, 201)
+        assert len(c.get("/api/documents").json()["documents"]) >= 2
+        r = c.delete("/api/documents")
+        assert r.status_code == 200 and r.json()["deleted"] >= 2
+        assert c.get("/api/documents").json()["documents"] == []

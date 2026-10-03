@@ -202,7 +202,10 @@ def test_answer_streams_with_page_citations_and_is_logged(client, doc_id, fake):
         assert row.route == "hybrid" and row.candidates["candidates"] and row.latency_ms["total"] > 0
 
 
-def test_off_topic_question_abstains_without_calling_the_model(client, doc_id, fake):
+def test_off_topic_question_abstains_without_calling_the_model(client, doc_id, fake, monkeypatch):
+    import app.retrieval.hybrid as hybrid
+
+    monkeypatch.setattr(hybrid, "SMALL_DOC_CHUNKS", 0)  # as for a document larger than the 6 passages sent
     conv = client.post("/api/conversations", json={"doc_id": doc_id}).json()
     events = ask(client, conv["id"], "Who won the cricket world cup in 2011?")
     answer = dict(events)["answer"]
@@ -265,3 +268,12 @@ def test_live_claude_answer_has_citations():
     assert result.status == "complete"
     assert any(c.chunk_id == 1 for s in result.segments for c in s.citations)
     assert "three lakh" in result.text.lower() or "3" in result.text
+
+
+def test_a_small_document_goes_to_the_model_whole(client, doc_id, fake):
+    """All of a small document fits in the passages sent, so the gate does not stop the question;
+    the model decides, and the citation check still applies."""
+    conv = client.post("/api/conversations", json={"doc_id": doc_id}).json()
+    events = dict(ask(client, conv["id"], "Who won the cricket world cup in 2011?"))
+    assert fake.requests and fake.requests[-1].question.startswith("Who won")
+    assert "whole document" in events["retrieval"]["gate"]["reason"]
