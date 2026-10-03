@@ -16,11 +16,13 @@ from sqlalchemy import delete, select
 
 from .. import storage
 from ..catalog import OCR_IMAGE_LABELS
-from ..db import Document, Page, session_scope
+from ..db import Chunk, Document, Page, session_scope
 from ..db.models import utcnow
 from ..inspect_file import script_mix
 from ..ocr import engine_status
-from . import docx_convert
+from . import docx_convert, tokens
+from .chunking import chunk_page
+from .normalize import normalize, script_of
 from .pages import ExtractedPage, docx_paragraphs, extract_pdf, image_to_pdf
 
 log = logging.getLogger("sakshya.ingest")
@@ -94,8 +96,32 @@ def _page_row(doc_id: str, page: ExtractedPage) -> Page:
     text, layout = page.build()
     return Page(doc_id=doc_id, page_no=page.page_no, source=page.source, ocr_reason=page.ocr_reason,
                 ocr_conf=page.ocr_conf, check_reason=page.check_reason, width=page.width,
-                height=page.height, text_raw=text, text_norm=text, layout=layout,
-                word_count=sum(len(line) for para in layout for line in para))
+                height=page.height, text_raw=text, text_norm=normalize(text), layout=layout,
+                word_count=sum(len(line) for para in layout for line in para), script=script_of(text))
+
+
+def _chunk_document(doc_id: str) -> int:
+    """Split every stored page into page-anchored chunks (plan section 6.2 steps 5-7)."""
+    with session_scope() as s:
+        pages = s.scalars(select(Page).where(Page.doc_id == doc_id).order_by(Page.page_no)).all()
+        s.expunge_all()
+    _update(doc_id, stage="chunking", progress_done=0, progress_total=len(pages))
+    seq = 0
+    for i, page in enumerate(pages, start=1):
+        drafts = chunk_page(page.page_no, page.text_raw, page.layout or [])
+        with session_scope() as s:
+            row = s.get(Document, doc_id)
+            if row is None:
+                raise Cancelled()
+            for d in drafts:
+                s.add(Chunk(doc_id=doc_id, page_id=page.id, page_no=page.page_no, para_idx=d.para_idx,
+                            chunk_idx=d.chunk_idx, seq=seq, char_start=d.char_start, char_end=d.char_end,
+                            bbox=d.bbox, text_raw=d.text_raw, text_norm=normalize(d.text_raw),
+                            script=script_of(d.text_raw), source=page.source,
+                            ocr_conf=d.ocr_conf if page.source == "ocr" else None, token_count=d.token_count))
+                seq += 1
+            row.progress_done = i
+    return seq
 
 
 def _page_stats(doc_id: str) -> dict:
@@ -153,4 +179,6 @@ def _ingest(doc_id: str) -> None:
             row.progress_done = done
             row.stage = "ocr" if page.source == "ocr" else "reading"
 
-    _update(doc_id, status="indexed", stage=None, indexed_at=utcnow(), notes=notes, stats=_page_stats(doc_id))
+    chunks = _chunk_document(doc_id)
+    stats = {**_page_stats(doc_id), "chunks": chunks, "tokenizer": tokens.tokenizer_name()}
+    _update(doc_id, status="indexed", stage=None, indexed_at=utcnow(), notes=notes, stats=stats)

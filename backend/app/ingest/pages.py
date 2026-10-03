@@ -76,6 +76,7 @@ def native_page(page, page_no: int, source: str = "native") -> ExtractedPage:
     import pymupdf
 
     rotate = page.rotation_matrix if page.rotation else None
+    width, height = page.rect.width, page.rect.height
     paragraphs: list[list[list[dict]]] = []
     last_block = last_line = None
     for x0, y0, x1, y1, text, block, line, _ in page.get_text("words"):
@@ -84,6 +85,10 @@ def native_page(page, page_no: int, source: str = "native") -> ExtractedPage:
         if rotate is not None:  # text coordinates are unrotated; the viewer shows the rotated page
             r = pymupdf.Rect(x0, y0, x1, y1) * rotate
             x0, y0, x1, y1 = r.x0, r.y0, r.x1, r.y1
+        # Clip to the page: text placed beyond its edge is not visible in the viewer either.
+        x0, y0, x1, y1 = max(0.0, x0), max(0.0, y0), min(width, x1), min(height, y1)
+        if x1 <= x0 or y1 <= y0:
+            continue
         word = {"t": text, "b": _round_box(x0, y0, x1, y1), "c": None}
         if block != last_block:
             paragraphs.append([[word]])

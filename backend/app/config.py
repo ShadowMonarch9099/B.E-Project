@@ -13,6 +13,8 @@ from dotenv import load_dotenv
 BACKEND_DIR = Path(__file__).resolve().parent.parent
 REPO_DIR = BACKEND_DIR.parent
 load_dotenv(BACKEND_DIR / ".env", override=False)
+# Windows without Developer Mode cannot symlink; the Hugging Face cache still works, so don't nag.
+os.environ.setdefault("HF_HUB_DISABLE_SYMLINKS_WARNING", "1")
 
 
 def _int(name: str, default: int) -> int:
