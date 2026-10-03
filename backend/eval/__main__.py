@@ -121,7 +121,18 @@ def cmd_noise(args) -> None:
     with session_scope() as s:
         rows = s.execute(select(Chunk.doc_id, Chunk.page_no, Chunk.text_norm)
                          .where(Chunk.doc_id.in_({i["doc_id"] for i in items})).order_by(Chunk.id)).all()
-    chunks = [{"doc_id": r.doc_id, "page_no": r.page_no, "text": r.text_norm} for r in rows][:args.max_chunks]
+    # Cap the work by whole documents (smallest first), never by cutting a document's chunks:
+    # a question whose page was cut off could not be found at any noise level.
+    per_doc: dict[str, list] = {}
+    for r in rows:
+        per_doc.setdefault(r.doc_id, []).append({"doc_id": r.doc_id, "page_no": r.page_no, "text": r.text_norm})
+    chunks, kept = [], set()
+    for doc_id in sorted(per_doc, key=lambda d: len(per_doc[d])):
+        if chunks and len(chunks) + len(per_doc[doc_id]) > args.max_chunks:
+            continue
+        chunks.extend(per_doc[doc_id])
+        kept.add(doc_id)
+    items = [i for i in items if i["doc_id"] in kept]
     analyses = {i["question"]: analyse_query(i["question"]) for i in items}
     levels = [float(x) for x in args.levels.split(",")]
     print(f"{len(items)} questions over {len(chunks)} chunks; CER levels {levels}")
