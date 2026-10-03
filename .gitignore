@@ -25,3 +25,6 @@ data/raw/
 
 # Sakshya runtime data: uploaded originals, model caches, indexes (never commit)
 /data/
+
+# Evaluation runs (each is reproducible from its command; chosen reports are copied to docs/results/)
+backend/eval/results/

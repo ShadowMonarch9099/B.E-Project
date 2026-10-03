@@ -83,6 +83,30 @@ cd backend
 
 The same data is available over HTTP: `POST/GET /api/bench/questions`, `POST /api/bench/questions/{id}/verify`, `GET /api/bench/second?annotator=…`, `POST /api/bench/questions/{id}/second`, `GET /api/bench/stats`, `GET /api/bench/export` (JSONL) and `GET /api/bench/manifest`.
 
+### Evaluation harness (plan §9)
+
+`backend/eval/` measures everything in plan §9 that can be measured without people, and writes a report in which every table names its split, its number of questions and the command that produced it:
+
+```bash
+cd backend
+.venv/bin/python -m eval run --split dev               # retrieval: RQ1 routes, baselines, ablations, abstention
+.venv/bin/python -m eval tau eval/results/<run>.json   # re-choose τ from the dev risk–coverage curve
+.venv/bin/python -m eval noise --split dev             # Recall@20 under synthetic OCR noise, 5–30% CER
+.venv/bin/python -m eval cost --split dev              # what an answer run would send, in tokens (and US$ with prices set)
+.venv/bin/python -m eval answers --split dev --yes     # answer-level metrics; calls the answer model
+.venv/bin/python -m eval known-item --n 100            # sanity check only (see below)
+```
+
+- **Retrieval** (no API calls): Recall@5/20, MRR@10 and nDCG@10 at page level, per question language, document type (native/scanned), slice and question type; the oracle bound (best route per question); the router's choices; p50/p95 latency per stage and peak RAM. Reranker and query-embedding scores are cached across systems, so latencies come from the first system run on each question.
+- **Systems**: Sakshya (router), each fixed route with the full stack (§9.2 baseline 4), vanilla dense E5 without reranker or gate (baseline 1), translate-only (2), hybrid without reranker or gate (3), and the ablations −transliteration, −digit normalization (question side), −OCR-aware weighting, −reranker, −gate (§9.3). Answer-level ablations (NLI, script repair) run through `answers`; E5-large needs the collection re-embedded with `SAKSHYA_EMBED_MODEL`.
+- **Comparisons** use paired bootstrap intervals (1,000 resamples over questions); a difference is marked real only when its 95% interval excludes zero.
+- **Abstention and risk–coverage**: abstention precision/recall, AURC and the curve (SVG); `tau` picks the lowest threshold whose risk stays under a target on the dev split, and refuses the test split.
+- **The test split** can only be evaluated once the splits are frozen (`python -m app.bench freeze`).
+- **Answers** (`answers`) go through the app's real answer path and report page-level citation precision/recall, answer-level abstention, the share of sentences the verifier removed, language and script match before repair, tokens, provider and latency, and write a CSV sheet for the human ratings (correctness on a 3-point scale, fluency, unsupported sentences). It prints the estimate first and sends nothing without `--yes`; set `SAKSHYA_PRICE_IN` / `SAKSHYA_PRICE_OUT` (US$ per million tokens) for a cost, and `--pause` to stay under free-tier rate limits.
+- **Known-item** queries (a sentence copied from a page must find that page; `--translate` machine-translates it to English) are an automatic **sanity check of the harness and indexes, not a result**: they are not questions a person asked, and copied sentences favour lexical matching. Their reports say so at the top.
+
+Results go to `backend/eval/results/` (gitignored); reports quoted in the project are copied to `docs/results/` with their command.
+
 **How τ was chosen (a starting value, not a result).** `backend/tools/gate_probe.py` runs 24 hand-written questions over two of the sample GRs (`backend/tools/gate_probe_questions.json`). With the question as typed only (phase 4), the 14 answerable questions' best reranker scores were 0.077–1.000 and the 10 unanswerable ones' 0.002–0.063. With the phase 6 views, romanized answerable questions rose sharply ("RUSA yojanet kendra ani rajya hissa kiti aahe?" 0.077 → 0.992, "Model Degree College Hingoli la kiti anudan milale?" 0.586 → 0.984), but so did some romanized off-topic ones: "RUSA 3.0 madhe kiti nidhi aahe?" (the GR covers RUSA 1.0 and 2.0) went from 0.063 to 0.401. Answerable now span 0.171–1.000 and unanswerable 0.002–0.401, so no threshold separates them; τ = 0.15 answers 14 of 14 and abstains on 9 of 10, and the near-miss is left to the answer model's "the documents do not say" rule. τ will be re-chosen from the risk–coverage curve on the Sakshya-Bench dev split.
 
 **API keys.** Copy `backend/.env.example` to `backend/.env` and set any of `GROQ_API_KEY`, `OPENROUTER_API_KEY`, `NVIDIA_API_KEY` (or `ANTHROPIC_API_KEY`), then restart the backend. `cd backend && .venv/bin/python -m app.llm models` lists the models each key can use and says whether the configured model is among them (it bills nothing). `backend/.env` is gitignored; keys are read on the server and never sent to the browser or logged. Without a key everything else works (upload, OCR, search, abstention, the viewer), and an answered question explains how to add one. **Privacy:** for each question that passes the evidence gate, the question and its top 6 passages are sent to the provider that answers it, which the ask bar names (decision log, `docs/Review2_Plan.md` §16); nothing else leaves the machine.

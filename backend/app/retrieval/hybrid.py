@@ -213,8 +213,10 @@ def first_stage(analysis: QueryAnalysis, doc_ids: list[str] | None, route: str =
     return lists
 
 
-def rerank(question_views: list[str], candidates: list[Candidate], chunks: dict[int, ChunkInfo]) -> None:
-    """Score every candidate with the cross-encoder; keep the best score over the views."""
+def rerank(question_views: list[str], candidates: list[Candidate], chunks: dict[int, ChunkInfo],
+           reorder: bool = True) -> None:
+    """Score every candidate with the cross-encoder; keep the best score over the views.
+    reorder=False keeps the fused order (the no-reranker baselines and ablation)."""
     if not candidates:
         return
     passages = [chunks[c.chunk_id].text for c in candidates]
@@ -224,7 +226,8 @@ def rerank(question_views: list[str], candidates: list[Candidate], chunks: dict[
             best[i] = max(best[i], score)
     for c, score in zip(candidates, best):
         c.rerank = score
-    candidates.sort(key=lambda c: -(c.rerank or 0.0))
+    if reorder:
+        candidates.sort(key=lambda c: -(c.rerank or 0.0))
 
 
 ROUTE_LISTS = {"direct": ("dense",), "translate": ("translate",), "hybrid": ("dense", "word", "char", "exact")}
@@ -261,9 +264,11 @@ def route_lists(lists: dict, route: str, timings: dict | None = None) -> dict:
 def retrieve(question: str, doc_ids: list[str] | None, route: str | None = "hybrid", k: int = TOP_K,
              n: int = TOP_N, tau: float = GATE_TAU, weights: dict[str, float] | None = None,
              analysis: QueryAnalysis | None = None, options: AnalysisOptions | None = None,
-             probe: bool = True, ocr_aware: bool | None = None) -> Retrieval:
+             probe: bool = True, ocr_aware: bool | None = None, use_reranker: bool = True) -> Retrieval:
     """Retrieve for one question. route=None lets the router choose; probe=False skips the
-    per-route probe (cheaper; used by evaluations of a fixed route)."""
+    per-route probe (cheaper; used by evaluations of a fixed route). use_reranker=False keeps
+    the fused order and scores only the top n with the cross-encoder, for the gate (the
+    no-reranker baselines and ablation, plan sections 9.2 and 9.3)."""
     if route is not None and route not in ROUTES:
         raise ValueError(f"unknown route {route}")
     weights = weights or WEIGHTS
@@ -309,7 +314,10 @@ def retrieve(question: str, doc_ids: list[str] | None, route: str | None = "hybr
     candidates = [c for c in candidates if c.chunk_id in chunks]
 
     t = time.perf_counter()
-    rerank(rerank_views, candidates, chunks)
+    if use_reranker:
+        rerank(rerank_views, candidates, chunks)
+    else:
+        rerank(rerank_views, candidates[:n], chunks, reorder=False)
     timings["rerank"] = (time.perf_counter() - t) * 1000
     top = candidates[:n]
     gate = evidence_gate(top, tau)
