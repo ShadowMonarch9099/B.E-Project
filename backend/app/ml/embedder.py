@@ -14,9 +14,10 @@ import hashlib
 import logging
 import os
 import threading
-from functools import lru_cache
 
 import numpy as np
+
+from .loading import load_once
 
 log = logging.getLogger("sakshya.embedder")
 
@@ -81,7 +82,7 @@ class HashEmbedder:
     embed_queries = embed_passages
 
 
-@lru_cache(maxsize=1)
+@load_once
 def get_embedder():
     kind = os.environ.get("SAKSHYA_EMBEDDER", "e5")
     if kind == "hash":

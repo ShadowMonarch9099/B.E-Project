@@ -13,7 +13,8 @@ import math
 import os
 import re
 import threading
-from functools import lru_cache
+
+from .loading import load_once
 
 log = logging.getLogger("sakshya.reranker")
 
@@ -65,7 +66,7 @@ class OverlapReranker:
         return out
 
 
-@lru_cache(maxsize=1)
+@load_once
 def get_reranker():
     if os.environ.get("SAKSHYA_RERANKER", "cross-encoder") == "overlap":
         return OverlapReranker()

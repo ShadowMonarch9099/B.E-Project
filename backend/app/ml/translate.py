@@ -18,9 +18,10 @@ import logging
 import os
 import re
 import threading
-from functools import lru_cache
 
 from .. import config
+
+from .loading import load_once
 
 log = logging.getLogger("sakshya.translate")
 
@@ -36,8 +37,13 @@ _SENT = re.compile(r"(?<=[.?!।॥])\s+")
 
 
 def split_sentences(text: str) -> list[str]:
-    parts = [p.strip() for line in text.splitlines() for p in _SENT.split(line)]
-    return [p for p in parts if p]
+    """Sentences, for translation. Paragraphs are split at blank lines and their lines joined
+    first: an OCR'd or PDF line is usually a piece of a sentence, not a whole one."""
+    out = []
+    for para in re.split(r"\n\s*\n", text):
+        joined = " ".join(line.strip() for line in para.splitlines() if line.strip())
+        out.extend(p.strip() for p in _SENT.split(joined) if p.strip())
+    return out
 
 
 def _by_sentence(texts: list[str], run) -> list[str]:
@@ -153,7 +159,7 @@ class NoTranslator:
         return "off"
 
 
-@lru_cache(maxsize=1)
+@load_once
 def get_translator():
     choice = os.environ.get("SAKSHYA_TRANSLATOR", "auto")
     if choice == "off":

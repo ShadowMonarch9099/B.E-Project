@@ -23,6 +23,7 @@ if os.environ.get("SAKSHYA_TEST_REAL_MODELS") != "1":
     os.environ["SAKSHYA_EMBEDDER"] = "hash"
     os.environ["SAKSHYA_RERANKER"] = "overlap"
     os.environ["SAKSHYA_QUERY_MODELS"] = "off"  # IndicLID, IndicXlit, translation
+    os.environ.setdefault("SAKSHYA_TRANSLATOR", "off")  # no 2.5 GB NLLB in unit tests
 # The answer model is always the scripted fake in unit tests (no key, no cost); the live
 # smoke test in test_answer.py builds the real provider itself.
 os.environ["SAKSHYA_LLM_PROVIDER"] = "fake"

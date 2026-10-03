@@ -22,6 +22,8 @@ import re
 import threading
 from functools import lru_cache
 
+from .loading import load_once
+
 log = logging.getLogger("sakshya.xlit")
 
 REPO = "ai4bharat/IndicXlit"
@@ -179,7 +181,7 @@ class IndicXlit:
             return self._word(word, lang)
 
 
-@lru_cache(maxsize=1)
+@load_once
 def get_xlit() -> IndicXlit:
     return IndicXlit()
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getDocument } from "@/lib/api";
-import { formatBytes, isPending, KIND_LABEL, percent, stageText, statusText } from "@/lib/format";
+import { formatBytes, isPending, KIND_LABEL, languageMix, percent, stageText, statusText } from "@/lib/format";
 import type { DetectionResult, DocSummary } from "@/lib/types";
 import DetectionFacts, { ScriptMixBar } from "./DetectionFacts";
 import PagesPanel from "./PagesPanel";
@@ -103,6 +103,23 @@ export default function DocumentCard({
         <div className="doc-scripts">
           <ScriptMixBar scripts={stats.scripts} />
         </div>
+      )}
+      {doc.status === "indexed" && languageMix(stats.languages) && (
+        <p className="meta doc-langs">Language of the passages (IndicLID): {languageMix(stats.languages)}</p>
+      )}
+      {doc.status === "indexed" && stats.shadow?.state === "building" && (
+        <div className="doc-progress">
+          <div className="bar bar--progress" aria-label="Building the English index">
+            <span style={{ width: stats.shadow.total ? percent((stats.shadow.done ?? 0) / stats.shadow.total) : "4%" }} />
+          </div>
+          <p className="meta">
+            Building the English index for the translate route
+            {stats.shadow.total ? `: ${stats.shadow.done ?? 0} of ${stats.shadow.total} passages translated` : "…"}
+          </p>
+        </div>
+      )}
+      {doc.status === "indexed" && stats.shadow?.state === "failed" && (
+        <p className="note">The English index could not be built; the translate route falls back to direct search.</p>
       )}
 
       <div className="card-actions">

@@ -536,6 +536,10 @@ h2 {
   margin-top: 14px;
 }
 
+.doc-langs {
+  margin-top: 6px;
+}
+
 .card-actions {
   display: flex;
   flex-wrap: wrap;
@@ -1667,5 +1671,110 @@ dd {
   .viewer__panel {
     width: 100%;
     border-left: 0;
+  }
+}
+
+/* ---------- "why this route" panel (plan section 6.5) ---------- */
+
+.why {
+  margin-top: 10px;
+  border-top: 1px dashed var(--line);
+  padding-top: 8px;
+  font-family: var(--body);
+  font-size: 0.86rem;
+}
+
+.why summary {
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-3);
+}
+
+.why summary::-webkit-details-marker {
+  display: none;
+}
+
+.why summary::before {
+  content: "+ ";
+}
+
+.why[open] summary::before {
+  content: "− ";
+}
+
+.why summary strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.why__reason {
+  margin: 8px 0 0;
+  color: var(--ink-2);
+}
+
+.why__views,
+.why__features {
+  display: grid;
+  gap: 6px 16px;
+  margin: 10px 0 0;
+}
+
+.why__views dd {
+  font-family: var(--doc);
+}
+
+.why__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px 20px;
+  margin-top: 6px;
+}
+
+.why__features {
+  grid-template-columns: 1fr 1fr;
+}
+
+.why__probes {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  align-content: start;
+}
+
+.why__probes li {
+  display: grid;
+  grid-template-columns: 76px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-2);
+}
+
+.why__probes li.is-chosen {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.why__probes .bar--value {
+  width: 100%;
+  margin: 0;
+}
+
+.why__note {
+  margin: 10px 0 0;
+  font-size: 0.75rem;
+  color: var(--ink-3);
+}
+
+@media (max-width: 640px) {
+  .why__grid {
+    grid-template-columns: 1fr;
   }
 }

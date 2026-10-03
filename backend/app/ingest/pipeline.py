@@ -1,6 +1,8 @@
 """Background ingestion (plan section 6.2).
 
-detect (at upload) -> viewer PDF -> read every page (text layer or OCR) -> store pages.
+detect (at upload) -> viewer PDF -> read every page (text layer or OCR) -> store pages ->
+page-anchored chunks -> language of each chunk -> E5 vectors -> (searchable) -> English
+shadow index for the translate route.
 
 Runs as a FastAPI background task. One document is ingested at a time, because OCR already
 uses several CPU cores per document. The document's status moves queued -> processing ->
@@ -21,7 +23,7 @@ from ..db.models import utcnow
 from ..index import dense
 from ..inspect_file import script_mix
 from ..ocr import engine_status
-from . import docx_convert, tokens
+from . import docx_convert, language, tokens
 from .chunking import chunk_page
 from .normalize import normalize, script_of
 from .pages import ExtractedPage, docx_paragraphs, extract_pdf, image_to_pdf
@@ -182,10 +184,44 @@ def _ingest(doc_id: str) -> None:
             row.stage = "ocr" if page.source == "ocr" else "reading"
 
     chunks = _chunk_document(doc_id)
+    languages = _identify(doc_id)
     _embed(doc_id)
     stats = {**_page_stats(doc_id), "chunks": chunks, "tokenizer": tokens.tokenizer_name(),
-             "embedding_model": get_embedder().name}
+             "embedding_model": get_embedder().name, "languages": languages,
+             "shadow": {"state": "pending" if language.SHADOW_ON else "off"}}
     _update(doc_id, status="indexed", stage=None, indexed_at=utcnow(), notes=notes, stats=stats)
+    if language.SHADOW_ON:
+        _shadow(doc_id)
+
+
+def _identify(doc_id: str) -> dict:
+    """IndicLID on every chunk (plan section 6.2 step 4)."""
+    _update(doc_id, stage="langid", progress_done=0, progress_total=0)
+    return language.identify_chunks(doc_id, on_progress=lambda done, total: _update(
+        doc_id, progress_done=done, progress_total=total))
+
+
+def _set_stats(doc_id: str, **fields) -> None:
+    with session_scope() as s:
+        doc = s.get(Document, doc_id)
+        if doc is None:
+            raise Cancelled()
+        doc.stats = {**(doc.stats or {}), **fields}
+
+
+def _shadow(doc_id: str) -> None:
+    """Build the English shadow index; the document is already searchable meanwhile."""
+    _set_stats(doc_id, shadow={"state": "building", "done": 0, "total": None})
+    try:
+        info = language.build_shadow(doc_id, on_progress=lambda done, total: _set_stats(
+            doc_id, shadow={"state": "building", "done": done, "total": total}))
+    except Cancelled:
+        raise
+    except Exception as exc:  # the translate route falls back to the direct route
+        log.exception("English shadow index failed for %s", doc_id)
+        _set_stats(doc_id, shadow={"state": "failed", "error": f"{type(exc).__name__}: {exc}"[:300]})
+        return
+    _set_stats(doc_id, shadow=info)
 
 
 def _embed(doc_id: str) -> None:
@@ -195,38 +231,41 @@ def _embed(doc_id: str) -> None:
                                                                        progress_total=total))
 
 
-def backfill_embeddings(wait: bool = False) -> None:
-    """Embed indexed documents that have no vectors for the current model (a new model, or
-    documents indexed before the dense index existed). Runs in the background at startup,
-    so loading or downloading the model never delays the server."""
+def backfill(wait: bool = False) -> None:
+    """Bring indexed documents up to date with stages added later: chunk language, vectors for
+    the current embedding model, and the English shadow index. Runs in the background at
+    startup, so loading or downloading a model never delays the server."""
 
     def work() -> None:
         with session_scope() as s:
             ids = s.scalars(select(Document.id).where(Document.status == "indexed")
                             .order_by(Document.created_at)).all()
-        missing = [i for i in ids if not dense.has_embeddings(i)]
-        if missing:
-            log.info("Embedding %d indexed document(s) for %s", len(missing), get_embedder().name)
-        for doc_id in missing:
+        for doc_id in ids:
             with _lock:
                 try:
-                    _update(doc_id, status="processing")
-                    _embed(doc_id)
-                    with session_scope() as s:
-                        doc = s.get(Document, doc_id)
-                        if doc is not None:
-                            doc.status, doc.stage = "indexed", None
-                            doc.stats = {**(doc.stats or {}), "embedding_model": get_embedder().name}
+                    if language.needs_language(doc_id):
+                        _set_stats(doc_id, languages=language.identify_chunks(doc_id))
+                    if not dense.has_embeddings(doc_id):
+                        log.info("Embedding %s for %s", doc_id, get_embedder().name)
+                        _update(doc_id, status="processing")
+                        _embed(doc_id)
+                        _update(doc_id, status="indexed", stage=None)
+                        _set_stats(doc_id, embedding_model=get_embedder().name)
+                    if language.needs_shadow(doc_id):
+                        _shadow(doc_id)
                 except Cancelled:
                     pass
                 except Exception as exc:
-                    log.exception("Embedding failed for %s", doc_id)
+                    log.exception("Backfill failed for %s", doc_id)
                     try:
                         _update(doc_id, status="failed", stage=None, error=f"{type(exc).__name__}: {exc}"[:500])
                     except Cancelled:
                         pass
 
-    thread = threading.Thread(target=work, name="embed-backfill", daemon=True)
+    thread = threading.Thread(target=work, name="backfill", daemon=True)
     thread.start()
     if wait:
         thread.join()
+
+
+backfill_embeddings = backfill  # the name used before the shadow index existed

@@ -1,8 +1,20 @@
 """Retrieval routes, fusion, reranking and the evidence gate (plan sections 6.4 and 6.7 step 1).
 
-hybrid:  E5 dense + BM25 words + BM25 character n-grams (+ exact number/ID matches), fused
-         with weighted reciprocal rank fusion (RRF), top 40 -> cross-encoder -> top 6.
-direct:  E5 dense only, top 40 -> cross-encoder -> top 6.
+direct:    E5 dense search of the chunks as written, with the question's views.
+translate: the question in English (as typed, or its translation) against the English shadow
+           index (each chunk translated to English and embedded with E5).
+hybrid:    E5 dense + BM25 words + BM25 character n-grams (+ exact number/ID matches),
+           fused with weighted reciprocal rank fusion (RRF).
+Every route: top 40 -> the same cross-encoder, on the chunks as written -> top 6, so the
+routes differ only in the candidates they find (plan section 6.4; RQ1 compares them).
+
+Unless a route is forced, the rule-based router (app/retrieval/router.py) chooses one. All
+first-stage lists are computed once; each route's top three candidates are reranked (the
+"probe"), which gives the router comparable scores across routes and goes to query_logs.
+
+OCR-aware fusion (N3, section 6.6): in the hybrid route, a chunk from a low-confidence scan
+gets more weight from the character n-gram list and less from the word list, because OCR
+errors break whole words but leave most of their character n-grams intact.
 
 Every route searches with all of the question's views (plan section 6.3, app/retrieval/
 query.py): as typed, the Devanagari transliteration of a romanized question, and the English
@@ -27,11 +39,12 @@ from ..ml.reranker import get_reranker
 from .chunks import ChunkInfo, load_chunks
 from .numbers import exact_matches
 from .query import AnalysisOptions, QueryAnalysis, analyse_query
+from .router import Decision, choose, features
 
 RRF_K = 60
 TOP_K = int(os.environ.get("SAKSHYA_TOP_K", "40"))
 TOP_N = int(os.environ.get("SAKSHYA_TOP_N", "6"))
-WEIGHTS = {"dense": 1.0, "word": 1.0, "char": 0.6, "exact": 0.8}
+WEIGHTS = {"dense": 1.0, "word": 1.0, "char": 0.6, "exact": 0.8, "translate": 1.0}
 # Measured with tools/gate_probe.py on 24 hand-written questions over two of the team's
 # sample GRs. With the as-typed question only (phase 4): answerable 0.077-1.000, unanswerable
 # 0.002-0.063, so tau was 0.07. With the transliterated and translated views (phase 6), the
@@ -80,6 +93,7 @@ class Retrieval:
     chunks: dict[int, ChunkInfo]
     latency_ms: dict[str, float]
     analysis: QueryAnalysis | None = None
+    decision: "Decision | None" = None
 
     def nearest_pages(self, n: int = NEAREST_PAGES) -> list[dict]:
         """The best distinct pages, for an abstention."""
@@ -100,15 +114,34 @@ class Retrieval:
                 "candidates": [c.as_log() for c in self.candidates]}
 
 
-def fuse(lists: dict[str, list[tuple[int, float]]], weights: dict[str, float]) -> list[Candidate]:
-    """Weighted reciprocal rank fusion: sum over lists of weight / (60 + rank)."""
+OCR_LOW = 0.85  # below this page OCR confidence, fusion shifts toward character n-grams
+OCR_AWARE = True
+
+
+def ocr_weight(name: str, base: float, conf: float | None) -> float:
+    """The weight of one list for one chunk, given the chunk's OCR confidence (None = native)."""
+    if conf is None or conf >= OCR_LOW:
+        return base
+    damage = (OCR_LOW - conf) / OCR_LOW  # 0 at the threshold, up to 1 for an unreadable page
+    if name == "char":
+        return base * (1 + 1.5 * damage)
+    if name == "word":
+        return base * (1 - 0.5 * damage)
+    return base
+
+
+def fuse(lists: dict[str, list[tuple[int, float]]], weights: dict[str, float],
+         ocr: dict[int, float | None] | None = None) -> list[Candidate]:
+    """Weighted reciprocal rank fusion: sum over lists of weight / (60 + rank). With `ocr`
+    (chunk id -> OCR confidence), the word and character weights follow each chunk's OCR."""
     out: dict[int, Candidate] = {}
     for name, hits in lists.items():
-        w = weights.get(name, 0.0)
+        base = weights.get(name, 0.0)
         for rank, (cid, score) in enumerate(hits, start=1):
             c = out.setdefault(cid, Candidate(cid))
             c.ranks[name] = rank
             c.scores[name] = score
+            w = ocr_weight(name, base, ocr.get(cid)) if ocr else base
             c.fused += w / (RRF_K + rank)
     return sorted(out.values(), key=lambda c: -c.fused)
 
@@ -139,10 +172,35 @@ def dense_lists(analysis: QueryAnalysis, doc_ids: list[str] | None, k: int, view
     return sorted(best.items(), key=lambda kv: -kv[1])[:k]
 
 
+ROUTES = ("direct", "translate", "hybrid")
+
+
+def translate_list(analysis: QueryAnalysis, doc_ids: list[str] | None, k: int,
+                   timings: dict | None = None) -> list[tuple[int, float]]:
+    """The translate route: the question in English against the English shadow index."""
+    timings = {} if timings is None else timings
+    query = analysis.english or (analysis.normalized if analysis.lang == "en" else None)
+    if not query:
+        return []
+    t = time.perf_counter()
+    vec = get_embedder().embed_queries([query])[0]
+    timings["embed"] = timings.get("embed", 0.0) + (time.perf_counter() - t) * 1000
+    t = time.perf_counter()
+    hits = dense.search(vec, doc_ids, k, view="en")
+    timings["dense_en"] = (time.perf_counter() - t) * 1000
+    return hits
+
+
 def first_stage(analysis: QueryAnalysis, doc_ids: list[str] | None, route: str = "hybrid",
                 k: int = TOP_K, timings: dict | None = None) -> dict[str, list[tuple[int, float]]]:
     """The candidate lists a route draws from, before fusion."""
     timings = {} if timings is None else timings
+    if route == "translate":
+        hits = translate_list(analysis, doc_ids, k, timings)
+        if hits:
+            return {"translate": hits}
+        timings["translate_fallback"] = 1.0  # no shadow index or no English view: search as direct
+        return {"dense": dense_lists(analysis, doc_ids, k, timings=timings)}
     lists = {"dense": dense_lists(analysis, doc_ids, k, timings=timings)}
     if route == "hybrid":
         t = time.perf_counter()
@@ -169,27 +227,94 @@ def rerank(question_views: list[str], candidates: list[Candidate], chunks: dict[
     candidates.sort(key=lambda c: -(c.rerank or 0.0))
 
 
-def retrieve(question: str, doc_ids: list[str] | None, route: str = "hybrid", k: int = TOP_K,
+ROUTE_LISTS = {"direct": ("dense",), "translate": ("translate",), "hybrid": ("dense", "word", "char", "exact")}
+PROBE_TOP = 3
+
+
+def _ocr_of(ids: list[int]) -> dict[int, float | None]:
+    if not ids:
+        return {}
+    from sqlalchemy import select
+
+    from ..db import Chunk, session_scope
+
+    with session_scope() as s:
+        return dict(s.execute(select(Chunk.id, Chunk.ocr_conf).where(Chunk.id.in_(ids))).all())
+
+
+def all_lists(analysis: QueryAnalysis, doc_ids: list[str] | None, k: int, timings: dict) -> dict:
+    """Every first-stage list, computed once: dense, word, char, exact, translate."""
+    lists = first_stage(analysis, doc_ids, "hybrid", k, timings)
+    lists["translate"] = translate_list(analysis, doc_ids, k, timings)
+    return lists
+
+
+def route_lists(lists: dict, route: str, timings: dict | None = None) -> dict:
+    chosen = {name: lists[name] for name in ROUTE_LISTS[route] if lists.get(name)}
+    if route == "translate" and not chosen:  # no shadow index or no English view
+        if timings is not None:
+            timings["translate_fallback"] = 1.0
+        chosen = {"dense": lists.get("dense", [])}
+    return chosen
+
+
+def retrieve(question: str, doc_ids: list[str] | None, route: str | None = "hybrid", k: int = TOP_K,
              n: int = TOP_N, tau: float = GATE_TAU, weights: dict[str, float] | None = None,
-             analysis: QueryAnalysis | None = None, options: AnalysisOptions | None = None) -> Retrieval:
-    if route not in {"hybrid", "direct"}:
+             analysis: QueryAnalysis | None = None, options: AnalysisOptions | None = None,
+             probe: bool = True, ocr_aware: bool | None = None) -> Retrieval:
+    """Retrieve for one question. route=None lets the router choose; probe=False skips the
+    per-route probe (cheaper; used by evaluations of a fixed route)."""
+    if route is not None and route not in ROUTES:
         raise ValueError(f"unknown route {route}")
+    weights = weights or WEIGHTS
+    ocr_aware = OCR_AWARE if ocr_aware is None else ocr_aware
     timings: dict[str, float] = {}
     t0 = time.perf_counter()
     if analysis is None:
         analysis = analyse_query(question, options)
     timings.update(analysis.latency_ms)
-    lists = first_stage(analysis, doc_ids, route, k, timings)
-    candidates = fuse(lists, weights or WEIGHTS)[:k]
+    rerank_views = [question] + ([analysis.devanagari] if analysis.devanagari else [])
+
+    if route is not None and not probe:
+        lists = route_lists(first_stage(analysis, doc_ids, route, k, timings), route, timings)
+        decision = None
+    else:
+        lists_all = all_lists(analysis, doc_ids, k, timings)
+        t = time.perf_counter()
+        probe_ids = {r: [c.chunk_id for c in fuse(route_lists(lists_all, r), weights)[:PROBE_TOP]] for r in ROUTES}
+        probe_chunks = load_chunks(sorted({cid for ids in probe_ids.values() for cid in ids}))
+        probe_cands = {cid: Candidate(cid) for cid in probe_chunks}
+        rerank(rerank_views, list(probe_cands.values()), probe_chunks)
+        probes = {}
+        for r, ids in probe_ids.items():
+            scored = [(cid, probe_cands[cid].rerank or 0.0) for cid in ids if cid in probe_cands]
+            probes[r] = {"best": round(max((sc for _, sc in scored), default=0.0), 4),
+                         "top": [{"chunk_id": cid, "page_no": probe_chunks[cid].page_no, "rerank": round(sc, 4)}
+                                 for cid, sc in scored]}
+        timings["probe"] = (time.perf_counter() - t) * 1000
+        top_dense = [cid for cid, _ in lists_all.get("dense", [])[:5]]
+        ocr_top = _ocr_of(top_dense)
+        feats = features(analysis, doc_ids, [ocr_top.get(cid) for cid in top_dense])
+        if route is None:
+            decision = choose(feats, probes)
+        else:
+            decision = Decision(route, "forced", "The route was set by the request.", feats, probes)
+        route = decision.route
+        lists = route_lists(lists_all, route, timings)
+
+    ids = sorted({cid for hits in lists.values() for cid, _ in hits})
+    ocr_map = _ocr_of(ids) if (ocr_aware and route == "hybrid") else None
+    candidates = fuse(lists, weights, ocr_map)[:k]
     chunks = load_chunks([c.chunk_id for c in candidates])
     candidates = [c for c in candidates if c.chunk_id in chunks]
 
     t = time.perf_counter()
-    rerank_views = [question] + ([analysis.devanagari] if analysis.devanagari else [])
     rerank(rerank_views, candidates, chunks)
     timings["rerank"] = (time.perf_counter() - t) * 1000
     top = candidates[:n]
     gate = evidence_gate(top, tau)
     timings["retrieval_total"] = (time.perf_counter() - t0) * 1000
-    return Retrieval(question, analysis.normalized, route, lists, candidates, top, gate, chunks,
-                     {key: round(v, 1) for key, v in timings.items()}, analysis)
+    r = Retrieval(question, analysis.normalized, route, lists, candidates, top, gate, chunks,
+                  {key: round(v, 1) for key, v in timings.items()}, analysis)
+    r.decision = decision
+    return r

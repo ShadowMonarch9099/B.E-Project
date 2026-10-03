@@ -7,6 +7,7 @@ from ..index.lexical import get_lexical_index
 from ..ingest.normalize import normalize
 from ..ml.embedder import get_embedder
 from ..retrieval.chunks import load_chunks
+from ..retrieval.hybrid import ROUTES, retrieve
 from .documents import require_db
 
 router = APIRouter(prefix="/api/search", tags=["search"])
@@ -26,3 +27,15 @@ def search(q: str = Query(..., min_length=1, max_length=1000), doc_id: list[str]
     return {"query": q, "normalized": norm,
             "hits": {name: [{"score": round(score, 4), **info[cid].as_dict()} for cid, score in lst if cid in info]
                      for name, lst in hits.items()}}
+
+
+@router.get("/route", dependencies=[Depends(require_db)])
+def search_route(q: str = Query(..., min_length=1, max_length=1000), doc_id: list[str] | None = Query(None),
+                 route: str = Query("hybrid", pattern="^(direct|translate|hybrid)$")) -> dict:
+    """One route end to end (views, first stage, reranking, gate), without answering."""
+    r = retrieve(q, doc_id, route=route)
+    return {"route": route, "routes": list(ROUTES), "analysis": r.analysis.as_log() if r.analysis else None,
+            "gate": r.gate.as_dict(), "latency_ms": r.latency_ms,
+            "lists": {name: len(hits) for name, hits in r.lists.items()},
+            "top": [{"rerank": round(c.rerank or 0, 4), "ranks": c.ranks, **r.chunks[c.chunk_id].as_dict()}
+                    for c in r.top]}

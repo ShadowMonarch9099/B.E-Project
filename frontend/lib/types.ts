@@ -66,6 +66,16 @@ export interface DocStats {
   check_pages?: number;
   words?: number;
   scripts?: ScriptMix | null;
+  languages?: Record<string, number>;
+  shadow?: {
+    state: "pending" | "building" | "ready" | "failed" | "off";
+    done?: number;
+    total?: number | null;
+    translated?: number;
+    copied_english?: number;
+    model?: string | string[] | null;
+    error?: string;
+  };
 }
 
 export interface DocSummary {
@@ -157,7 +167,24 @@ export interface Gate {
   reason: string;
 }
 
+export interface Routing {
+  route: string;
+  rule: string;
+  reason: string;
+  override: string | null;
+  features: Record<string, unknown> & {
+    doc_lang_mix?: Record<string, number>;
+    scanned_share?: number;
+    top_dense_ocr_conf?: number | null;
+    code_mix?: number;
+  };
+  probes: Record<string, { best: number | null; page: number | null }>;
+  views: Record<string, string>;
+  numbers: string[];
+}
+
 export interface AnswerPayload {
+  routing?: Routing | null;
   kind: "answer";
   segments: { text: string; citations: Citation[] }[];
   status: "complete" | "cut_short" | "refused";
@@ -170,6 +197,7 @@ export interface AnswerPayload {
 }
 
 export interface AbstainPayload {
+  routing?: Routing | null;
   kind: "abstain";
   reason: string;
   gate: Gate;
@@ -179,6 +207,7 @@ export interface AbstainPayload {
 }
 
 export interface ErrorPayload {
+  routing?: Routing | null;
   kind: "error";
   code: string;
   message: string;

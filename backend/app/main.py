@@ -18,7 +18,7 @@ from .db import init_db
 from .db.session import status as db_status
 from .detection import analyse, detect as detect_type, get_magika
 from .ingest import docx_convert
-from .ingest.pipeline import backfill_embeddings, resume_pending
+from .ingest.pipeline import backfill, resume_pending
 from .llm import get_provider
 from .ml import embedder, langid, reranker, translate, warmup
 from .ocr import OcrUnavailable, engine_status, run_ocr
@@ -38,7 +38,7 @@ async def lifespan(_: FastAPI):
     warmup.start()  # the retrieval and language models load in the background
     if init_db():
         resume_pending()
-        backfill_embeddings()
+        backfill()
     yield
 
 

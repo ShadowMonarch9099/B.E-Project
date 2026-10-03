@@ -2,6 +2,7 @@
 
 import json
 import logging
+from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
@@ -23,6 +24,8 @@ class NewConversation(BaseModel):
 
 class NewMessage(BaseModel):
     question: str = Field(..., min_length=1, max_length=1000)
+    # Force a route (evaluation, demos). By default the router chooses.
+    route: Literal["direct", "translate", "hybrid"] | None = None
 
 
 def conversation_view(c: Conversation, messages: list[Message] | None = None) -> dict:
@@ -84,7 +87,7 @@ async def post_message(conversation_id: str, body: NewMessage):
 
     async def events():
         try:
-            async for event, data in ask(conversation_id, question):
+            async for event, data in ask(conversation_id, question, route=body.route):
                 yield _sse(event, data)
         except NotFound:
             yield _sse("error", {"code": "not_found", "message": "No such conversation."})

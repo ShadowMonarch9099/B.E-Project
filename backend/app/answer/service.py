@@ -116,6 +116,22 @@ def _write_log(**fields) -> int:
         return row.id
 
 
+ROUTING_FEATURES = ("lang", "script", "romanized", "code_mix", "has_number_or_id", "question_type",
+                    "doc_main_lang", "doc_lang_mix", "scanned_share", "top_dense_ocr_conf", "shadow_ready")
+
+
+def routing_view(r: Retrieval) -> dict | None:
+    """What the "why this route" panel shows: the decision, its features and the probes."""
+    d, a = r.decision, r.analysis
+    if d is None:
+        return None
+    return {"route": d.route, "rule": d.rule, "reason": d.reason, "override": d.override,
+            "features": {k: d.features.get(k) for k in ROUTING_FEATURES},
+            "probes": {name: {"best": p.get("best"), "page": (p.get("top") or [{}])[0].get("page_no")}
+                       for name, p in d.probes.items()},
+            "views": a.views() if a else {}, "numbers": a.numbers if a else []}
+
+
 def _answer_payload(result: AnswerResult, r: Retrieval) -> dict:
     segments = []
     for seg in result.segments:
@@ -123,12 +139,12 @@ def _answer_payload(result: AnswerResult, r: Retrieval) -> dict:
         segments.append({"text": seg.text, "citations": cits})
     return {"kind": "answer", "segments": segments, "status": result.status, "model": result.model,
             "fallback_used": result.fallback_used, "refusal_category": result.refusal_category,
-            "route": r.route, "gate": r.gate.as_dict()}
+            "route": r.route, "gate": r.gate.as_dict(), "routing": routing_view(r)}
 
 
 def _retrieval_view(r: Retrieval) -> dict:
     a = r.analysis
-    return {"route": r.route, "gate": r.gate.as_dict(), "latency_ms": r.latency_ms,
+    return {"route": r.route, "gate": r.gate.as_dict(), "latency_ms": r.latency_ms, "routing": routing_view(r),
             "query": {"lang": a.lang, "romanized": a.romanized, "views": a.views(), "numbers": a.numbers}
             if a else None,
             "top": [{"chunk_id": c.chunk_id, "page_no": r.chunks[c.chunk_id].page_no,
@@ -136,26 +152,28 @@ def _retrieval_view(r: Retrieval) -> dict:
                     for c in r.top]}
 
 
-async def ask(conversation_id: str, question: str) -> AsyncIterator[tuple[str, dict]]:
+async def ask(conversation_id: str, question: str, route: str | None = None) -> AsyncIterator[tuple[str, dict]]:
     t0 = time.perf_counter()
     doc_ids, history = await to_thread.run_sync(_load, conversation_id)
     user = await to_thread.run_sync(_add_message, conversation_id, "user", question, "complete", {})
     yield "status", {"stage": "retrieving", "user_message": user}
 
-    r = await to_thread.run_sync(retrieve, question, doc_ids)
+    r = await to_thread.run_sync(lambda: retrieve(question, doc_ids, route=route))
     yield "retrieval", _retrieval_view(r)
     provider = get_provider()
     base_log = dict(conversation_id=conversation_id, doc_ids=doc_ids or [], question=question,
                     views=r.analysis.as_log() if r.analysis else {"as_typed": question},
-                    features=query_features(question, r.analysis), route=r.route,
-                    route_reason="fixed route (rule-based router comes in phase 8)", route_scores={},
+                    features={**query_features(question, r.analysis), **(r.decision.features if r.decision else {})},
+                    route=r.route,
+                    route_reason=(f"[{r.decision.rule}] {r.decision.reason}" if r.decision else None),
+                    route_scores=r.decision.probes if r.decision else {},
                     candidates=r.log(), reranked=[c.as_log() for c in r.top], gate=r.gate.as_dict(),
                     config={"top_k": TOP_K, "top_n": TOP_N, "tau": GATE_TAU, "weights": WEIGHTS,
                             "provider": provider.status()})
 
     if not r.gate.passed:
         payload = {"kind": "abstain", "reason": r.gate.reason, "gate": r.gate.as_dict(),
-                   "nearest": r.nearest_pages(), "route": r.route}
+                   "nearest": r.nearest_pages(), "route": r.route, "routing": routing_view(r)}
         latency = {**r.latency_ms, "total": round((time.perf_counter() - t0) * 1000, 1)}
         log_id = await to_thread.run_sync(lambda: _write_log(**base_log, abstained=True, llm_called=False,
                                                              latency_ms=latency))
@@ -187,7 +205,7 @@ async def ask(conversation_id: str, question: str) -> AsyncIterator[tuple[str, d
             **base_log, abstained=False, llm_called=exc.code != "not_configured",
             llm={**provider.status(), "error_code": exc.code}, error=exc.message, latency_ms=latency))
         payload = {"kind": "error", "code": exc.code, "message": exc.message, "nearest": r.nearest_pages(),
-                   "route": r.route, "gate": r.gate.as_dict(), "query_log_id": log_id}
+                   "route": r.route, "gate": r.gate.as_dict(), "routing": routing_view(r), "query_log_id": log_id}
         msg = await to_thread.run_sync(_add_message, conversation_id, "assistant", "", "error", payload, log_id)
         yield "answer", msg
         yield "done", {"message_id": msg["id"], "query_log_id": log_id}

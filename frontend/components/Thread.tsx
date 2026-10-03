@@ -2,6 +2,7 @@
 
 import { percent } from "@/lib/format";
 import type { AbstainPayload, AnswerPayload, ChatMessage, Citation, ErrorPayload, NearestPage } from "@/lib/types";
+import WhyRoute from "./WhyRoute";
 
 export type OpenCitation = (c: Citation) => void;
 
@@ -99,6 +100,7 @@ function AssistantMessage({ m, onOpen, onRetry }: { m: ChatMessage; onOpen: Open
           Sakshya did not call the answer model: {p.reason}.
         </p>
         <NearestList pages={p.nearest} onOpen={onOpen} />
+        {p.routing && <WhyRoute routing={p.routing} />}
       </div>
     );
   }
@@ -117,6 +119,7 @@ function AssistantMessage({ m, onOpen, onRetry }: { m: ChatMessage; onOpen: Open
             <NearestList pages={p.nearest} onOpen={onOpen} />
           </>
         )}
+        {p.routing && <WhyRoute routing={p.routing} />}
       </div>
     );
   }
@@ -130,6 +133,7 @@ function AssistantMessage({ m, onOpen, onRetry }: { m: ChatMessage; onOpen: Open
   return (
     <div className="msg msg--assistant">
       {p.kind === "answer" ? <Answer payload={p} onOpen={onOpen} /> : <p className="answer-text">{m.content}</p>}
+      {p.kind === "answer" && p.routing && <WhyRoute routing={p.routing} />}
     </div>
   );
 }

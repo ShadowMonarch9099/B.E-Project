@@ -21,9 +21,10 @@ import threading
 import urllib.request
 import zipfile
 from dataclasses import asdict, dataclass, field
-from functools import lru_cache
 
 from .. import config
+
+from .loading import load_once
 
 log = logging.getLogger("sakshya.langid")
 
@@ -159,7 +160,7 @@ class IndicLID:
         return en > indic and en >= 0.3
 
 
-@lru_cache(maxsize=1)
+@load_once
 def get_langid() -> IndicLID:
     return IndicLID()
 

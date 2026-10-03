@@ -90,3 +90,12 @@ export function pageSourceLabel(p: Pick<PageInfo, "source" | "ocr_reason">): str
   if (p.ocr_reason === "broken_text") return "OCR · broken text layer";
   return "OCR";
 }
+
+export const LANG_NAME: Record<string, string> = { en: "English", hi: "Hindi", mr: "Marathi" };
+
+export function languageMix(mix: Record<string, number> | undefined): string | null {
+  if (!mix || Object.keys(mix).length === 0) return null;
+  return Object.entries(mix)
+    .map(([lang, share]) => `${LANG_NAME[lang] ?? lang} ${percent(share)}`)
+    .join(" · ");
+}
