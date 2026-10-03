@@ -108,7 +108,9 @@ function Answer({ payload, onOpen }: { payload: AnswerPayload; onOpen: OpenCitat
       )}
       {note && <p className="msg-note">{note}</p>}
       {payload.status === "cut_short" && <p className="msg-note">The answer was cut short before it finished.</p>}
-      {payload.fallback_used && <p className="msg-note">Answered by a fallback model after the first model declined.</p>}
+      {payload.fallback_used && (
+        <p className="msg-note">Answered by {payload.model ?? "a fallback model"} because the first answer model could not answer.</p>
+      )}
       {removed.length > 0 && (
         <details className="removed">
           <summary>

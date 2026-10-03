@@ -104,10 +104,18 @@ export default function AskBar({
           </button>
         </div>
         <p className="askbar__hint">
-          Answers are written by Claude (Anthropic API); the passages used for each answer are sent to it.
+          {answerNotice(llm)}
           {llm && !llm.configured && <strong> No API key is set yet: questions are searched, and answers explain how to add one.</strong>}
         </p>
       </form>
     </div>
   );
+}
+
+/** Who writes the answers, as the backend reports it (never a key). */
+function answerNotice(llm?: LlmStatus): string {
+  if (!llm?.provider) return "Answers are written by the answer model; the passages used for each answer are sent to it.";
+  const ready = (llm.chain ?? []).filter((p) => p.configured && p.provider !== llm.provider).map((p) => p.provider);
+  const backup = ready.length ? `, with ${ready.join(" and ")} as fallback` : "";
+  return `Answers are written by ${llm.model ?? "the answer model"} on ${llm.provider}${backup}; the passages used for each answer are sent to it.`;
 }

@@ -27,6 +27,8 @@ if os.environ.get("SAKSHYA_TEST_REAL_MODELS") != "1":
 # The answer model is always the scripted fake in unit tests (no key, no cost); the live
 # smoke test in test_answer.py builds the real provider itself.
 os.environ["SAKSHYA_LLM_PROVIDER"] = "fake"
+os.environ["SAKSHYA_INGEST_INLINE"] = "1"  # ingest during the upload request, as the tests expect
+os.environ.setdefault("SAKSHYA_TEXT_CHECK", "off")  # tests/test_textcheck.py switches it on
 
 if _pg:
     from sqlalchemy import create_engine, make_url, text

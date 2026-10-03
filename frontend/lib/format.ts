@@ -56,6 +56,7 @@ export const CHECK_REASON_LABEL: Record<string, string> = {
 
 const STAGE_LABEL: Record<string, string> = {
   preparing: "Preparing the file",
+  checking: "Checking the text layer against OCR of one page",
   reading: "Reading the text layer",
   ocr: "Reading scanned pages with OCR (Tesseract mar+hin+eng)",
   chunking: "Splitting pages into passages",
@@ -75,7 +76,7 @@ export function statusText(doc: DocSummary): string {
   if (doc.status === "indexed") return "Indexed";
   const { done, total } = doc.progress;
   if (total > 0 && (doc.stage === "reading" || doc.stage === "ocr")) return `Indexing… page ${done} of ${total}`;
-  if (total > 0 && doc.stage && doc.stage !== "preparing") return `Indexing… ${done} of ${total}`;
+  if (total > 0 && doc.stage && doc.stage !== "preparing" && doc.stage !== "checking") return `Indexing… ${done} of ${total}`;
   return "Indexing…";
 }
 
@@ -88,6 +89,7 @@ export function pageSourceLabel(p: Pick<PageInfo, "source" | "ocr_reason">): str
   if (p.source === "docx") return "Word document";
   if (p.ocr_reason === "legacy_font") return "OCR · legacy font";
   if (p.ocr_reason === "broken_text") return "OCR · broken text layer";
+  if (p.ocr_reason === "text_mismatch") return "OCR · text layer did not match the page";
   return "OCR";
 }
 

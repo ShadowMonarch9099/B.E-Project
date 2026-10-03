@@ -174,3 +174,19 @@ def test_control_characters_in_pdf_metadata_are_dropped():
     facts.add("Created with", "Adobe PSL 1.3e for Canon" + chr(0))
     facts.add("Title", chr(0))
     assert facts.items == [("Created with", "Adobe PSL 1.3e for Canon")]
+
+
+def test_queued_ingestion_does_not_hold_the_request(monkeypatch):
+    """Uploads only queue the document; one worker thread ingests them in turn."""
+    import threading
+
+    from app.ingest import pipeline
+
+    seen, done = [], threading.Event()
+    monkeypatch.delenv("SAKSHYA_INGEST_INLINE")
+    monkeypatch.setattr(pipeline, "run_ingestion", lambda doc_id: (seen.append(doc_id),
+                                                                   done.set() if len(seen) == 3 else None))
+    for i in range(3):
+        pipeline.enqueue(f"doc-{i}")  # returns at once
+    assert done.wait(5) and seen == ["doc-0", "doc-1", "doc-2"]
+    assert pipeline._worker.name == "ingest"

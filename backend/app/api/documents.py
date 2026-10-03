@@ -11,7 +11,7 @@ from .. import config, storage
 from ..catalog import OCR_IMAGE_LABELS
 from ..db import Chunk, Document, Page, get_session, is_ready
 from ..detection import analyse
-from ..ingest.pipeline import PENDING, run_ingestion
+from ..ingest.pipeline import PENDING, enqueue
 
 router = APIRouter(prefix="/api/documents", tags=["documents"])
 
@@ -104,7 +104,7 @@ def upload(background: BackgroundTasks, file: UploadFile = File(...), s: Session
     ext = PurePath(name).suffix.lower().lstrip(".") or label
     doc.original_path = storage.keep(received, doc.id, ext)
     s.commit()
-    background.add_task(run_ingestion, doc.id)
+    background.add_task(enqueue, doc.id)
     return JSONResponse(status_code=201, content={"duplicate": False, "document": summary(doc),
                                                   "detection": detection})
 
@@ -161,7 +161,7 @@ def reindex(doc_id: str, background: BackgroundTasks, s: Session = Depends(get_s
     doc.detection, doc.kind = detection, _kind(detection)
     doc.status, doc.stage, doc.error = "queued", None, None
     s.commit()
-    background.add_task(run_ingestion, doc.id)
+    background.add_task(enqueue, doc.id)
     return summary(doc)
 
 

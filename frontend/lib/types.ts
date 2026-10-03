@@ -103,7 +103,7 @@ export interface PageInfo {
   page_no: number;
   source: "native" | "ocr" | "docx";
   ocr_conf: number | null;
-  ocr_reason: "no_text_layer" | "legacy_font" | "broken_text" | null;
+  ocr_reason: "no_text_layer" | "legacy_font" | "broken_text" | "text_mismatch" | null;
   check_reason: "low_confidence" | "no_text" | "ocr_unavailable" | null;
   word_count: number;
   width?: number | null;
@@ -255,9 +255,13 @@ export interface Conversation {
   messages?: ChatMessage[];
 }
 
-export interface LlmStatus {
-  provider: string;
+export interface LlmProviderStatus {
+  provider: string | null;
   configured: boolean;
-  model: string;
-  effort: string | null;
+  model: string | null;
+}
+
+export interface LlmStatus extends LlmProviderStatus {
+  effort?: string | null;
+  chain?: LlmProviderStatus[]; // OpenAI-compatible providers, in fallback order
 }

@@ -30,7 +30,7 @@ class ExtractedPage:
     height: float | None
     paragraphs: list[list[list[dict]]] = field(default_factory=list)
     ocr_conf: float | None = None  # 0-1
-    ocr_reason: str | None = None  # no_text_layer / legacy_font / broken_text
+    ocr_reason: str | None = None  # no_text_layer / legacy_font / broken_text / text_mismatch
     check_reason: str | None = None  # low_confidence / no_text / ocr_unavailable
 
     def build(self) -> tuple[str, list]:
@@ -124,8 +124,13 @@ def _ocr_page(image: Image.Image, page_no: int, width: float, height: float, rea
 
 
 def extract_pdf(path, ocr_available: bool, source_for_text: str = "native",
-                on_total: Callable[[int], None] | None = None) -> Iterator[ExtractedPage]:
-    """Yield every page of a PDF, in completion order (OCR'd pages run in parallel)."""
+                on_total: Callable[[int], None] | None = None,
+                distrust_devanagari: bool = False) -> Iterator[ExtractedPage]:
+    """Yield every page of a PDF, in completion order (OCR'd pages run in parallel).
+    distrust_devanagari: the text layer failed the OCR comparison (app/ingest/textcheck.py), so
+    pages with Devanagari text are OCR'd too."""
+    from .textcheck import PAGE_DEVANAGARI, devanagari_count
+
     import pymupdf
 
     pymupdf.TOOLS.mupdf_display_errors(False)
@@ -140,6 +145,8 @@ def extract_pdf(path, ocr_available: bool, source_for_text: str = "native",
             for i in range(doc.page_count):
                 page = doc[i]
                 kind, _, _ = classify_page(page)
+                if kind == "text" and distrust_devanagari and devanagari_count(page.get_text()) >= PAGE_DEVANAGARI:
+                    kind = "mismatch"
                 if kind == "text":
                     yield native_page(page, i + 1, source_for_text)
                     continue

@@ -41,7 +41,8 @@ WINDOWS_DEFAULT = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 
 # Why a PDF page is OCR'd, by its classify_page() kind.
-OCR_REASON = {"none": "no_text_layer", "legacy": "legacy_font", "broken": "broken_text"}
+OCR_REASON = {"none": "no_text_layer", "legacy": "legacy_font", "broken": "broken_text",
+              "mismatch": "text_mismatch"}
 
 
 class OcrUnavailable(RuntimeError):

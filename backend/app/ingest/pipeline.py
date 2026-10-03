@@ -11,6 +11,8 @@ by a restart are picked up again when the app starts.
 """
 
 import logging
+import os
+import queue
 import threading
 from collections import Counter
 
@@ -23,7 +25,7 @@ from ..db.models import utcnow
 from ..index import dense
 from ..inspect_file import script_mix
 from ..ocr import engine_status
-from . import docx_convert, language, tokens
+from . import docx_convert, language, textcheck, tokens
 from .chunking import chunk_page
 from .normalize import normalize, script_of
 from .pages import ExtractedPage, docx_paragraphs, extract_pdf, image_to_pdf
@@ -54,6 +56,40 @@ def run_ingestion(doc_id: str) -> None:
                 pass
 
 
+# One worker thread ingests queued documents in turn. Uploads only put an id on the queue, so a
+# batch of uploads never ties up the web server's thread pool (which once froze the API while
+# 40 documents waited for the ingestion lock).
+_queue: "queue.Queue[str]" = queue.Queue()
+_worker: threading.Thread | None = None
+_worker_lock = threading.Lock()
+
+
+def _work() -> None:
+    while True:
+        doc_id = _queue.get()
+        try:
+            run_ingestion(doc_id)
+        finally:
+            _queue.task_done()
+
+
+def enqueue(doc_id: str) -> None:
+    """Queue a document for ingestion. SAKSHYA_INGEST_INLINE=1 (the tests) ingests it now instead."""
+    global _worker
+    if os.environ.get("SAKSHYA_INGEST_INLINE") == "1":
+        run_ingestion(doc_id)
+        return
+    _queue.put(doc_id)
+    with _worker_lock:
+        if _worker is None or not _worker.is_alive():
+            _worker = threading.Thread(target=_work, name="ingest", daemon=True)
+            _worker.start()
+
+
+def queue_length() -> int:
+    return _queue.qsize()
+
+
 def resume_pending() -> None:
     """Re-queue documents a previous run left unfinished (called once at startup)."""
     with session_scope() as s:
@@ -63,8 +99,8 @@ def resume_pending() -> None:
             doc.status, doc.stage = "queued", None
     if ids:
         log.info("Resuming ingestion of %d document(s)", len(ids))
-        threading.Thread(target=lambda: [run_ingestion(i) for i in ids], name="ingest-resume",
-                         daemon=True).start()
+        for doc_id in ids:
+            enqueue(doc_id)
 
 
 def _update(doc_id: str, **fields) -> None:
@@ -161,6 +197,7 @@ def _ingest(doc_id: str) -> None:
     first_stage = "ocr" if doc.kind in OCR_KINDS else "reading"
     _update(doc_id, viewer_path=viewer_path, anchor=anchor, notes=notes, stage=first_stage)
 
+    check = None
     if anchor == "paragraph":
         pages = iter([docx_paragraphs(storage.resolve(doc.original_path))])
         _update(doc_id, progress_total=1, page_count=1)
@@ -168,9 +205,17 @@ def _ingest(doc_id: str) -> None:
         ocr_ok = engine_status()["available"]
         if not ocr_ok:
             notes.append("OCR is not available, so pages without a usable text layer were left empty.")
+        if ocr_ok and doc.label != "docx" and doc.kind not in OCR_KINDS and textcheck.enabled():
+            _update(doc_id, stage="checking")
+            check = textcheck.check_pdf(storage.resolve(viewer_path))
+            if check is not None:
+                _set_stats(doc_id, text_check=check.as_dict())
+                if not check.trusted:
+                    notes.append(check.note())
         pages = extract_pdf(storage.resolve(viewer_path), ocr_ok,
                             source_for_text="docx" if doc.label == "docx" else "native",
-                            on_total=lambda n: _update(doc_id, progress_total=n, page_count=n))
+                            on_total=lambda n: _update(doc_id, progress_total=n, page_count=n),
+                            distrust_devanagari=check is not None and not check.trusted)
 
     done = 0
     for page in pages:
@@ -188,7 +233,8 @@ def _ingest(doc_id: str) -> None:
     _embed(doc_id)
     stats = {**_page_stats(doc_id), "chunks": chunks, "tokenizer": tokens.tokenizer_name(),
              "embedding_model": get_embedder().name, "languages": languages,
-             "shadow": {"state": "pending" if language.SHADOW_ON else "off"}}
+             "shadow": {"state": "pending" if language.SHADOW_ON else "off"},
+             **({"text_check": check.as_dict()} if check is not None else {})}
     _update(doc_id, status="indexed", stage=None, indexed_at=utcnow(), notes=notes, stats=stats)
     if language.SHADOW_ON:
         _shadow(doc_id)
